@@ -24,6 +24,7 @@ bool estDansVector(const edge& e)
     {
       if(e==in[i])
       {
+        posE1=i;
         return true; 
       }
     }
