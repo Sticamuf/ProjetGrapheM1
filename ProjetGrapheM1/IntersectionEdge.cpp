@@ -7,6 +7,8 @@ using ogdf::DPolyline;
 using ogdf::ListIterator;
 using ogdf::DPoint;
 
+
+vector <edge> i;
 bool intersection(const edge& e1,const edge& e2)
 {
   bool inter=false;
