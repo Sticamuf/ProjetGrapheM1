@@ -31,6 +31,12 @@ bool estDansVector(const edge& e)
     return false;
   }
 }
+
+bool surSegment(double px, double py, double qx, double qy, double rx, double ry)
+{
+  
+}
+
 bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 {
   bool inter=false;
