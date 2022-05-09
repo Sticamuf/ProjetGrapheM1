@@ -24,15 +24,12 @@
     <ClCompile Include="main.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="calcEdgeLength.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dispOpenGL.hpp">
       <Filter>Fichiers d%27en-tête\openGL</Filter>
     </ClInclude>
-    <ClInclude Include="calcEdgeLength.h">
+    <ClInclude Include="calcEdgeLength.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="jsonIO.hpp">

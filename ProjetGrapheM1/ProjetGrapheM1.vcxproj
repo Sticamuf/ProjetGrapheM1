@@ -145,11 +145,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="calcEdgeLength.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="calcEdgeLength.h" />
+    <ClInclude Include="calcEdgeLength.hpp" />
     <ClInclude Include="dispOpenGL.hpp" />
     <ClInclude Include="jsonIO.hpp" />
   </ItemGroup>

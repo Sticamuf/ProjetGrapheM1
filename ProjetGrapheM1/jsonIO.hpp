@@ -8,7 +8,7 @@
 
 #include <ogdf/basic/MinHeap.h>
 #include <ogdf/basic/heap/BinaryHeap.h>
-#include "calcEdgeLength.h"
+#include "calcEdgeLength.hpp"
 
 using std::string;
 using nlohmann::json;

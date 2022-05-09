@@ -1,6 +1,9 @@
-#include "calcEdgeLength.h"
+#ifndef CALCEDGELENGTH_HPP
+#define CALCEDGELENGTH_HPP
+#include <ogdf/basic/GraphAttributes.h>
 
-// Calculer la longueur d'un edge
+using namespace ogdf;
+
 double calcEdgeLength(const edge& e, const GraphAttributes& GA) {
     node source = e->source();
     node target = e->target();
@@ -31,3 +34,4 @@ double calcEdgeLength(const edge& e, const GraphAttributes& GA) {
     length += sqrt(pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2));
     return length;
 }
+#endif
