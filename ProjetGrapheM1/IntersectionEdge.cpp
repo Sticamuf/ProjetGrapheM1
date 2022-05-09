@@ -9,5 +9,8 @@ using ogdf::DPoint;
 
 bool intersection(const edge& e1,const edge& e2)
 {
+  bool inter=false;
+  return inter;
+  
   
 }
