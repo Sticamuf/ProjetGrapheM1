@@ -54,6 +54,12 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
   
   double sourceX2 = GA.x(source2);
   double sourceY2 = GA.y(source2);
+  
+  double targetX1 = GA.x(target1);
+  double targetY1 = GA.y(target1);
+  
+  double targetX2 = GA.x(target2);
+  double targetY2 = GA.y(target2);
   return inter;
   
   
