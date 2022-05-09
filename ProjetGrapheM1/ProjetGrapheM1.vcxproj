@@ -151,6 +151,12 @@
     <ClCompile Include="readFromJson.cpp" />
     <ClCompile Include="writeToJson.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="calcEdgeLength.h" />
+    <ClInclude Include="dispOpenGL.h" />
+    <ClInclude Include="readFromJson.h" />
+    <ClInclude Include="writeToJson.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

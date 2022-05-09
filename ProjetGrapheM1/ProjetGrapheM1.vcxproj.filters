@@ -19,6 +19,12 @@
     <Filter Include="Fichiers sources\openGL">
       <UniqueIdentifier>{dd844186-9891-4bbd-80a8-0f0b74d0944a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers d%27en-tête\json">
+      <UniqueIdentifier>{0a0d4067-7e9e-405b-bd3e-1b9775104e6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\openGL">
+      <UniqueIdentifier>{00501fd6-a922-4ae1-a891-3d352fdf7b06}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -36,5 +42,19 @@
     <ClCompile Include="dispOpenGL.cpp">
       <Filter>Fichiers sources\openGL</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="readFromJson.h">
+      <Filter>Fichiers d%27en-tête\json</Filter>
+    </ClInclude>
+    <ClInclude Include="writeToJson.h">
+      <Filter>Fichiers d%27en-tête\json</Filter>
+    </ClInclude>
+    <ClInclude Include="dispOpenGL.h">
+      <Filter>Fichiers d%27en-tête\openGL</Filter>
+    </ClInclude>
+    <ClInclude Include="calcEdgeLength.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

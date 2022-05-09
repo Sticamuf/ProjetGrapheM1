@@ -1,14 +1,7 @@
-#include <ogdf/basic/GraphAttributes.h>
-
-using ogdf::edge;
-using ogdf::GraphAttributes;
-using ogdf::node;
-using ogdf::DPolyline;
-using ogdf::ListIterator;
-using ogdf::DPoint;
+#include "calcEdgeLength.h"
 
 // Calculer la longueur d'un edge
-double calcEdgeLength(edge& e, const GraphAttributes& GA) {
+double calcEdgeLength(const edge& e, const GraphAttributes& GA) {
     node source = e->source();
     node target = e->target();
     double length = 0.0;
@@ -17,14 +10,16 @@ double calcEdgeLength(edge& e, const GraphAttributes& GA) {
     double targetX, targetY;
     DPolyline bends = GA.bends(e);
     if (bends.size() > 0) {
-        int l = 0;
         for (ListIterator<DPoint> i = bends.begin(); i.valid(); i++) {
             targetX = (*i).m_x;
             targetY = (*i).m_y;
+            //alternantive ???
+            //if (sourceX == targetX) { length += abs(targetY - sourceY); }
+            //else if (sourceY == sourceX) { length += abs(targetX - sourceX); }
+            //else
             length += sqrt(pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2));
             sourceX = targetX;
             sourceY = targetY;
-            l++;
         }
     }
     targetX = GA.x(target);

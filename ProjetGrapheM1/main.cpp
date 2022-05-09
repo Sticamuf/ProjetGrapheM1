@@ -1,8 +1,8 @@
 ﻿#include <ogdf/basic/GraphAttributes.h>
 
-#include "writeToJson.cpp"
-#include "readFromJson.cpp"
-#include "dispOpenGL.cpp"
+#include "writeToJson.h"
+#include "readFromJson.h"
+#include "dispOpenGL.h"
 
 using ogdf::Graph;
 using ogdf::GraphAttributes;
@@ -19,10 +19,10 @@ int main() {
     writeToJson("output.json", G, GA, gridWidth, gridHeight, maxBends);
 
     // Affichage openGL
-    srand(time(NULL));
+    srand(static_cast<unsigned int>(time(NULL)));
 
     //debut opengl
-    dispOpenGL(G,GA,gridWidth,gridHeight);
+    //dispOpenGL(G,GA,gridWidth,gridHeight);
     //fin opengl
     return 0;
 }
