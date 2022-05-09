@@ -55,6 +55,7 @@ void dispOpenGL(const Graph& G, /*const*/ GraphAttributes& GA, const int gridWid
     glfwSetKeyCallback(window, key_callback);
     glfwMakeContextCurrent(window);
     int width, height;
+    double tempX, tempY;
     while (!glfwWindowShouldClose(window))
     {
         float ratio;
@@ -72,8 +73,6 @@ void dispOpenGL(const Graph& G, /*const*/ GraphAttributes& GA, const int gridWid
             node n = G.firstNode();
             GA.x(n) += 0.1;
             l.x(n) = (GA.x(n) / gridWidth * 1.9) - 0.95;
-            std::cout << "Layout: " << l.x(n) << std::endl;
-            std::cout << "GA: " << GA.x(n) << std::endl;
             SListPure<edge> edges;
             n->adjEdges(edges);
             for (SListConstIterator<edge> i = edges.begin(); i.valid(); i++) {
@@ -88,12 +87,11 @@ void dispOpenGL(const Graph& G, /*const*/ GraphAttributes& GA, const int gridWid
         {
             glBegin(GL_LINE_STRIP);
             glVertex2d(l.x(e->source()), l.y(e->source()));
-            double tempX, tempY;
             DPolyline& bends = GA.bends(e);
             for (ListIterator<DPoint> i = bends.begin(); i.valid(); i++) {
-                double tempx = ((*i).m_x / (double)gridWidth * 1.9) - 0.95;
-                double tempy = ((*i).m_y / (double)gridHeight * 1.9) - 0.95;
-                glVertex2d(tempx, tempy);
+                tempX = ((*i).m_x / (double)gridWidth * 1.9) - 0.95;
+                tempY = ((*i).m_y / (double)gridHeight * 1.9) - 0.95;
+                glVertex2d(tempX, tempY);
             }
             glVertex2d(l.x(e->target()), l.y(e->target()));
             glEnd();

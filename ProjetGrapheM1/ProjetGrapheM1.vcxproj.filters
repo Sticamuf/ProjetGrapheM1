@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Fichiers sources\json">
-      <UniqueIdentifier>{09ed0969-3b62-4a1e-b38e-9416c3425147}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Fichiers d%27en-tête\json">
       <UniqueIdentifier>{0a0d4067-7e9e-405b-bd3e-1b9775104e6c}</UniqueIdentifier>
     </Filter>
@@ -30,25 +27,16 @@
     <ClCompile Include="calcEdgeLength.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="readFromJson.cpp">
-      <Filter>Fichiers sources\json</Filter>
-    </ClCompile>
-    <ClCompile Include="writeToJson.cpp">
-      <Filter>Fichiers sources\json</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="readFromJson.h">
-      <Filter>Fichiers d%27en-tête\json</Filter>
-    </ClInclude>
-    <ClInclude Include="writeToJson.h">
-      <Filter>Fichiers d%27en-tête\json</Filter>
-    </ClInclude>
     <ClInclude Include="dispOpenGL.hpp">
       <Filter>Fichiers d%27en-tête\openGL</Filter>
     </ClInclude>
     <ClInclude Include="calcEdgeLength.h">
       <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="jsonIO.hpp">
+      <Filter>Fichiers d%27en-tête\json</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

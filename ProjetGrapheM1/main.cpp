@@ -1,7 +1,6 @@
 ﻿#include <ogdf/basic/GraphAttributes.h>
 
-#include "writeToJson.h"
-#include "readFromJson.h"
+#include "jsonIO.hpp"
 #include "dispOpenGL.hpp"
 
 using ogdf::Graph;

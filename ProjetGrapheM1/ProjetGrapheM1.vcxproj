@@ -147,14 +147,11 @@
   <ItemGroup>
     <ClCompile Include="calcEdgeLength.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="readFromJson.cpp" />
-    <ClCompile Include="writeToJson.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="calcEdgeLength.h" />
     <ClInclude Include="dispOpenGL.hpp" />
-    <ClInclude Include="readFromJson.h" />
-    <ClInclude Include="writeToJson.h" />
+    <ClInclude Include="jsonIO.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
