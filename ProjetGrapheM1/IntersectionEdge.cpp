@@ -31,12 +31,23 @@ bool estDansVector(const edge& e)
     return false;
   }
 }
-bool intersection(const edge& e1,const edge& e2)
+bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 {
-  
   bool inter=false;
   //push_back si n'est pas dans le vector
   //erase si on doit l'enlever
+  
+  node source1 = e1->source();
+  node target2 = e2->target();
+  
+  node source2 = e2->source();
+  node target2 = e2->target();
+  
+  double sourceX1 = GA.x(source1);
+  double sourceY1 = GA.y(source1);
+  
+  double sourceX2 = GA.x(source2);
+  double sourceY2 = GA.y(source2);
   return inter;
   
   
