@@ -32,9 +32,13 @@ bool estDansVector(const edge& e)
   }
 }
 
-bool surSegment(double px, double py, double qx, double qy, double rx, double ry)
+bool surSegment(double px, double py, double qx, double qy, double rx, double ry) // pour vérifier si c'est aligné
 {
-  
+	if (qx <= max(px, rx) && qx >= min(px, rx) && qy <= max(py, ry) && qy >= min(py, ry))
+	{
+		return true;
+	}
+    return false;
 }
 
 bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
@@ -44,7 +48,7 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
   //erase si on doit l'enlever
   
   node source1 = e1->source();
-  node target2 = e2->target();
+  node target1 = e1->target();
   
   node source2 = e2->source();
   node target2 = e2->target();
