@@ -146,14 +146,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="calcEdgeLength.cpp" />
-    <ClCompile Include="dispOpenGL.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="readFromJson.cpp" />
     <ClCompile Include="writeToJson.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="calcEdgeLength.h" />
-    <ClInclude Include="dispOpenGL.h" />
+    <ClInclude Include="dispOpenGL.hpp" />
     <ClInclude Include="readFromJson.h" />
     <ClInclude Include="writeToJson.h" />
   </ItemGroup>

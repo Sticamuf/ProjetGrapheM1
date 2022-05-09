@@ -1,5 +1,8 @@
+#ifndef CALCEDGELENGTH_H
+#define CALCEDGELENGTH_H
 #include <ogdf/basic/GraphAttributes.h>
 
 using namespace ogdf;
 
 double calcEdgeLength(const edge& e, const GraphAttributes& GA);
+#endif

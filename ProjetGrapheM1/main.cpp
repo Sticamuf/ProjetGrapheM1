@@ -2,7 +2,7 @@
 
 #include "writeToJson.h"
 #include "readFromJson.h"
-#include "dispOpenGL.h"
+#include "dispOpenGL.hpp"
 
 using ogdf::Graph;
 using ogdf::GraphAttributes;
@@ -22,7 +22,7 @@ int main() {
     srand(static_cast<unsigned int>(time(NULL)));
 
     //debut opengl
-    //dispOpenGL(G,GA,gridWidth,gridHeight);
+    dispOpenGL(G,GA,gridWidth,gridHeight);
     //fin opengl
     return 0;
 }

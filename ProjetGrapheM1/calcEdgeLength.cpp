@@ -24,6 +24,10 @@ double calcEdgeLength(const edge& e, const GraphAttributes& GA) {
     }
     targetX = GA.x(target);
     targetY = GA.y(target);
+    //alternantive ???
+    //if (sourceX == targetX) { length += abs(targetY - sourceY); }
+    //else if (sourceY == sourceX) { length += abs(targetX - sourceX); }
+    //else
     length += sqrt(pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2));
     return length;
 }
