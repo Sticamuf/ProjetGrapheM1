@@ -33,7 +33,10 @@ bool estDansVector(const edge& e)
 }
 bool intersection(const edge& e1,const edge& e2)
 {
+  
   bool inter=false;
+  //push_back si n'est pas dans le vector
+  //erase si on doit l'enlever
   return inter;
   
   
