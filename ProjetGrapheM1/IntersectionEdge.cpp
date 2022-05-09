@@ -8,7 +8,28 @@ using ogdf::ListIterator;
 using ogdf::DPoint;
 
 
-vector <edge> i;
+std::vector<edge> in;
+int posE1=-1;
+int posE2=-1;
+
+bool estDansVector(const edge& e)
+{
+  if(in.size()==0)
+  {
+    return false; 
+  }
+  else
+  {
+    for(int i=0;i<in.size();i++)
+    {
+      if(e==in[i])
+      {
+        return true; 
+      }
+    }
+    return false;
+  }
+}
 bool intersection(const edge& e1,const edge& e2)
 {
   bool inter=false;
