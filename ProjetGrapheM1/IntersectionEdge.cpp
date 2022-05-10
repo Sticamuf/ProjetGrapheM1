@@ -32,7 +32,7 @@ bool estDansVector(const edge& e)
 	}
 }
 
-bool surSegment(double px, double py, double qx, double qy, double rx, double ry) // pour vérifier si c'est aligné
+bool surSegment(int px, int py, int qx, int qy, int rx, int ry) // pour vérifier si c'est aligné
 {
 	if (qx <= max(px, rx) && qx >= min(px, rx) && qy <= max(py, ry) && qy >= min(py, ry))
 	{
@@ -41,9 +41,9 @@ bool surSegment(double px, double py, double qx, double qy, double rx, double ry
     return false;
 }
 
-int orientation(double px, double py, double qx, double qy, double rx, double ry)
+int orientation(int px, int py, int qx, double qy, double rx, double ry)
 {
-    int val = ((qy - py) * (rx - qx)) - ((qx - px) * (ry - qy));
+    long long val = ((qy - py) * (rx - qx)) - ((qx - px) * (ry - qy));
  
     if (val == 0) return 0;  // collinéaire
  
