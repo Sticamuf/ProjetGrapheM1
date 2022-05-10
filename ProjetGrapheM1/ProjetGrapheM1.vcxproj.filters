@@ -24,6 +24,9 @@
     <ClCompile Include="main.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="edgeMap.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dispOpenGL.hpp">
@@ -34,6 +37,9 @@
     </ClInclude>
     <ClInclude Include="jsonIO.hpp">
       <Filter>Fichiers d%27en-tête\json</Filter>
+    </ClInclude>
+    <ClInclude Include="edgeMap.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

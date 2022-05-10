@@ -1,14 +1,13 @@
-#ifndef JSONIO
-#define JSONIO
+#ifndef JSONIO_HPP
+#define JSONIO_HPP
 
 #include <string>
 #include <ogdf/basic/GraphAttributes.h>
 #include <ogdf/fileformats/GraphIO.h>
 #include <nlohmann/json.hpp>
 
-#include <ogdf/basic/MinHeap.h>
-#include <ogdf/basic/heap/BinaryHeap.h>
 #include "calcEdgeLength.hpp"
+#include "edgeMap.hpp"
 
 using std::string;
 using nlohmann::json;
@@ -16,7 +15,6 @@ using namespace ogdf;
 
 // ----- LECTURE D'UN Graph DANS UN FICHIER JSON -----
 void readFromJson(string input, Graph& G, GraphAttributes& GA, int& gridWidth, int& gridHeight, int& maxBends) {
-    BinaryHeap<double> BH;
 
     std::ifstream i(input);
     json j;
@@ -36,8 +34,6 @@ void readFromJson(string input, Graph& G, GraphAttributes& GA, int& gridWidth, i
     }
     int edgeNumber = static_cast<int>(j["edges"].size());
 
-    BinaryHeapSimple<double> bhs{ edgeNumber };
-
     edge* edgeTab = new edge[edgeNumber];
     for (int i = 0; i < edgeNumber; i++) {
         edgeTab[i] = G.newEdge(nodeTab[j["edges"][i]["source"]], nodeTab[j["edges"][i]["target"]]);
@@ -48,16 +44,6 @@ void readFromJson(string input, Graph& G, GraphAttributes& GA, int& gridWidth, i
                 p.pushBack(DPoint(j["edges"][i]["bends"][k]["x"], j["edges"][i]["bends"][k]["y"]));
             }
         }
-        //recuperer longueur edge
-        BH.push(calcEdgeLength(edgeTab[i], GA));
-        double tmp = calcEdgeLength(edgeTab[i], GA);
-        bhs.insert(tmp);
-    }
-
-    for (int i = 1; i <= edgeNumber; i++)
-    {
-        std::cout << "BHS " << i - 1 << ": " << bhs[i - 1] << std::endl;
-        std::cout << "Edge " << i << ": " << BH.value(&i) << std::endl;
     }
 
     delete[] nodeTab;
