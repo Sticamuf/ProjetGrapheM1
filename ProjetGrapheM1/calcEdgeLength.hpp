@@ -1,7 +1,7 @@
 #ifndef CALCEDGELENGTH_HPP
 #define CALCEDGELENGTH_HPP
 #include <ogdf/basic/GraphAttributes.h>
-//#include <ogdf/basic/EdgeArray.h> //non necessaire car GraphAttributes inclut EdgeArray
+#include <ogdf/basic/EdgeArray.h> //non necessaire car GraphAttributes inclut EdgeArray
 
 using namespace ogdf;
 

@@ -36,6 +36,7 @@ void readFromJson(string input, Graph& G, GraphAttributes& GA, int& gridWidth, i
 
     edge* edgeTab = new edge[edgeNumber];
     for (int i = 0; i < edgeNumber; i++) {
+        
         edgeTab[i] = G.newEdge(nodeTab[j["edges"][i]["source"]], nodeTab[j["edges"][i]["target"]]);
         if (j["edges"][i]["bends"] != nullptr) {
             DPolyline& p = GA.bends(edgeTab[i]);
@@ -44,6 +45,9 @@ void readFromJson(string input, Graph& G, GraphAttributes& GA, int& gridWidth, i
                 p.pushBack(DPoint(j["edges"][i]["bends"][k]["x"], j["edges"][i]["bends"][k]["y"]));
             }
         }
+        //GA.setAllHeight(1);
+        //GA.setAllWidth(1);
+        //GA.strokeWidth(edgeTab[i]) = 0.1;
     }
 
     delete[] nodeTab;

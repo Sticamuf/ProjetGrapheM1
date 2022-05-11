@@ -1,21 +1,22 @@
 ﻿#ifndef DISPOPENGL_HPP
 #define DISPOPENGL_HPP
 
+#include <chrono>
+#include <thread>
+
 #include <Windows.h>
 #undef max
 #include <gl/GL.h>
 
-#include <glad/glad.h>
+//#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 
 #include <ogdf/basic/GraphAttributes.h>
 #include <ogdf/basic/Layout.h>
+#include "edgeMap.hpp"
 
 using namespace ogdf;
-
-
-#include "EdgeMap.hpp"
 
 bool move_randomly = false;
 
@@ -79,7 +80,7 @@ void dispOpenGL(const Graph& G, GraphAttributes& GA, const int gridWidth, const 
 	//fin ogdf
 	if (!glfwInit())
 		exit(EXIT_FAILURE);
-	GLFWwindow* window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(640, 480, "Fenetre OpenGL", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -98,10 +99,10 @@ void dispOpenGL(const Graph& G, GraphAttributes& GA, const int gridWidth, const 
 		ratio = width / (float)height;
 		glViewport(0, 0, width, height);
 		glClear(GL_COLOR_BUFFER_BIT);
-		//glMatrixMode(GL_PROJECTION);
-		//glLoadIdentity();
-		//glOrtho(-ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-		//glMatrixMode(GL_MODELVIEW);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(-ratio, ratio, -1.f, 1.f, 1.f, -1.f);
+		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 		// Deplacer un noeud aléatoirement
 		if (move_randomly) {
@@ -145,6 +146,7 @@ void dispOpenGL(const Graph& G, GraphAttributes& GA, const int gridWidth, const 
 		glEnd();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+		std::this_thread::sleep_for(std::chrono::milliseconds(33));
 	}
 	glfwDestroyWindow(window);
 	glfwTerminate();
