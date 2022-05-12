@@ -288,7 +288,7 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 			inter=true;	
 		}
     	}
-	else
+	else if (bends1.size() > 0 && bends2.size()>0)
 	{
 		for(ListIterator<DPoint> i = bends1.begin(); i.valid(); i++) {
 			targetX1 = (*i).m_x;
@@ -319,6 +319,49 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 			inter=true;	
 		}
 		
+	}
+	else if(bends2.size()==0)
+	{
+		targetX2 = GA.x(target2);
+		targetY2 = GA.y(target2);
+		for(ListIterator<DPoint> i = bends1.begin(); i.valid(); i++) {
+			targetX1 = (*i).m_x;
+            		targetY1 = (*i).m_y;
+			if(Croisement(sourceX1,sourceY1,targetX1,targetY1,sourceX2,sourceY2,targetX2,targetY2)==true)
+			{
+				inter=true;	
+			}
+			sourceX1 = targetX1;
+            		sourceY1 = targetY1;
+		}
+		targetX1 = GA.x(target1);
+		targetY1 = GA.y(target1);
+		if(Croisement(sourceX1,sourceY1,targetX1,targetY1,sourceX2,sourceY2,targetX2,targetY2)==true)
+		{
+			inter=true;	
+		}
+	}
+	else
+	{
+		targetX1 = GA.x(target1);
+		targetY1 = GA.y(target1);
+		for(ListIterator<DPoint> j= bends2.begin(); j.valid(); j++)
+		{
+			targetX2 = (*j).m_x;
+            		targetY2 = (*j).m_y;
+			if(Croisement(sourceX1,sourceY1,targetX1,targetY1,sourceX2,sourceY2,targetX2,targetY2)==true)
+			{
+				inter=true;	
+			}
+			sourceX2 = targetX2;
+            		sourceY2 = targetY2;
+		}
+		targetX2 = GA.x(target2);
+		targetY2 = GA.y(target2);
+        	if(Croisement(sourceX1,sourceY1,targetX1,targetY1,sourceX2,sourceY2,targetX2,targetY2)==true)
+		{
+			inter=true;	
+		}
 	}
 	
 	/*int o1 = orientation(sourceX1,sourceY1,targetX1,targetY1,sourceX2,sourceY2);
