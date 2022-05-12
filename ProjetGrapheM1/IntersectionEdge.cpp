@@ -114,10 +114,22 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 	int targetX2 = GA.x(target2);
 	int targetY2 = GA.y(target2);
 	
-	int o1 = orientation(sourceX1,sourceY1,targetX1,targetY1,sourceX2,sourceY2);
+	DPolyline bends1 = GA.bends(e1);
+	DPolyline bends2 = GA.bends(e2);
+	if (bends1.size() == 0 && bends2.size()==0) {
+        	if(sontAlignes(sourceX1,sourceY1,targetX1,targetY1,sourceX2,sourceY2) ||
+		   sontAlignes(sourceX1,sourceY1,targetX1,targetY1,targetX2,targetY2) || 
+		   sontAlignes(sourceX2,sourceY2,targetX2,targetY2,sourceX1,sourceY1) || 
+		   sontAlignes(sourceX2,sourceY2,targetX2,targetY2,targetX1,targetY1))
+		{
+				
+		}
+    	}
+	
+	/*int o1 = orientation(sourceX1,sourceY1,targetX1,targetY1,sourceX2,sourceY2);
     	int o2 = orientation(sourceX1,sourceY1,targetX1,targetY1,targetX2,targetY2);
     	int o3 = orientation(sourceX2,sourceY2,targetX2,targetY2,sourceX1,sourceY1);
-   	 int o4 = orientation(sourceX2,sourceY2,targetX2,targetY2,targetX1,targetY1);
+   	int o4 = orientation(sourceX2,sourceY2,targetX2,targetY2,targetX1,targetY1);
 	
 	// cas général
     	if (o1 != o2 && o3 != o4)
@@ -145,6 +157,7 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 	{
 		inter=true;
 	}
+	*/
 	// Si vraie on les ajoutent dans le vector s'ils n'y sont pas
 	if(inter==true)
 	{
