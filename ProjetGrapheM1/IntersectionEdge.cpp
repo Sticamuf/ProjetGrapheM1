@@ -250,6 +250,8 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 				sourceX2 = targetX2;
             			sourceY2 = targetY2;
 			}
+			sourceX2 = GA.x(source2);
+            		sourceY2 = GA.y(source2);
             		sourceX1 = targetX1;
             		sourceY1 = targetY1;
         	}
