@@ -11,6 +11,8 @@ using ogdf::DPoint;
 std::vector<edge> in;
 int posE1=-1;
 int posE2=-1;
+int align=-1;
+
 
 bool estDansVector(const edge& e)
 {
@@ -44,6 +46,11 @@ bool surSegment(int px, int py, int qx, int qy, int rx, int ry)
 bool sontAlignes(int px, int py, int qx, int qy, int rx, int ry) // pour vérifier si c'est aligné
 {
  	return((ry-py)/(rx-px)==(qy-py)/(qx-px)); 	
+}
+
+bool Alignes(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
+{
+		
 }
 
 bool estADroite(int px,int rx)
