@@ -103,7 +103,7 @@ int main() {
 	//std::cout << "devrait etre de (0 ; 0) a (" << 2 * nbNodes - 4 << " ; " << nbNodes - 2 << ") (2*nbNoeuds-4 ; nbNoeuds-2)" << std::endl;
 
 	//GraphIO::write(GA, "output-ERDiagram.gml", GraphIO::writeGML);
-	GraphIO::write(GA, "output-ERDiagram.svg", GraphIO::drawSVG);
+	//GraphIO::write(GA, "output-ERDiagram.svg", GraphIO::drawSVG);
 
 	// ----- INITIALISER LES VARIABLES GLOBALES -----
 	//std::map<edge, double>::iterator it;
@@ -121,7 +121,7 @@ int main() {
 	writeToJson("output.json", G, GA, gridWidth, gridHeight, maxBends);
 
 	// ----- AFFICHAGE OPENGL -----
-	dispOpenGL(G, GA, gridWidth, gridHeight);
+	dispOpenGL(G, GA, gridWidth, gridHeight,maxX,maxY);
 
 	return 0;
 }
