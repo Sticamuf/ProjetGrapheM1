@@ -28,7 +28,7 @@ bool estDansVector(const edge& e)
 				return true; 
 			}
 		}
-    return false;
+    	return false;
 	}
 }
 
@@ -38,7 +38,43 @@ bool surSegment(int px, int py, int qx, int qy, int rx, int ry) // pour vérifie
 	{
 		return true;
 	}
-    return false;
+    	return false;
+}
+
+bool estADroite(int px,int rx)
+{
+	if(px<rx)
+	{
+		return true;	
+	}
+	return false;
+}
+
+bool estAGauche(int px,int rx)
+{
+	if(px>rx)
+	{
+		return true;	
+	}
+	return false;
+}
+
+bool estEnHaut(int py,int ry)
+{
+	if(py<ry)
+	{
+		return true;	
+	}
+	return false;
+}
+
+bool estEnBas(int py,int ry)
+{
+	if(py>ry)
+	{
+		return true;	
+	}
+	return false;
 }
 
 int orientation(int px, int py, int qx, int qy, int rx, int ry)
@@ -74,33 +110,33 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 	int targetY2 = GA.y(target2);
 	
 	int o1 = orientation(sourceX1,sourceY1,targetX1,targetY1,sourceX2,sourceY2);
-    int o2 = orientation(sourceX1,sourceY1,targetX1,targetY1,targetX2,targetY2);
-    int o3 = orientation(sourceX2,sourceY2,targetX2,targetY2,sourceX1,sourceY1);
-    int o4 = orientation(sourceX2,sourceY2,targetX2,targetY2,targetX1,targetY1);
+    	int o2 = orientation(sourceX1,sourceY1,targetX1,targetY1,targetX2,targetY2);
+    	int o3 = orientation(sourceX2,sourceY2,targetX2,targetY2,sourceX1,sourceY1);
+   	 int o4 = orientation(sourceX2,sourceY2,targetX2,targetY2,targetX1,targetY1);
 	
 	// cas général
-    if (o1 != o2 && o3 != o4)
+    	if (o1 != o2 && o3 != o4)
 	{
 		inter = true;
 	}
  
-    // cas particuliers
-    if (o1 == 0 && surSegment(sourceX1,sourceY1,targetX1,targetY1,sourceX2,sourceY2))
+    	// cas particuliers
+    	if (o1 == 0 && surSegment(sourceX1,sourceY1,targetX1,targetY1,sourceX2,sourceY2))
 	{
 		inter=true;
 	}
  
-    if (o2 == 0 && surSegment(sourceX1,sourceY1,targetX1,targetY1,targetX2,targetY2))
+    	if (o2 == 0 && surSegment(sourceX1,sourceY1,targetX1,targetY1,targetX2,targetY2))
 	{
 		inter=true;
 	}
  
-    if (o3 == 0 && surSegment(sourceX2,sourceY2,targetX2,targetY2,sourceX1,sourceY1))
+    	if (o3 == 0 && surSegment(sourceX2,sourceY2,targetX2,targetY2,sourceX1,sourceY1))
 	{
 		inter=true;
 	}
  
-    if (o4 == 0 && surSegment(sourceX2,sourceY2,targetX2,targetY2,targetX1,targetY1))
+    	if (o4 == 0 && surSegment(sourceX2,sourceY2,targetX2,targetY2,targetX1,targetY1))
 	{
 		inter=true;
 	}
