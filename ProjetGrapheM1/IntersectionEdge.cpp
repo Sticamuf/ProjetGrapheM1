@@ -32,13 +32,18 @@ bool estDansVector(const edge& e)
 	}
 }
 
-bool surSegment(int px, int py, int qx, int qy, int rx, int ry) // pour vérifier si c'est aligné
+bool surSegment(int px, int py, int qx, int qy, int rx, int ry)
 {
 	if (qx <= max(px, rx) && qx >= min(px, rx) && qy <= max(py, ry) && qy >= min(py, ry))
 	{
 		return true;
 	}
     	return false;
+}
+
+bool sontAlignes(int px, int py, int qx, int qy, int rx, int ry) // pour vérifier si c'est aligné
+{
+ 	return((ry-py)/(rx-px)==(qy-py)/(qx-px)); 	
 }
 
 bool estADroite(int px,int rx)
