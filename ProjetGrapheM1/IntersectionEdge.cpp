@@ -41,7 +41,7 @@ bool surSegment(int px, int py, int qx, int qy, int rx, int ry) // pour vérifie
     return false;
 }
 
-int orientation(int px, int py, int qx, double qy, double rx, double ry)
+int orientation(int px, int py, int qx, int qy, int rx, int ry)
 {
     long long val = ((qy - py) * (rx - qx)) - ((qx - px) * (ry - qy));
  
@@ -61,17 +61,17 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 	node source2 = e2->source();
 	node target2 = e2->target();
   
-	double sourceX1 = GA.x(source1);
-	double sourceY1 = GA.y(source1);
+	int sourceX1 = GA.x(source1);
+	int sourceY1 = GA.y(source1);
   
-	double sourceX2 = GA.x(source2);
-	double sourceY2 = GA.y(source2);
+	int sourceX2 = GA.x(source2);
+	int sourceY2 = GA.y(source2);
   
-	double targetX1 = GA.x(target1);
-	double targetY1 = GA.y(target1);
+	int targetX1 = GA.x(target1);
+	int targetY1 = GA.y(target1);
   
-	double targetX2 = GA.x(target2);
-	double targetY2 = GA.y(target2);
+	int targetX2 = GA.x(target2);
+	int targetY2 = GA.y(target2);
 	
 	int o1 = orientation(sourceX1,sourceY1,targetX1,targetY1,sourceX2,sourceY2);
     int o2 = orientation(sourceX1,sourceY1,targetX1,targetY1,targetX2,targetY2);
