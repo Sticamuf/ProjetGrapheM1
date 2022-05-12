@@ -123,7 +123,7 @@ bool estEnBas(int py,int ry)
 bool seCroisent(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 {
 	if(((estADroite(px,rx)==true&&estAGauche(qx,rx)==true)||
-	    (estADroite(qx,rx)==true&&estAGauche(px,rx)==true)&&
+	    	(estADroite(qx,rx)==true&&estAGauche(px,rx)==true)&&
 		estEnHaut(py,ry)==true&&estEnHaut(qy,ry)==true&&
 		estEnBas(py,sy)==true&&estEnBas(qy,sy)==true)
 	{
@@ -149,6 +149,34 @@ bool seCroisent(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 		estEnBas(py,sy)==true&&estEnBas(qy,sy)==true)
 	{
 		return true;	
+	}
+	else if(((estEnHaut(py,ry)==true&&estEnBas(qy,ry)==true)||
+	    	(estEnHaut(qy,ry)==true&&estEnBas(py,ry)==true)&&
+		estAGauche(px,rx)==true&&estAGauche(qx,rx)==true&&
+		estADroite(px,sx)==true&&estADroite(qx,sx)==true)
+	{
+		return true;
+	}
+	else if(((estEnHaut(py,ry)==true&&estEnBas(qy,ry)==true)||
+	    	(estEnHaut(qy,ry)==true&&estEnBas(py,ry)==true)&&
+		estAGauche(px,sx)==true&&estAGauche(qx,sx)==true&&
+		estADroite(px,rx)==true&&estADroite(qx,rx)==true)
+	{
+		return true;
+	}
+	else if(((estEnHaut(py,sy)==true&&estEnBas(qy,sy)==true)||
+	    	(estEnHaut(qy,sy)==true&&estEnBas(py,sy)==true)&&
+		estAGauche(px,sx)==true&&estAGauche(qx,sx)==true&&
+		estADroite(px,rx)==true&&estADroite(qx,rx)==true)
+	{
+		return true;
+	}
+	else if(((estEnHaut(py,sy)==true&&estEnBas(qy,sy)==true)||
+	    	(estEnHaut(qy,sy)==true&&estEnBas(py,sy)==true)&&
+		estAGauche(px,rx)==true&&estAGauche(qx,rx)==true&&
+		estADroite(px,sx)==true&&estADroite(qx,sx)==true)
+	{
+		return true;
 	}
 	else
 	{
