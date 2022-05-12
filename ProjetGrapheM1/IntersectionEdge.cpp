@@ -165,7 +165,10 @@ bool Croisement(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 		}
 		else if(align==3)
 		{
-			if()
+			if((estAGauche(rx,px)==true&&estAGauche(sx,px)==true)||
+			   (estADroite(rx,px)==true&&estADroite(sx,px)==true)||
+			   (estEnHaut(ry,py)==true&&estEnHaut(sy,py)==true)||
+			   (estEnBas(ry,py)==true&&estEnBas(sy,py)==true))
 			{
 				return true;	
 			}
@@ -176,7 +179,10 @@ bool Croisement(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 		}
 		else if(align==4)
 		{
-			if()
+			if((estAGauche(rx,qx)==true&&estAGauche(sx,qx)==true)||
+			   (estADroite(rx,qx)==true&&estADroite(sx,qx)==true)||
+			   (estEnHaut(ry,qy)==true&&estEnHaut(sy,qy)==true)||
+			   (estEnBas(ry,qy)==true&&estEnBas(sy,qy)==true))
 			{
 				return true;	
 			}
