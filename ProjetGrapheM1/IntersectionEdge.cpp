@@ -213,19 +213,49 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 	int sourceX2 = GA.x(source2);
 	int sourceY2 = GA.y(source2);
   
-	int targetX1 = GA.x(target1);
-	int targetY1 = GA.y(target1);
-  
-	int targetX2 = GA.x(target2);
-	int targetY2 = GA.y(target2);
+	int targetX1,targetY1,targetX2,targetY2;
 	
 	DPolyline bends1 = GA.bends(e1);
 	DPolyline bends2 = GA.bends(e2);
 	if (bends1.size() == 0 && bends2.size()==0) {
-        	
+		targetX1 = GA.x(target1);
+		targetY1 = GA.y(target1);
+  
+		targetX2 = GA.x(target2);
+		targetY2 = GA.y(target2);
+        	if(Croisement(sourceX1,sourceY1,targetX1,targetY1,sourceX2,sourceY2,targetX2,targetY2)==true)
+		{
+			inter=true;	
+		}
     	}
 	else
 	{
+		for(ListIterator<DPoint> i = bends1.begin(); i.valid(); i++) {
+			targetX1 = (*i).m_x;
+            		targetY1 = (*i).m_y;
+			for(ListIterator<DPoint> j= bends2.begin(); j.valid(); j++)
+			{
+				targetX2 = (*j).m_x;
+            			targetY2 = (*j).m_y;
+				if(Croisement(sourceX1,sourceY1,targetX1,targetY1,sourceX2,sourceY2,targetX2,targetY2)==true)
+				{
+					inter=true;	
+				}
+				sourceX2 = targetX2;
+            			sourceY2 = targetY2;
+			}
+            		sourceX1 = targetX1;
+            		sourceY1 = targetY1;
+        	}
+		targetX1 = GA.x(target1);
+		targetY1 = GA.y(target1);
+  
+		targetX2 = GA.x(target2);
+		targetY2 = GA.y(target2);
+        	if(Croisement(sourceX1,sourceY1,targetX1,targetY1,sourceX2,sourceY2,targetX2,targetY2)==true)
+		{
+			inter=true;	
+		}
 		
 	}
 	
