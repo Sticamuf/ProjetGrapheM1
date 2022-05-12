@@ -151,7 +151,10 @@ bool Croisement(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 		}
 		else if(align==2)
 		{
-			if()
+			if((estAGauche(px,rx)==true&&estAGauche(qx,rx)==true)||
+			   (estADroite(px,rx)==true&&estADroite(qx,rx)==true)||
+			   (estEnHaut(py,ry)==true&&estEnHaut(qy,ry)==true)||
+			   (estEnBas(py,ry)==true&&estEnBas(qy,ry)==true))
 			{
 				return true;	
 			}
