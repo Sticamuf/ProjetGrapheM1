@@ -122,11 +122,34 @@ bool estEnBas(int py,int ry)
 
 bool seCroisent(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 {
-	if(estADroite(px,rx)==true&&estAGauche(qx,rx)==true&&
+	if((estADroite(px,rx)==true&&estAGauche(qx,rx)==true||
+	    (estADroite(px,rx)==true&&estAGauche(qx,rx))&&
 			   estEnHaut(py,ry)&&estEnHaut(qy,ry)&&
 			   estEnBas(py,sy)&&estEnBas(qy,sy))
 	{
 		return true;	
+	}
+	else if(estADroite(px,rx)==true&&estAGauche(qx,rx)==true&&
+			   estEnHaut(py,sy)&&estEnHaut(qy,sy)&&
+			   estEnBas(py,ry)&&estEnBas(qy,ry))
+	{
+		return true;	
+	}
+	if(estADroite(px,sx)==true&&estAGauche(qx,sx)==true&&
+			   estEnHaut(py,sy)&&estEnHaut(qy,sy)&&
+			   estEnBas(py,ry)&&estEnBas(qy,ry))
+	{
+		return true;	
+	}
+	else if(estADroite(px,sx)==true&&estAGauche(qx,sx)==true&&
+			   estEnHaut(py,ry)&&estEnHaut(qy,ry)&&
+			   estEnBas(py,sy)&&estEnBas(qy,sy))
+	{
+		return true;	
+	}
+	else
+	{
+		return false;	
 	}
 }
 
