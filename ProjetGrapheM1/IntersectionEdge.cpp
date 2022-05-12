@@ -136,10 +136,10 @@ bool Croisement(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 	{
 		if(align==1)
 		{
-			if((estAGauche(px,sx)==true&&estAGauche(qx,sx)==true)||
-			   (estADroite(px,sx)==true&&estADroite(qx,sx)==true)||
-			   (estEnHaut(py,sy)==true&&estEnHaut(qy,sy)==true)||
-			   (estEnBas(py,sy)==true&&estEnBas(qy,sy)==true))
+			if((estAGauche(px,rx)==true&&estADroite(qx,rx)==true)||
+			   (estADroite(px,rx)==true&&estAGauche(qx,rx)==true)||
+			   (estEnHaut(py,ry)==true&&estEnBas(qy,ry)==true)||
+			   (estEnBas(py,ry)==true&&estEnHaut(qy,ry)==true))
 			{
 				return true;	
 			}
@@ -151,10 +151,10 @@ bool Croisement(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 		}
 		else if(align==2)
 		{
-			if((estAGauche(px,rx)==true&&estAGauche(qx,rx)==true)||
-			   (estADroite(px,rx)==true&&estADroite(qx,rx)==true)||
-			   (estEnHaut(py,ry)==true&&estEnHaut(qy,ry)==true)||
-			   (estEnBas(py,ry)==true&&estEnBas(qy,ry)==true))
+			if((estAGauche(px,sx)==true&&estADroite(qx,sx)==true)||
+			   (estADroite(px,sx)==true&&estAGauche(qx,sx)==true)||
+			   (estEnHaut(py,sy)==true&&estEnBas(qy,sy)==true)||
+			   (estEnBas(py,sy)==true&&estEnHaut(qy,sy)==true))
 			{
 				return true;	
 			}
@@ -165,10 +165,10 @@ bool Croisement(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 		}
 		else if(align==3)
 		{
-			if((estAGauche(rx,px)==true&&estAGauche(sx,px)==true)||
-			   (estADroite(rx,px)==true&&estADroite(sx,px)==true)||
-			   (estEnHaut(ry,py)==true&&estEnHaut(sy,py)==true)||
-			   (estEnBas(ry,py)==true&&estEnBas(sy,py)==true))
+			if((estAGauche(rx,px)==true&&estADroite(sx,px)==true)||
+			   (estADroite(rx,px)==true&&estAGauche(sx,px)==true)||
+			   (estEnHaut(ry,py)==true&&estEnBas(sy,py)==true)||
+			   (estEnBas(ry,py)==true&&estEnHaut(sy,py)==true))
 			{
 				return true;	
 			}
@@ -179,10 +179,10 @@ bool Croisement(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 		}
 		else if(align==4)
 		{
-			if((estAGauche(rx,qx)==true&&estAGauche(sx,qx)==true)||
-			   (estADroite(rx,qx)==true&&estADroite(sx,qx)==true)||
-			   (estEnHaut(ry,qy)==true&&estEnHaut(sy,qy)==true)||
-			   (estEnBas(ry,qy)==true&&estEnBas(sy,qy)==true))
+			if((estAGauche(rx,qx)==true&&estADroite(sx,qx)==true)||
+			   (estADroite(rx,qx)==true&&estAGauche(sx,qx)==true)||
+			   (estEnHaut(ry,qy)==true&&estEnBas(sy,qy)==true)||
+			   (estEnBas(ry,qy)==true&&estEnHaut(sy,qy)==true))
 			{
 				return true;	
 			}
