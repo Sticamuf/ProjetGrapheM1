@@ -117,12 +117,21 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 	DPolyline bends1 = GA.bends(e1);
 	DPolyline bends2 = GA.bends(e2);
 	if (bends1.size() == 0 && bends2.size()==0) {
-        	if(sontAlignes(sourceX1,sourceY1,targetX1,targetY1,sourceX2,sourceY2) ||
-		   sontAlignes(sourceX1,sourceY1,targetX1,targetY1,targetX2,targetY2) || 
-		   sontAlignes(sourceX2,sourceY2,targetX2,targetY2,sourceX1,sourceY1) || 
-		   sontAlignes(sourceX2,sourceY2,targetX2,targetY2,targetX1,targetY1))
+        	if(sontAlignes(sourceX1,sourceY1,targetX1,targetY1,sourceX2,sourceY2)==true ||
+		   sontAlignes(sourceX1,sourceY1,targetX1,targetY1,targetX2,targetY2)==true || 
+		   sontAlignes(sourceX2,sourceY2,targetX2,targetY2,sourceX1,sourceY1)==true || 
+		   sontAlignes(sourceX2,sourceY2,targetX2,targetY2,targetX1,targetY1)==true)
 		{
 				
+		}
+		else
+		{
+			if(estADroite(sourceX1,sourceX2)==true&&estAGauche(targetX1,sourceX2)==true&&
+			   estEnHaut(sourceX1,sourceX2)&&estEnHaut(targetX1,sourceX2)&&
+			   estEnBas(sourceX1,targetX2)&&estEnBas(targetX1,targetX2))
+			{
+				inter=true;	
+			}
 		}
     	}
 	
