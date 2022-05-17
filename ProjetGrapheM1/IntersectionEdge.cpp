@@ -111,70 +111,34 @@ bool estEnBas(int py,int ry)
 	return false;
 }
 
-/*int orientation(int px, int py, int qx, int qy, int rx, int ry)
+int AGauche(int px, int py, int qx, int qy, int rx, int ry)
 {
     long long val = ((qy - py) * (rx - qx)) - ((qx - px) * (ry - qy));
  
-    if (val == 0) return 0;  // collinéaire
- 
-    return (val > 0)? 1: 2; // dans le sens des aiguilles d'une montre ou contraire
-}*/
+    if (val == 0)
+    {
+	    return 0;
+    }
+    else if(val>0)
+    {
+	    return 1;
+    }
+    else
+    {
+	    return -1;
+    }
+    
+}
 
 bool seCroisent(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 {
-	if(((estADroite(px,rx)==true&&estAGauche(qx,rx)==true)||
-	    	(estADroite(qx,rx)==true&&estAGauche(px,rx)==true)&&
-		estEnHaut(py,ry)==true&&estEnHaut(qy,ry)==true&&
-		estEnBas(py,sy)==true&&estEnBas(qy,sy)==true)
-	{
-		return true;	
-	}
-	else if(((estADroite(px,rx)==true&&estAGauche(qx,rx)==true)||
-		(estADroite(qx,rx)==true&&estAGauche(px,rx)==true))&&
-		estEnHaut(py,sy)==true&&estEnHaut(qy,sy)==true&&
-		estEnBas(py,ry)==true&&estEnBas(qy,ry)==true)
-	{
-		return true;	
-	}
-	else if(((estADroite(px,sx)==true&&estAGauche(qx,sx)==true)||
-		(estADroite(qx,sx)==true&&estAGauche(px,sx)==true)&&
-		estEnHaut(py,sy)==true&&estEnHaut(qy,sy)==true&&
-		estEnBas(py,ry)==true&&estEnBas(qy,ry)==true)
-	{
-		return true;	
-	}
-	else if(((estADroite(px,sx)==true&&estAGauche(qx,sx)==true)||
-		(estADroite(px,sx)==true&&estAGauche(qx,sx)==true)&&
-		estEnHaut(py,ry)==true&&estEnHaut(qy,ry)==true&&
-		estEnBas(py,sy)==true&&estEnBas(qy,sy)==true)
-	{
-		return true;	
-	}
-	else if(((estEnHaut(py,ry)==true&&estEnBas(qy,ry)==true)||
-	    	(estEnHaut(qy,ry)==true&&estEnBas(py,ry)==true)&&
-		estAGauche(px,rx)==true&&estAGauche(qx,rx)==true&&
-		estADroite(px,sx)==true&&estADroite(qx,sx)==true)
-	{
-		return true;
-	}
-	else if(((estEnHaut(py,ry)==true&&estEnBas(qy,ry)==true)||
-	    	(estEnHaut(qy,ry)==true&&estEnBas(py,ry)==true)&&
-		estAGauche(px,sx)==true&&estAGauche(qx,sx)==true&&
-		estADroite(px,rx)==true&&estADroite(qx,rx)==true)
-	{
-		return true;
-	}
-	else if(((estEnHaut(py,sy)==true&&estEnBas(qy,sy)==true)||
-	    	(estEnHaut(qy,sy)==true&&estEnBas(py,sy)==true)&&
-		estAGauche(px,sx)==true&&estAGauche(qx,sx)==true&&
-		estADroite(px,rx)==true&&estADroite(qx,rx)==true)
-	{
-		return true;
-	}
-	else if(((estEnHaut(py,sy)==true&&estEnBas(qy,sy)==true)||
-	    	(estEnHaut(qy,sy)==true&&estEnBas(py,sy)==true)&&
-		estAGauche(px,rx)==true&&estAGauche(qx,rx)==true&&
-		estADroite(px,sx)==true&&estADroite(qx,sx)==true)
+	int ag1 = AGauche(px,py,qx,qy,rx,ry);
+    	int ag2 = AGauche(px,py,qx,qy,sx,sy);
+    	int ag3 = AGauche(rx,ry,sx,sy,px,py);
+   	int ag4 = AGauche(rx,ry,sx,sy,qx,qy);
+	
+	// cas général
+    	if (ag1 != ag2 && ag3 != ag4)
 	{
 		return true;
 	}
@@ -236,7 +200,7 @@ bool Croisement(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 			if((estAGauche(rx,qx)==true&&estADroite(sx,qx)==true)||
 			   (estADroite(rx,qx)==true&&estAGauche(sx,qx)==true)||
 			   (estEnHaut(ry,qy)==true&&estEnBas(sy,qy)==true)||
-			   (estEnBas(ry,qy)==true&&estEnHaut(sy,qy)==true))
+			   (estEnBas(ry,qy)==true&&estEnHaut(sy,qy)==true)))
 			{
 				return true;	
 			}
@@ -364,17 +328,8 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 		}
 	}
 	
-	/*int o1 = orientation(sourceX1,sourceY1,targetX1,targetY1,sourceX2,sourceY2);
-    	int o2 = orientation(sourceX1,sourceY1,targetX1,targetY1,targetX2,targetY2);
-    	int o3 = orientation(sourceX2,sourceY2,targetX2,targetY2,sourceX1,sourceY1);
-   	int o4 = orientation(sourceX2,sourceY2,targetX2,targetY2,targetX1,targetY1);
 	
-	// cas général
-    	if (o1 != o2 && o3 != o4)
-	{
-		inter = true;
-	}
- 
+ 	/*
     	// cas particuliers
     	if (o1 == 0 && surSegment(sourceX1,sourceY1,targetX1,targetY1,sourceX2,sourceY2))
 	{
@@ -415,11 +370,11 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 		if(estDansVector(e2)==true)
 		{
 			posE2=posE1;
-			in.erase(posE2);
+			in.erase(in.begin()+posE2);
 		}
 		if(estDansVector(e1)==true)
 		{
-			in.erase(posE1);
+			in.erase(in.begin()+posE1);
 		}
 
 
