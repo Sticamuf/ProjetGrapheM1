@@ -2,7 +2,7 @@
 #define JSONIO
 
 #include <string>
-#include <ogdf/basic/GraphAttributes.h>
+#include <ogdf/basic/GridLayout.h>
 #include <ogdf/fileformats/GraphIO.h>
 #include <nlohmann/json.hpp>
 
@@ -17,7 +17,7 @@ using nlohmann::json;
 using namespace ogdf;
 
 // ----- CREATION D'UN Graph A PARTIR D'UN FICHIER JSON -----
-void readFromJson(string input, Graph& G, GraphAttributes& GA, int& gridWidth, int& gridHeight, int& maxBends) {
+void readFromJson(string input, Graph& G, GridLayout& GL, int& gridWidth, int& gridHeight, int& maxBends) {
     std::ifstream i(input);
     json j;
     i >> j;
@@ -43,10 +43,10 @@ void readFromJson(string input, Graph& G, GraphAttributes& GA, int& gridWidth, i
     node* nodeTab = new node[nodeNumber];
     for (int i = 0; i < nodeNumber; i++) {
         nodeTab[i] = G.newNode();
-        GA.x(nodeTab[i]) = j["nodes"][i]["x"];
-        GA.y(nodeTab[i]) = j["nodes"][i]["y"];
-        std::pair<int, int> coord((int)GA.x(nodeTab[i]), (int)GA.y(nodeTab[i]));
-        mapPosNode[(int)GA.y(nodeTab[i])][(int)GA.x(nodeTab[i])] = true;
+        GL.x(nodeTab[i]) = j["nodes"][i]["x"];
+        GL.y(nodeTab[i]) = j["nodes"][i]["y"];
+        std::pair<int, int> coord((int)GL.x(nodeTab[i]), (int)GL.y(nodeTab[i]));
+        mapPosNode[(int)GL.y(nodeTab[i])][(int)GL.x(nodeTab[i])] = true;
     }
     int edgeNumber = static_cast<int>(j["edges"].size());
     edge* edgeTab = new edge[edgeNumber];
@@ -73,14 +73,14 @@ void readFromJson(string input, Graph& G, GraphAttributes& GA, int& gridWidth, i
         edgeTab[i] = G.newEdge(nodeTab[j["edges"][i]["source"]], nodeTab[j["edges"][i]["target"]]);
 
         if (j["edges"][i]["bends"] != nullptr) {
-            DPolyline& p = GA.bends(edgeTab[i]);
+            IPolyline& p = GL.bends(edgeTab[i]);
             int bendsNumber = static_cast<int>(j["edges"][i]["bends"].size());
             for (int k = 0; k < bendsNumber; k++) {
-                p.pushBack(DPoint(j["edges"][i]["bends"][k]["x"], j["edges"][i]["bends"][k]["y"]));
+                p.pushBack(IPoint(j["edges"][i]["bends"][k]["x"], j["edges"][i]["bends"][k]["y"]));
             }
         }
         //recuperer longueur edge
-        double length = calcEdgeLength(edgeTab[i], GA);
+        double length = calcEdgeLength(edgeTab[i], GL);
         mapEdgeLength.insert(std::pair<edge, double>(edgeTab[i], length));
         std::map<double, std::set<edge>>::iterator it2 = mapLengthEdgeSet.begin();
         it2 = mapLengthEdgeSet.find(length);
@@ -102,7 +102,7 @@ void readFromJson(string input, Graph& G, GraphAttributes& GA, int& gridWidth, i
 }
 
 // ----- ECRITURE D'UN Graph DANS UN FICHIER JSON -----
-void writeToJson(string output, const Graph& G, const GraphAttributes& GA, int gridWidth, int gridHeight, int maxBends) {
+void writeToJson(string output, const Graph& G, const GridLayout& GL, int gridWidth, int gridHeight, int maxBends) {
     json j2;
     j2["width"] = gridWidth;
     j2["height"] = gridHeight;
@@ -112,8 +112,8 @@ void writeToJson(string output, const Graph& G, const GraphAttributes& GA, int g
     int m = 0;
     while (n != nullptr) {
         j2["nodes"][m]["id"] = n->index();
-        j2["nodes"][m]["x"] = (int)GA.x(n);
-        j2["nodes"][m]["y"] = (int)GA.y(n);
+        j2["nodes"][m]["x"] = (int)GL.x(n);
+        j2["nodes"][m]["y"] = (int)GL.y(n);
         n = n->succ();
         m++;
     }
@@ -123,10 +123,10 @@ void writeToJson(string output, const Graph& G, const GraphAttributes& GA, int g
     while (e != nullptr) {
         j2["edges"][m]["source"] = e->source()->index();
         j2["edges"][m]["target"] = e->target()->index();
-        DPolyline bends = GA.bends(e);
+        IPolyline bends = GL.bends(e);
         if (bends.size() > 0) {
             int l = 0;
-            for (ListIterator<DPoint> i = bends.begin(); i.valid(); i++) {
+            for (ListIterator<IPoint> i = bends.begin(); i.valid(); i++) {
                 j2["edges"][m]["bends"][l]["x"] = (int)(*i).m_x;
                 j2["edges"][m]["bends"][l]["y"] = (int)(*i).m_y;
                 l++;

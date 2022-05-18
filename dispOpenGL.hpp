@@ -5,7 +5,7 @@
 #include <gl/GL.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
-#include <ogdf/basic/GraphAttributes.h>
+#include <ogdf/basic/GridLayout.h>
 #include <ogdf/basic/CombinatorialEmbedding.h>
 #include <ogdf/basic/Layout.h>
 #include "calcEdgeLength.hpp"
@@ -70,8 +70,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                 break;
             case GLFW_KEY_J:
                 if (selectedAdj != nullptr)
-                    if (selectedAdj->cyclicPred() != nullptr) {
-                        selectedAdj = selectedAdj->cyclicPred();
+                    if (selectedAdj->cyclicSucc() != nullptr) {
+                        selectedAdj = selectedAdj->cyclicSucc();
                         selectedEdge = selectedAdj->theEdge();
                         selectedNode = selectedAdj->theNode();
                     }
@@ -115,10 +115,10 @@ double calcEdgeLengthRatio() {
     return ratio;
 }
 
-void changeEdgeMapValue(edge e, GraphAttributes& GA) {
+void changeEdgeMapValue(edge e, GridLayout& GL) {
     auto it = mapEdgeLength.find(e);
     double length = it->second;
-    double newLength = calcEdgeLength(e, GA);
+    double newLength = calcEdgeLength(e, GL);
     if (length != newLength) {
         it->second = newLength;
         auto it2 = mapLengthEdgeSet.find(newLength);
@@ -138,7 +138,7 @@ void changeEdgeMapValue(edge e, GraphAttributes& GA) {
     }
 }
 
-void dispOpenGL(const Graph& G, GraphAttributes& GA, const int gridWidth, const int gridHeight, int maxX, int maxY) {
+void dispOpenGL(const Graph& G, GridLayout& GL, const int gridWidth, const int gridHeight, int maxX, int maxY) {
     //debut ogdf
     node n = G.firstNode();
     CCE = ConstCombinatorialEmbedding{ G };
@@ -180,12 +180,12 @@ void dispOpenGL(const Graph& G, GraphAttributes& GA, const int gridWidth, const 
         // Deplacer un noeud aléatoirement
         if (move_randomly) {
             node n = G.firstNode();
-            GA.x(n) += 1;
+            GL.x(n) += 1;
             SListPure<edge> edges;
             n->adjEdges(edges);
             for (SListConstIterator<edge> i = edges.begin(); i.valid(); i++) {
                 edge e = (*i);
-                changeEdgeMapValue(e, GA);
+                changeEdgeMapValue(e, GL);
             }
             std::cout << "Ratio: " << calcEdgeLengthRatio() << std::endl;
             move_randomly = false;
@@ -204,12 +204,12 @@ void dispOpenGL(const Graph& G, GraphAttributes& GA, const int gridWidth, const 
                 glColor3f(1.0f, 1.0f, 1.0f);
             }
             glBegin(GL_LINE_STRIP);
-            glVertex2d(GA.x(e->source()), GA.y(e->source()));
-            DPolyline& bends = GA.bends(e);
-            for (ListIterator<DPoint> i = bends.begin(); i.valid(); i++) {
+            glVertex2d(GL.x(e->source()), GL.y(e->source()));
+            IPolyline& bends = GL.bends(e);
+            for (ListIterator<IPoint> i = bends.begin(); i.valid(); i++) {
                 glVertex2d((*i).m_x, (*i).m_y);
             }
-            glVertex2d(GA.x(e->target()), GA.y(e->target()));
+            glVertex2d(GL.x(e->target()), GL.y(e->target()));
             glEnd();
         }
         //afficher les nodes
@@ -224,7 +224,7 @@ void dispOpenGL(const Graph& G, GraphAttributes& GA, const int gridWidth, const 
             else {
                 glColor3f(1.0f, 0.0f, 0.0f);
             }
-            glVertex2d(GA.x(n), GA.y(n));
+            glVertex2d(GL.x(n), GL.y(n));
             n = n->succ();
         }
         glEnd();

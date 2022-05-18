@@ -1,4 +1,4 @@
-﻿#include <ogdf/basic/GraphAttributes.h>
+﻿#include <ogdf/basic/GridLayout.h>
 
 #include <ogdf/planarlayout/PlanarStraightLayout.h>
 #include <ogdf/planarity/EmbedderMinDepth.h>
@@ -11,7 +11,7 @@
 #include "NodeMap.hpp"
 
 using ogdf::Graph;
-using ogdf::GraphAttributes;
+using ogdf::GridLayout;
 
 const int Q1 = 0;
 const int Q2 = 1;
@@ -39,26 +39,38 @@ bool aGauche(const GridLayout& GL, const node& src, const node& targ, const node
     return ((GL.x(targ) - GL.x(src)) * (GL.y(comp) - GL.y(src)) - (GL.y(targ) - GL.y(src)) * (GL.x(comp) - GL.x(src))) > 0;
 }
 
-void embedder(Graph& G, GridLayout& GL) {
+void embedderDeFou(Graph& G, GridLayout& GL) {
     node nsrc = G.firstNode();
     SListPure<adjEntry> adj;
     SListPure<adjEntry> newOrder;
+    // Itérateur qui itere sur le tableau des adjacent non trié
+    SListIterator<adjEntry> it;
+    // Itérateur sur le nouveau tableau d'adjacent trié
+    SListIterator<adjEntry> it2;
+    // Itérateur égal a it2-1 :)
+    SListIterator<adjEntry> it3;
+    int i = 0;
     while (nsrc != nullptr) {
         nsrc->allAdjEntries(adj);
-        // Itérateur qui itere sur le tableau des adjacent non trié
-        SListIterator<adjEntry> it = adj.begin();
-        // Itérateur sur le nouveau tableau d'adjacent trié
-        SListIterator<adjEntry> it2;
-        // Itérateur égal a it2-1 :)
-        SListIterator<adjEntry> it3;
+        newOrder.clear(); 
+        it = adj.begin();
         // On insere le premier element et on passe directement au prochain
         newOrder.pushBack((*it));
         it++;
+        std::cout << "Tour: " << i << std::endl;
+        std::cout << "Nb Adj: " << adj.size() << std::endl;
         // On itere sur tout les éléments de la liste non triée
+        int j = 0;
         for (;it.valid();it++) {
             bool inserted = false;
             // On itere sur le deuxieme tableau tant qu'on est pas a la fin et tant qu'on a pas inseré
-            for (it2 = newOrder.begin(), it3=it2;(it2 != newOrder.end()&&!inserted); it3=it2++) {
+            std::cout << "Tour interne: " << j << std::endl;
+            j++;
+            int k = 0;
+            for (it2 = newOrder.begin(),it3=it2;((it2.valid())&&(!inserted));it3=it2++) {
+                std::cout << "Tour interne interne: " << k << std::endl;
+                std::cout << "Size New Order interne interne: " << newOrder.size() << std::endl;
+                k++;
                 node ntrg = (*it2)->twinNode();
                 int qtrg = quadrant(GL, nsrc, ntrg);
                 node newnode = (*it)->twinNode();
@@ -66,7 +78,7 @@ void embedder(Graph& G, GridLayout& GL) {
                 // Si le quadrant du point que l'on veut inserer est inférieur a celui qu'on compare
                 if (qnewnode < qtrg) {
                     // Si on compare au premier, on insere en premiere place
-                    if (it3 == newOrder.begin()) {
+                    if (it2 == newOrder.begin()) {
                         newOrder.pushFront((*it));
                     }
                     // Sinon on insere apres it3 car insertBefore n'existe pas :)
@@ -81,20 +93,33 @@ void embedder(Graph& G, GridLayout& GL) {
                     while ((qnewnode == qtrg) && (!inserted)) {
                         // Si on est a droite on insere apres it3
                         if (!aGauche(GL, nsrc, ntrg, newnode)) {
-                            newOrder.insertAfter((*it), it3);
+                            if (it2 == newOrder.begin()) {
+                                newOrder.pushFront((*it));
+                            }
+                            // Sinon on insere apres it3 car insertBefore n'existe pas :)
+                            else {
+                                newOrder.insertAfter((*it), it3);
+                            }
                             inserted = true;
                         }
                         // Sinon on passe au prochain point
                         else {
                             it3 = it2++;
-                            ntrg = (*it2)->twinNode();
-                            qtrg = quadrant(GL, nsrc, ntrg);
+                            if (it2 != newOrder.end()) {
+                                ntrg = (*it2)->twinNode();
+                                qtrg = quadrant(GL, nsrc, ntrg);
+                            }
+                            else {
+                                qnewnode = 5;
+                                break;
+                            }
                         }
                     }
                     // Si on a pas inséré, c'est qu'on est le dernier élément du quadrant, donc on insere apres it3
                     if ((qnewnode != qtrg) && (!inserted)) {
                         newOrder.insertAfter((*it), it3);
                         inserted = true;
+                        break;
                     }
                 }
             }
@@ -103,50 +128,61 @@ void embedder(Graph& G, GridLayout& GL) {
                 newOrder.pushBack((*it));
             }
         }
+        std::cout << "Size New Order Final: " << newOrder.size() << std::endl;
+        G.sort(nsrc, newOrder);
         nsrc = nsrc->succ();
+        i++;
     }
 }
 
 int main() {
     
     Graph G;
-    GraphAttributes GA{G};
-    GA.directed() = false;
+    GridLayout GL{G};
 
     int gridWidth, gridHeight, maxBends;
 
     // ----- LECTURE D'UN FICHIER JSON DANS UN Graph -----
     string file = "exemple7.json";
-    readFromJson(file, G, GA, gridWidth, gridHeight, maxBends);
-    writeToJson("output.json", G, GA, gridWidth, gridHeight, maxBends);
+    readFromJson(file, G, GL, gridWidth, gridHeight, maxBends);
+    writeToJson("output.json", G, GL, gridWidth, gridHeight, maxBends);
+
+    node nsrc = G.firstNode();
+    SListPure<adjEntry> adj;
+    int i = 0;
+    while (nsrc != nullptr) {
+        nsrc->allAdjEntries(adj);
+        nsrc = nsrc->succ();
+        std::cout << "Nb Adj du noeud " << i << ": " << adj.size() << std::endl;
+        i++;
+    }
 
     std::cout << G.representsCombEmbedding() << std::endl;
     int maxX = 0, maxY = 0, minX = 100000, minY = 100000;
+
+    embedderDeFou(G, GL);
+    std::cout << "Embeded: " << G.representsCombEmbedding() << std::endl;
 
     bool planarize = false;
     std::cout << "Connexe: " << isConnected(G) << std::endl;
     std::cout << "Planaire: " << isPlanar(G) << std::endl;
     if (planarize) {
         PlanarStraightLayout PL;
-        PL.call(GA);
+        PL.separation(-19);
+        PL.callGridFixEmbed(G, GL);
         node n = G.firstNode();
         while (n != nullptr) {
-            if (GA.x(n) > maxX) maxX = GA.x(n);
-            if (GA.x(n) < minX) minX = GA.x(n);
-            if (GA.y(n) > maxY) maxY = GA.x(n);
-            if (GA.y(n) < minY) minY = GA.x(n);
+            if (GL.x(n) > maxX) maxX = GL.x(n);
+            if (GL.x(n) < minX) minX = GL.x(n);
+            if (GL.y(n) > maxY) maxY = GL.x(n);
+            if (GL.y(n) < minY) minY = GL.x(n);
             n = n->succ();
         }
         std::cout << "Planarised" << std::endl;
     }
-    //GraphIO::write(GA, "output-ERDiagram2.svg", GraphIO::drawSVG);
+    //GraphIO::write(GL, "output-ERDiagram2.svg", GraphIO::drawSVG);
     std::cout << "Connexe: " << isConnected(G) << std::endl;
     std::cout << "Planaire: " << isPlanar(G) << std::endl;
-    SimpleEmbedder Emf;
-    //EmbedderMinDepth Emf;
-    adjEntry tmpAdj;
-    Emf.doCall(G, tmpAdj);
-    std::cout << "Embeded: " << G.representsCombEmbedding() << std::endl;
 
     // Affichage des maps
     /*
@@ -163,6 +199,6 @@ int main() {
 
     // OpenGL
     srand(static_cast<unsigned int>(time(NULL)));
-    dispOpenGL(G,GA,gridWidth,gridHeight,maxX,maxY);
+    dispOpenGL(G,GL,gridWidth,gridHeight,maxX,maxY);
     return 0;
 }
