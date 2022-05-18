@@ -35,6 +35,10 @@ void readFromJson(string input, Graph& G, GraphAttributes& GA, int& gridWidth, i
     if (j["nodes"] == nullptr) {
         exit(1);
     }
+
+    // REMPLIR LES MAP ET VECTOR UNIQUEMENT SI GRAPHE PLANAIRE,
+    // VERIF PAR EXEMPLE SI (j["nodes"][0]["x"]!=j["nodes"][1]["x"])&&(j["nodes"][0]["y"]!=j["nodes"][1]["y"])
+
     int nodeNumber = static_cast<int>(j["nodes"].size());
     node* nodeTab = new node[nodeNumber];
     for (int i = 0; i < nodeNumber; i++) {
@@ -49,6 +53,7 @@ void readFromJson(string input, Graph& G, GraphAttributes& GA, int& gridWidth, i
     for (int i = 0; i < edgeNumber; i++) {
 
         // DEBUT TEST
+        /*
         node n1 = nodeTab[j["edges"][i]["source"]];
         node n2 = nodeTab[j["edges"][i]["target"]];
         if ((n1->lastAdj() != nullptr) && (n2->lastAdj() != nullptr)) {
@@ -63,8 +68,9 @@ void readFromJson(string input, Graph& G, GraphAttributes& GA, int& gridWidth, i
         else {
             edgeTab[i] = G.newEdge(n1->lastAdj(), n2);
         }
+        */
         // -- FIN TEST
-        //edgeTab[i] = G.newEdge(nodeTab[j["edges"][i]["source"]], nodeTab[j["edges"][i]["target"]]);
+        edgeTab[i] = G.newEdge(nodeTab[j["edges"][i]["source"]], nodeTab[j["edges"][i]["target"]]);
 
         if (j["edges"][i]["bends"] != nullptr) {
             DPolyline& p = GA.bends(edgeTab[i]);

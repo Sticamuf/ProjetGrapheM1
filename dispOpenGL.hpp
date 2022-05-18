@@ -70,8 +70,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                 break;
             case GLFW_KEY_J:
                 if (selectedAdj != nullptr)
-                    if (selectedAdj->pred() != nullptr) {
-                        selectedAdj = selectedAdj->pred();
+                    if (selectedAdj->cyclicPred() != nullptr) {
+                        selectedAdj = selectedAdj->cyclicPred();
                         selectedEdge = selectedAdj->theEdge();
                         selectedNode = selectedAdj->theNode();
                     }
