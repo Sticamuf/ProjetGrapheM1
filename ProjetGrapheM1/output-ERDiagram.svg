@@ -1,161 +1,209 @@
 <?xml version="1.0"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events" version="1.1" baseProfile="full" viewBox="-11 -11 742 382">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events" version="1.1" baseProfile="full" viewBox="-11 -11 1382 422">
 	<g>
 		<g>
-			<polygon points="710,360,705,361.25,705,358.75," stroke="#000000" />
-			<path fill="none" d=" M0,360 L710,360" stroke="#000000" />
+			<path fill="none" d=" M360,40 L0,400" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="150,322.5,145.452,324.925,144.846,322.5," stroke="#000000" />
-			<path fill="none" d=" M0,360 L150,322.5" stroke="#000000" />
+			<path fill="none" d=" M400,280 L360,240" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="310,245,306.087,248.354,304.969,246.118," stroke="#000000" />
-			<path fill="none" d=" M160,320 L310,245" stroke="#000000" />
+			<path fill="none" d=" M840,200 L640,240" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="430,276.667,424.861,276.271,425.652,273.9," stroke="#000000" />
-			<path fill="none" d=" M320,240 L430,276.667" stroke="#000000" />
+			<path fill="none" d=" M240,280 L400,280" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="450,270,452.652,265.581,454.419,267.348," stroke="#000000" />
-			<path fill="none" d=" M480,240 L450,270" stroke="#000000" />
+			<path fill="none" d=" M80,360 L160,360" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="490,245,495.031,246.118,493.913,248.354," stroke="#000000" />
-			<path fill="none" d=" M720,360 L490,245" stroke="#000000" />
+			<path fill="none" d=" M0,400 L80,360" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="710,359.286,704.924,360.176,705.102,357.683," stroke="#000000" />
-			<path fill="none" d=" M160,320 L710,359.286" stroke="#000000" />
+			<path fill="none" d=" M1360,400 L160,360" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="430,281.429,425.227,283.373,424.873,280.898," stroke="#000000" />
-			<path fill="none" d=" M160,320 L430,281.429" stroke="#000000" />
+			<path fill="none" d=" M320,120 L80,360" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="450,282.857,455.151,283.029,454.464,285.433," stroke="#000000" />
-			<path fill="none" d=" M720,360 L450,282.857" stroke="#000000" />
+			<path fill="none" d=" M360,240 L280,240" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="512,190,507.9,186.877,509.853,185.315," stroke="#000000" />
-			<path fill="none" d=" M360,0 L512,190" stroke="#000000" />
+			<path fill="none" d=" M880,160 L960,160" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="360,30,358.75,25,361.25,25," stroke="#000000" />
-			<path fill="none" d=" M360,0 L360,25" stroke="#000000" />
+			<path fill="none" d=" M880,160 L840,120" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="390,70,385.581,67.3483,387.348,65.5806," stroke="#000000" />
-			<path fill="none" d=" M360,40 L390,70" stroke="#000000" />
+			<path fill="none" d=" M600,280 L480,280" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="396.667,90,396.271,95.1387,393.9,94.3481," stroke="#000000" />
-			<path fill="none" d=" M360,200 L396.667,90" stroke="#000000" />
+			<path fill="none" d=" M1160,200 L1120,240" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="430,130,427.348,134.419,425.581,132.652," stroke="#000000" />
-			<path fill="none" d=" M360,200 L430,130" stroke="#000000" />
+			<path fill="none" d=" M760,120 L840,120" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="510,190,505.581,187.348,507.348,185.581," stroke="#000000" />
-			<path fill="none" d=" M440,120 L510,190" stroke="#000000" />
+			<path fill="none" d=" M1200,320 L760,280" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="410,90,414.419,92.6517,412.652,94.4194," stroke="#000000" />
-			<path fill="none" d=" M440,120 L410,90" stroke="#000000" />
+			<path fill="none" d=" M0,400 L120,400" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="395,70,391.646,66.0869,393.882,64.9688," stroke="#000000" />
-			<path fill="none" d=" M360,0 L395,70" stroke="#000000" />
+			<path fill="none" d=" M1120,240 L1200,320" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="433.333,110,429.52,106.533,431.6,105.146," stroke="#000000" />
-			<path fill="none" d=" M360,0 L433.333,110" stroke="#000000" />
+			<path fill="none" d=" M1120,240 L880,240" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="370,10,374.419,12.6517,372.652,14.4194," stroke="#000000" />
-			<path fill="none" d=" M720,360 L370,10" stroke="#000000" />
+			<path fill="none" d=" M1360,400 L1200,320" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="350,10,347.348,14.4194,345.581,12.6517," stroke="#000000" />
-			<path fill="none" d=" M0,360 L350,10" stroke="#000000" />
+			<path fill="none" d=" M160,360 L240,280" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="352.857,50,350.968,54.7952,348.934,53.3421," stroke="#000000" />
-			<path fill="none" d=" M160,320 L352.857,50" stroke="#000000" />
+			<path fill="none" d=" M600,280 L360,40" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="350,48.8889,347.093,53.145,345.432,51.2764," stroke="#000000" />
-			<path fill="none" d=" M0,360 L350,48.8889" stroke="#000000" />
+			<path fill="none" d=" M880,240 L640,240" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="390,90,387.348,94.4194,385.581,92.6517," stroke="#000000" />
-			<path fill="none" d=" M160,320 L390,90" stroke="#000000" />
+			<path fill="none" d=" M1080,200 L840,200" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="395,90,393.882,95.0312,391.646,93.9131," stroke="#000000" />
-			<path fill="none" d=" M320,240 L395,90" stroke="#000000" />
+			<path fill="none" d=" M640,240 L760,120" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="350,210,347.348,214.419,345.581,212.652," stroke="#000000" />
-			<path fill="none" d=" M320,240 L350,210" stroke="#000000" />
+			<path fill="none" d=" M840,200 L880,160" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="370,210,374.419,212.652,372.652,214.419," stroke="#000000" />
-			<path fill="none" d=" M440,280 L370,210" stroke="#000000" />
+			<path fill="none" d=" M640,240 L600,280" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="443.333,130,446.1,134.348,443.729,135.139," stroke="#000000" />
-			<path fill="none" d=" M480,240 L443.333,130" stroke="#000000" />
+			<path fill="none" d=" M440,320 L400,280" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="440,130,438.75,135,441.25,135," stroke="#000000" />
-			<path fill="none" d=" M440,280 L440,135" stroke="#000000" />
+			<path fill="none" d=" M1160,200 L1360,400" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="510,210,507.348,214.419,505.581,212.652," stroke="#000000" />
-			<path fill="none" d=" M480,240 L510,210" stroke="#000000" />
+			<path fill="none" d=" M960,0 L1160,200" stroke="#000000" />
 		</g>
 		<g>
-			<polygon points="530,208,534.685,210.147,533.123,212.1," stroke="#000000" />
-			<path fill="none" d=" M720,360 L530,208" stroke="#000000" />
+			<path fill="none" d=" M280,240 L240,280" stroke="#000000" />
+		</g>
+		<g>
+			<path fill="none" d=" M1040,160 L1080,200" stroke="#000000" />
+		</g>
+		<g>
+			<path fill="none" d=" M480,280 L320,120" stroke="#000000" />
+		</g>
+		<g>
+			<path fill="none" d=" M1200,320 L440,320" stroke="#000000" />
+		</g>
+		<g>
+			<path fill="none" d=" M160,360 L440,320" stroke="#000000" />
+		</g>
+		<g>
+			<path fill="none" d=" M120,400 L1360,400" stroke="#000000" />
+		</g>
+		<g>
+			<path fill="none" d=" M440,320 L480,280" stroke="#000000" />
+		</g>
+		<g>
+			<path fill="none" d=" M960,160 L1040,160" stroke="#000000" />
+		</g>
+		<g>
+			<path fill="none" d=" M760,280 L600,280" stroke="#000000" />
+		</g>
+		<g>
+			<path fill="none" d=" M1080,200 L1120,240" stroke="#000000" />
+		</g>
+		<g>
+			<path fill="none" d=" M840,120 L960,0" stroke="#000000" />
 		</g>
 	</g>
 	<g>
-		<rect x="-10" y="350" width="20" height="20" />
+		<rect x="-10" y="390" width="20" height="20" />
 	</g>
 	<g>
-		<rect x="150" y="310" width="20" height="20" />
+		<rect x="230" y="270" width="20" height="20" />
 	</g>
 	<g>
-		<rect x="710" y="350" width="20" height="20" />
+		<rect x="1150" y="190" width="20" height="20" />
 	</g>
 	<g>
-		<rect x="470" y="230" width="20" height="20" />
+		<rect x="830" y="190" width="20" height="20" />
 	</g>
 	<g>
-		<rect x="310" y="230" width="20" height="20" />
+		<rect x="270" y="230" width="20" height="20" />
 	</g>
 	<g>
-		<rect x="430" y="270" width="20" height="20" />
+		<rect x="1350" y="390" width="20" height="20" />
 	</g>
 	<g>
-		<rect x="350" y="-10" width="20" height="20" />
+		<rect x="430" y="310" width="20" height="20" />
+	</g>
+	<g>
+		<rect x="390" y="270" width="20" height="20" />
+	</g>
+	<g>
+		<rect x="310" y="110" width="20" height="20" />
+	</g>
+	<g>
+		<rect x="750" y="270" width="20" height="20" />
+	</g>
+	<g>
+		<rect x="150" y="350" width="20" height="20" />
+	</g>
+	<g>
+		<rect x="950" y="-10" width="20" height="20" />
+	</g>
+	<g>
+		<rect x="630" y="230" width="20" height="20" />
+	</g>
+	<g>
+		<rect x="830" y="110" width="20" height="20" />
+	</g>
+	<g>
+		<rect x="750" y="110" width="20" height="20" />
+	</g>
+	<g>
+		<rect x="470" y="270" width="20" height="20" />
+	</g>
+	<g>
+		<rect x="110" y="390" width="20" height="20" />
+	</g>
+	<g>
+		<rect x="1030" y="150" width="20" height="20" />
+	</g>
+	<g>
+		<rect x="1110" y="230" width="20" height="20" />
+	</g>
+	<g>
+		<rect x="1070" y="190" width="20" height="20" />
+	</g>
+	<g>
+		<rect x="590" y="270" width="20" height="20" />
+	</g>
+	<g>
+		<rect x="870" y="230" width="20" height="20" />
+	</g>
+	<g>
+		<rect x="1190" y="310" width="20" height="20" />
 	</g>
 	<g>
 		<rect x="350" y="30" width="20" height="20" />
 	</g>
 	<g>
-		<rect x="350" y="190" width="20" height="20" />
+		<rect x="350" y="230" width="20" height="20" />
 	</g>
 	<g>
-		<rect x="430" y="110" width="20" height="20" />
+		<rect x="950" y="150" width="20" height="20" />
 	</g>
 	<g>
-		<rect x="510" y="190" width="20" height="20" />
+		<rect x="870" y="150" width="20" height="20" />
 	</g>
 	<g>
-		<rect x="390" y="70" width="20" height="20" />
+		<rect x="70" y="350" width="20" height="20" />
 	</g>
 </svg>

@@ -145,7 +145,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="edgeMap.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -153,6 +152,7 @@
     <ClInclude Include="dispOpenGL.hpp" />
     <ClInclude Include="edgeMap.hpp" />
     <ClInclude Include="jsonIO.hpp" />
+    <ClInclude Include="NodeMap.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
