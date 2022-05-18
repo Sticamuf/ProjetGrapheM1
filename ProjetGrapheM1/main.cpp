@@ -173,7 +173,7 @@ int main() {
 
 	//GA.setAllHeight(0.01);
 	//GA.setAllWidth(0.01);
-	//writeToJson("output.json", G, GA, gridWidth, gridHeight, maxBends);
+	writeToJson("output.json", G, GL, gridWidth, gridHeight, maxBends);
 
 	// ----- AFFICHAGE OPENGL -----
 	dispOpenGL(G, GL, gridWidth, gridHeight, maxX, maxY);
