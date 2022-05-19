@@ -10,6 +10,8 @@
 #include <ogdf/basic/Layout.h>
 #include "calcEdgeLength.hpp"
 #include "EdgeMap.hpp"
+#include "Quadrant.hpp"
+
 
 using namespace ogdf;
 
@@ -23,6 +25,14 @@ std::set<edge> setEdge;
 bool showAllEdges = false;
 ConstCombinatorialEmbedding CCE;
 
+// Incrément de déplacement du selected node
+int dx, dy;
+
+double calcEdgeLengthRatio() {
+    double ratio = (mapLengthEdgeSet.rbegin()->first / mapLengthEdgeSet.begin()->first);
+    return ratio;
+}
+
 void error_callback(int error, const char* description) {
     fputs(description, stderr);
 }
@@ -35,9 +45,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             case GLFW_KEY_ESCAPE: glfwSetWindowShouldClose(window, GLFW_TRUE); break;
                 // Action deplacer un noeud aleatoirement?
                 // TOUCHE Q SUR UN CLAVIER AZERTY!
-            case GLFW_KEY_A:
-                move_randomly = !move_randomly;
-                break;
+            // Touche D et F pour changer d'edge dans le graphe (edge coloré)
             case GLFW_KEY_D:
                 if (selectedEdge->pred() != nullptr)
                     selectedEdge = selectedEdge->pred();
@@ -46,6 +54,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                 if (selectedEdge->succ() != nullptr)
                     selectedEdge = selectedEdge->succ();
                 break;
+            // Touche C et V pour changer de noeud dans le graphe (noeud coloré)
             case GLFW_KEY_C:
                 if (selectedNode->pred() != nullptr)
                     selectedNode = selectedNode->pred();
@@ -54,20 +63,21 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                 if (selectedNode->succ() != nullptr)
                     selectedNode = selectedNode->succ();
                 break;
+            // G permet de sélectionner l'adjEntry associé au noeud sélectionné
             case GLFW_KEY_G:
                 selectedAdj = selectedNode->firstAdj();
                 selectedEdge = selectedAdj->theEdge();
                 selectedNode = selectedAdj->theNode();
                 break;
+            // T permet de sélectionner l'adjEntry opposée a l'adjEntry actuelle
             case GLFW_KEY_T:
-                selectedAdj = selectedAdj->twin();
-                selectedEdge = selectedAdj->theEdge();
-                selectedNode = selectedAdj->theNode();
-                break;
-            case GLFW_KEY_H:
-                if (selectedAdj != nullptr)
+                if (selectedAdj != nullptr) {
+                    selectedAdj = selectedAdj->twin();
                     selectedEdge = selectedAdj->theEdge();
+                    selectedNode = selectedAdj->theNode();
+                }
                 break;
+            // Permet de tourner sur les edge adjacent a un point en fonction de l'embedding (sens trigo)
             case GLFW_KEY_J:
                 if (selectedAdj != nullptr)
                     if (selectedAdj->cyclicSucc() != nullptr) {
@@ -76,9 +86,11 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                         selectedNode = selectedAdj->theNode();
                     }
                 break;
+            // Change la taille de l'affichage (utile apres la planarisation)
             case GLFW_KEY_R:
                 show_grid_size = !show_grid_size;
                 break;
+            // Récupere les faces adjacentes et ajoute les edges qui les composent dans setEdge
             case GLFW_KEY_P:
                 if (selectedNode != nullptr) {
                     setFace.clear();
@@ -104,15 +116,28 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                     }
                 }
                 break;
+            // Active ou désactive l'affichage des edge en bleu contenus dans setEdge
             case GLFW_KEY_L:
                 showAllEdges = !showAllEdges;
                 break;
+            // GAUCHE,DROITE,HAUT,BAS déplace le point sélectionné de 1 case dans la direction de la fleche
+            case GLFW_KEY_LEFT:
+                dx = -1;
+                move_randomly = true;
+                break;
+            case GLFW_KEY_RIGHT:
+                dx = 1;
+                move_randomly = true;
+                break;
+            case GLFW_KEY_DOWN:
+                dy = -1;
+                move_randomly = true;
+                break;
+            case GLFW_KEY_UP:
+                dy = 1;
+                move_randomly = true;
+                break;
         }
-}
-
-double calcEdgeLengthRatio() {
-    double ratio = (mapLengthEdgeSet.rbegin()->first / mapLengthEdgeSet.begin()->first);
-    return ratio;
 }
 
 void changeEdgeMapValue(edge e, GridLayout& GL) {
@@ -138,7 +163,53 @@ void changeEdgeMapValue(edge e, GridLayout& GL) {
     }
 }
 
-void dispOpenGL(const Graph& G, GridLayout& GL, const int gridWidth, const int gridHeight, int maxX, int maxY) {
+void changeNodeAdjEdgesMapValues(node n, GridLayout& GL) {
+    SListPure<edge> edges;
+    n->adjEdges(edges);
+    for (SListConstIterator<edge> i = edges.begin(); i.valid(); i++) {
+        edge e = (*i);
+        changeEdgeMapValue(e, GL);
+    }
+    std::cout << "Ratio: " << calcEdgeLengthRatio() << std::endl;
+}
+
+void move(Graph& G, GridLayout& GL, node n, int dx, int dy) {
+
+    face f2 = nullptr;
+    face selectedFace = getFace(CCE, GL, n, GL.x(n) + dx, GL.y(n) + dy, f2);
+    GL.x(n) += dx;
+    GL.y(n) += dy;
+    setEdge.clear();
+
+    embedNode(G, GL, n);
+
+    if (f2 != nullptr) {
+        adjEntry firstAdj = f2->firstAdj();
+        adjEntry nextAdj = firstAdj;
+        if (firstAdj != nullptr) {
+            do {
+                if (nextAdj->theEdge() != nullptr) {
+                    setEdge.insert(nextAdj->theEdge());
+                }
+                nextAdj = f2->nextFaceEdge(nextAdj);
+            } while ((nextAdj != firstAdj) && (nextAdj != nullptr));
+        }
+    }
+
+
+    adjEntry firstAdj = selectedFace->firstAdj();
+    adjEntry nextAdj = firstAdj;
+    if (firstAdj != nullptr) {
+        do {
+            if (nextAdj->theEdge() != nullptr) {
+                setEdge.insert(nextAdj->theEdge());
+            }
+            nextAdj = selectedFace->nextFaceEdge(nextAdj);
+        } while ((nextAdj != firstAdj) && (nextAdj != nullptr));
+    }
+}
+
+void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHeight, int maxX, int maxY) {
     //debut ogdf
     node n = G.firstNode();
     CCE = ConstCombinatorialEmbedding{ G };
@@ -179,15 +250,10 @@ void dispOpenGL(const Graph& G, GridLayout& GL, const int gridWidth, const int g
         glLoadIdentity();
         // Deplacer un noeud aléatoirement
         if (move_randomly) {
-            node n = G.firstNode();
-            GL.x(n) += 1;
-            SListPure<edge> edges;
-            n->adjEdges(edges);
-            for (SListConstIterator<edge> i = edges.begin(); i.valid(); i++) {
-                edge e = (*i);
-                changeEdgeMapValue(e, GL);
-            }
-            std::cout << "Ratio: " << calcEdgeLengthRatio() << std::endl;
+            move(G, GL, selectedNode, dx, dy);
+            dx = 0;
+            dy = 0;
+            changeNodeAdjEdgesMapValues(selectedNode, GL);
             move_randomly = false;
         }
         //afficher les edge
