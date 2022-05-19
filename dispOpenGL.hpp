@@ -182,6 +182,7 @@ void move(Graph& G, GridLayout& GL, node n, int dx, int dy) {
     setEdge.clear();
 
     embedNode(G, GL, n);
+    changeNodeAdjEdgesMapValues(n, GL);
 
     if (f2 != nullptr) {
         adjEntry firstAdj = f2->firstAdj();
@@ -195,7 +196,6 @@ void move(Graph& G, GridLayout& GL, node n, int dx, int dy) {
             } while ((nextAdj != firstAdj) && (nextAdj != nullptr));
         }
     }
-
 
     adjEntry firstAdj = selectedFace->firstAdj();
     adjEntry nextAdj = firstAdj;
@@ -253,7 +253,6 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
             move(G, GL, selectedNode, dx, dy);
             dx = 0;
             dy = 0;
-            changeNodeAdjEdgesMapValues(selectedNode, GL);
             move_randomly = false;
         }
         //afficher les edge

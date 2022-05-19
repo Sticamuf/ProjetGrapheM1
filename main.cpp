@@ -23,7 +23,7 @@ int main() {
     int gridWidth, gridHeight, maxBends;
 
     // ----- LECTURE D'UN FICHIER JSON DANS UN Graph -----
-    string file = "exemples/man3.json";
+    string file = "exemples/test4.json";
     readFromJson(file, G, GL, gridWidth, gridHeight, maxBends);
     writeToJson("output.json", G, GL, gridWidth, gridHeight, maxBends);
     
