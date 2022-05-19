@@ -86,6 +86,28 @@ void embedNode(Graph& G, GridLayout& GL, node nsrc) {
 	// On itere sur tout les éléments de la liste non triée
 	for (; it.valid(); it++) {
 		bool inserted = false;
+		edge tmpEdge2;
+		int qnewnode;
+		if (newOrder.size() > 0) {
+			tmpEdge2 = (*it)->theEdge();
+			IPolyline& p2 = GL.bends(tmpEdge2);
+			if (p2.size() > 0) {
+				if (tmpEdge2->source() == nsrc) {
+					nx = p2.front().m_x;
+					ny = p2.front().m_y;
+				}
+				else {
+					nx = p2.back().m_x;
+					ny = p2.back().m_y;
+				}
+			}
+			else {
+				node newnode = (*it)->twinNode();
+				nx = GL.x(newnode);
+				ny = GL.y(newnode);
+			}
+			qnewnode = quadrant(sx, sy, nx, ny);
+		}
 		// On itere sur le deuxieme tableau tant qu'on est pas a la fin et tant qu'on a pas inseré
 		for (it2 = newOrder.begin(), it3 = it2; ((it2.valid()) && (!inserted)); it3 = it2++) {
 			edge tmpEdge = (*it2)->theEdge();
@@ -112,25 +134,6 @@ void embedNode(Graph& G, GridLayout& GL, node nsrc) {
 			// Quadrant du noeud/premier bend
 			int qtrg = quadrant(sx, sy, tx, ty);
 
-
-			edge tmpEdge2 = (*it)->theEdge();
-			IPolyline& p2 = GL.bends(tmpEdge2);
-			if (p2.size() > 0) {
-				if (tmpEdge2->source() == nsrc) {
-					nx = p2.front().m_x;
-					ny = p2.front().m_y;
-				}
-				else {
-					nx = p2.back().m_x;
-					ny = p2.back().m_y;
-				}
-			}
-			else {
-				node newnode = (*it)->twinNode();
-				nx = GL.x(newnode);
-				ny = GL.y(newnode);
-			}
-			int qnewnode = quadrant(sx, sy, nx, ny);
 			// Si le quadrant du point que l'on veut inserer est inférieur a celui qu'on compare
 			if (qnewnode < qtrg) {
 				// Si on compare au premier, on insere en premiere place
