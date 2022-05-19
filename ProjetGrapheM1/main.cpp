@@ -19,6 +19,7 @@
 #include "jsonIO.hpp"
 #include "edgeMap.hpp"
 #include "dispOpenGL.hpp"
+#include "Quadrant.hpp"
 
 using ogdf::Graph;
 using ogdf::GraphAttributes;
@@ -26,86 +27,69 @@ using std::cout, std::endl;
 
 
 
-
 int main() {
-	srand(static_cast<unsigned int>(time(NULL)));
 
-	Graph G;
-	GridLayout GL{ G };
-	int gridWidth, gridHeight, maxBends;
+    Graph G;
+    GridLayout GL{ G };
 
-	// ----- LECTURE D'UN FICHIER JSON DANS UN Graph -----
-	//string file = "test4.json";
-	string file = "auto21-5.json";
-	//string file = "auto21-13.json";
-	//string file = "testConnex.json";
-	readFromJson(file, G, GL, gridWidth, gridHeight, maxBends);
+    int gridWidth, gridHeight, maxBends;
 
-	cout << "is connected " << ogdf::isConnected(G) << endl;
+    // ----- LECTURE D'UN FICHIER JSON DANS UN Graph -----
+    string file = "test4.json";
+    readFromJson(file, G, GL, gridWidth, gridHeight, maxBends);
+    writeToJson("output.json", G, GL, gridWidth, gridHeight, maxBends);
 
-	// ---- - PLANARISER LE GRAPHE LU---- -
-	PlanarStraightLayout PL;
-	//PlanarDrawLayout PL;
-	//PlanarizationGridLayout PL;
-	//MixedModelLayout PL;
+    node nsrc = G.firstNode();
+    SListPure<adjEntry> adj;
+    int i = 0;
+    while (nsrc != nullptr) {
+        nsrc->allAdjEntries(adj);
+        nsrc = nsrc->succ();
+        std::cout << "Nb Adj du noeud " << i << ": " << adj.size() << std::endl;
+        i++;
+    }
 
-	//SchnyderLayout PL;
-	//FPPLayout PL;
+    std::cout << G.representsCombEmbedding() << std::endl;
+    int maxX = 0, maxY = 0, minX = 100000, minY = 100000;
 
-	PL.separation(-19);
+    embedderCarte(G, GL);
+    std::cout << "Embeded: " << G.representsCombEmbedding() << std::endl;
 
-	cout << "separation "<< PL.separation() << endl;
+    bool planarize = false;
+    std::cout << "Connexe: " << isConnected(G) << std::endl;
+    std::cout << "Planaire: " << isPlanar(G) << std::endl;
+    if (planarize) {
+        PlanarStraightLayout PL;
+        PL.separation(-19);
+        PL.callGridFixEmbed(G, GL);
+        node n = G.firstNode();
+        while (n != nullptr) {
+            if (GL.x(n) > maxX) maxX = GL.x(n);
+            if (GL.x(n) < minX) minX = GL.x(n);
+            if (GL.y(n) > maxY) maxY = GL.x(n);
+            if (GL.y(n) < minY) minY = GL.x(n);
+            n = n->succ();
+        }
+        std::cout << "Planarised" << std::endl;
+    }
+    //GraphIO::write(GL, "output-ERDiagram2.svg", GraphIO::drawSVG);
+    std::cout << "Connexe: " << isConnected(G) << std::endl;
+    std::cout << "Planaire: " << isPlanar(G) << std::endl;
 
-	EmbedderMinDepth* Emf = new EmbedderMinDepth;
-	PL.setEmbedder(Emf);
-	adjEntry tmpAdj;
-	
-	//PL.call(GA);
-	Emf->doCall(G, tmpAdj);
-	PL.callGridFixEmbed(G,GL);
-	cout << "G represents comb embedding : " << G.representsCombEmbedding() << endl;
-	
+    // Affichage des maps
+    /*
+    std::map<edge, double>::iterator it;
+    for (it = mapEdgeLength.begin(); it != mapEdgeLength.end(); it++) {
+        std::cout << "MapEdgeLength: " << it->second << std::endl;
+    }
+    std::map<double, std::set<edge>>::iterator it2;
+    for (it2 = mapLengthEdgeSet.begin(); it2 != mapLengthEdgeSet.end(); it2++) {
+        std::cout << "mapLengthEdgeSet: " << it2->first << std::endl;
+    }
+    */
 
-	int nbNodes = 0;
-	int maxX = 0, maxY = 0, minX = 100000, minY = 100000;
-	node n = G.firstNode();
-	
-	while (n != nullptr) {
-		nbNodes++;
-
-		//cout << "(x;y) (" << GA.x(n) << ";" << GA.y(n) << ")" << endl;
-
-		if (GL.x(n) > maxX) maxX = GL.x(n);
-		if (GL.x(n) < minX) minX = GL.x(n);
-		if (GL.y(n) > maxY) maxY = GL.y(n);
-		if (GL.y(n) < minY) minY = GL.y(n);
-		//cout << GA.x(n) << ' ' << GA.y(n) << endl;
-		n = n->succ();
-	}
-
-	std::cout << "nb noeuds " << nbNodes << std::endl;
-	std::cout << "maxX, maxY : " << maxX << ' ' << maxY << std::endl;
-
-	//GraphIO::write(GA, "output-ERDiagram.gml", GraphIO::writeGML);
-	//GraphIO::write(GA, "output-ERDiagram.svg", GraphIO::drawSVG);
-
-
-	//// ----- INITIALISER LES VARIABLES GLOBALES -----
-	////std::map<edge, double>::iterator it;
-	//for (auto it = mapEdgeLength.begin(); it != mapEdgeLength.end(); it++) {
-	//	std::cout << "MapEdgeLength: " << it->second << std::endl;
-	//}
-
-	////std::map<double, std::set<edge>>::iterator it2;
-	//for (auto it2 = mapLengthEdgeSet.begin(); it2 != mapLengthEdgeSet.end(); it2++) {
-	//	std::cout << "mapLengthEdgeSet: " << it2->first << std::endl;
-	//}
-
-	writeToJson("output.json", G, GL, gridWidth, gridHeight, maxBends);
-
-	// ----- AFFICHAGE OPENGL -----
-	dispOpenGL(G, GL, gridWidth, gridHeight, maxX, maxY);
-
-
-	return 0;
+    // OpenGL
+    srand(static_cast<unsigned int>(time(NULL)));
+    dispOpenGL(G, GL, gridWidth, gridHeight, maxX, maxY);
+    return 0;
 }

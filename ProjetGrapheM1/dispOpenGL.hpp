@@ -16,6 +16,7 @@
 #include <ogdf/basic/GraphAttributes.h>
 #include <ogdf/basic/Layout.h>
 #include "edgeMap.hpp"
+#include "Quadrant.hpp"
 
 using namespace ogdf;
 
@@ -31,6 +32,8 @@ std::set<face> setFace;
 std::set<edge> setEdge;
 bool showAllEdges = false;
 ConstCombinatorialEmbedding CCE;
+
+int dx, dy;
 
 double calcEdgeLengthRatio() {
 	double ratio = (mapLengthEdgeSet.rbegin()->first / mapLengthEdgeSet.begin()->first);
@@ -84,8 +87,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			break;
 		case GLFW_KEY_J:
 			if (selectedAdj != nullptr)
-				if (selectedAdj->pred() != nullptr) {
-					selectedAdj = selectedAdj->pred();
+				if (selectedAdj->cyclicSucc() != nullptr) {
+					selectedAdj = selectedAdj->cyclicSucc();
 					selectedEdge = selectedAdj->theEdge();
 					selectedNode = selectedAdj->theNode();
 				}
@@ -121,127 +124,183 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		case GLFW_KEY_L:
 			showAllEdges = !showAllEdges;
 			break;
+		case GLFW_KEY_LEFT:
+			dx = -1;
+			move_randomly = true;
+			break;
+		case GLFW_KEY_RIGHT:
+			dx = 1;
+			move_randomly = true;
+			break;
+		case GLFW_KEY_DOWN:
+			dy = -1;
+			move_randomly = true;
+			break;
+		case GLFW_KEY_UP:
+			dy = 1;
+			move_randomly = true;
+			break;
 		}
 }
 
 void changeEdgeMapValue(edge e, GridLayout& GL) {
-    auto it = mapEdgeLength.find(e);
-    double length = it->second;
-    double newLength = calcEdgeLength(e, GL);
-    if (length != newLength) {
-        it->second = newLength;
-        auto it2 = mapLengthEdgeSet.find(newLength);
-        if (it2 != mapLengthEdgeSet.end()) {
-            it2->second.insert(e);
-        }
-        else {
-            std::set<edge> tmpSet;
-            tmpSet.insert(e);
-            mapLengthEdgeSet.insert(std::pair<double, std::set<edge>>(newLength, tmpSet));
-        }
-        auto it3 = mapLengthEdgeSet.find(length);
-        it3->second.erase(e);
-        if (it3->second.empty()) {
-            mapLengthEdgeSet.erase(length);
-        }
-    }
+	auto it = mapEdgeLength.find(e);
+	double length = it->second;
+	double newLength = calcEdgeLength(e, GL);
+	if (length != newLength) {
+		it->second = newLength;
+		auto it2 = mapLengthEdgeSet.find(newLength);
+		if (it2 != mapLengthEdgeSet.end()) {
+			it2->second.insert(e);
+		}
+		else {
+			std::set<edge> tmpSet;
+			tmpSet.insert(e);
+			mapLengthEdgeSet.insert(std::pair<double, std::set<edge>>(newLength, tmpSet));
+		}
+		auto it3 = mapLengthEdgeSet.find(length);
+		it3->second.erase(e);
+		if (it3->second.empty()) {
+			mapLengthEdgeSet.erase(length);
+		}
+	}
 }
 
-void dispOpenGL(const Graph& G, GridLayout& GL, const int gridWidth, const int gridHeight, int maxX, int maxY) {
-    //debut ogdf
-    node n = G.firstNode();
-    CCE = ConstCombinatorialEmbedding{ G };
+void move(Graph& G, GridLayout& GL, node n, int dx, int dy) {
 
-    //fin ogdf
-    if (!glfwInit())
-        exit(EXIT_FAILURE);
-    GLFWwindow* window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
-    glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-    glfwSetErrorCallback(error_callback);
-    glfwSetKeyCallback(window, key_callback);
-    glfwMakeContextCurrent(window);
-    int width, height;
-    double tempX, tempY;
-    selectedEdge = G.firstEdge();
-    selectedNode = G.firstNode();
-    while (!glfwWindowShouldClose(window))
-    {
-        float ratio;
-        glfwGetFramebufferSize(window, &width, &height);
-        ratio = width / (float)height;
-        glViewport(0, 0, width, height);
-        glClear(GL_COLOR_BUFFER_BIT);
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        if (show_grid_size) {
-            glOrtho(-1, static_cast<float>(gridWidth) + 1, -1, static_cast<float>(gridHeight) + 1, 1.f, -1.f);
-        }
-        else {
-            glOrtho(-1, static_cast<float>(maxX) + 1, -1, static_cast<float>(maxY) + 1, 1.f, -1.f);
-        }
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        // Deplacer un noeud aléatoirement
-        if (move_randomly) {
-            node n = G.firstNode();
-            GL.x(n) += 1;
-            SListPure<edge> edges;
-            n->adjEdges(edges);
-            for (SListConstIterator<edge> i = edges.begin(); i.valid(); i++) {
-                edge e = (*i);
-                changeEdgeMapValue(e, GL);
-            }
-            std::cout << "Ratio: " << calcEdgeLengthRatio() << std::endl;
-            move_randomly = false;
-        }
-        //afficher les edge
-        glColor3f(1.0f, 1.0f, 1.0f);
-        for (auto e : G.edges)
-        {
-            if ((showAllEdges) && (setEdge.find(e) != setEdge.end())) {
-                glColor3f(0.0f, 0.0f, 1.0f);
-            }
-            else if (e == selectedEdge) {
-                glColor3f(0.0f, 1.0f, 0.0f);
-            }
-            else {
-                glColor3f(1.0f, 1.0f, 1.0f);
-            }
-            glBegin(GL_LINE_STRIP);
-            glVertex2d(GL.x(e->source()), GL.y(e->source()));
-            IPolyline& bends = GL.bends(e);
-            for (ListIterator<IPoint> i = bends.begin(); i.valid(); i++) {
-                glVertex2d((*i).m_x, (*i).m_y);
-            }
-            glVertex2d(GL.x(e->target()), GL.y(e->target()));
-            glEnd();
-        }
-        //afficher les nodes
-        glColor3f(1.0f, 0.0f, 0.0f);
-        glPointSize(5);
-        n = G.firstNode();
-        glBegin(GL_POINTS);
-        while (n != nullptr) {
-            if (n == selectedNode) {
-                glColor3f(0.0f, 0.0f, 1.0f);
-            }
-            else {
-                glColor3f(1.0f, 0.0f, 0.0f);
-            }
-            glVertex2d(GL.x(n), GL.y(n));
-            n = n->succ();
-        }
-        glEnd();
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-    glfwDestroyWindow(window);
-    glfwTerminate();
+	face f2 = nullptr;
+	face selectedFace = getFace(CCE, GL, n, GL.x(n) + dx, GL.y(n) + dy, f2);
+	GL.x(n) += dx;
+	GL.y(n) += dy;
+	setEdge.clear();
+
+	embedNode(G, GL, n);
+
+	if (f2 != nullptr) {
+		adjEntry firstAdj = f2->firstAdj();
+		adjEntry nextAdj = firstAdj;
+		if (firstAdj != nullptr) {
+			do { 
+				if (nextAdj->theEdge() != nullptr) {
+					setEdge.insert(nextAdj->theEdge());
+				}
+				nextAdj = f2->nextFaceEdge(nextAdj);
+			} while ((nextAdj != firstAdj) && (nextAdj != nullptr));
+		}
+	}
+
+
+	adjEntry firstAdj = selectedFace->firstAdj();
+	adjEntry nextAdj = firstAdj;
+	if (firstAdj != nullptr) {
+		do {
+			if (nextAdj->theEdge() != nullptr) {
+				setEdge.insert(nextAdj->theEdge());
+			}
+			nextAdj = selectedFace->nextFaceEdge(nextAdj);
+		} while ((nextAdj != firstAdj) && (nextAdj != nullptr));
+	}
+}
+
+void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHeight, int maxX, int maxY) {
+	//debut ogdf
+	node n = G.firstNode();
+	CCE = ConstCombinatorialEmbedding{ G };
+
+	//fin ogdf
+	if (!glfwInit())
+		exit(EXIT_FAILURE);
+	GLFWwindow* window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
+	if (!window)
+	{
+		glfwTerminate();
+		exit(EXIT_FAILURE);
+	}
+	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+	glfwSetErrorCallback(error_callback);
+	glfwSetKeyCallback(window, key_callback);
+	glfwMakeContextCurrent(window);
+	int width, height;
+	double tempX, tempY;
+	selectedEdge = G.firstEdge();
+	selectedNode = G.firstNode();
+	while (!glfwWindowShouldClose(window))
+	{
+		float ratio;
+		glfwGetFramebufferSize(window, &width, &height);
+		ratio = width / (float)height;
+		glViewport(0, 0, width, height);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		if (show_grid_size) {
+			glOrtho(-1, static_cast<float>(gridWidth) + 1, -1, static_cast<float>(gridHeight) + 1, 1.f, -1.f);
+		}
+		else {
+			glOrtho(-1, static_cast<float>(maxX) + 1, -1, static_cast<float>(maxY) + 1, 1.f, -1.f);
+		}
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		// Deplacer un noeud aléatoirement
+		if (move_randomly) {
+			//node n = G.firstNode();
+			//GL.x(n) += 1;
+			//SListPure<edge> edges;
+			//n->adjEdges(edges);
+			//for (SListConstIterator<edge> i = edges.begin(); i.valid(); i++) {
+			//    edge e = (*i);
+			//    changeEdgeMapValue(e, GL);
+			//}
+			//std::cout << "Ratio: " << calcEdgeLengthRatio() << std::endl;
+			//move_randomly = false;
+			move(G, GL, selectedNode, dx, dy);
+			dx = 0;
+			dy = 0;
+			move_randomly = false;
+		}
+		//afficher les edge
+		glColor3f(1.0f, 1.0f, 1.0f);
+		for (auto e : G.edges)
+		{
+			if ((showAllEdges) && (setEdge.find(e) != setEdge.end())) {
+				glColor3f(0.0f, 0.0f, 1.0f);
+			}
+			else if (e == selectedEdge) {
+				glColor3f(0.0f, 1.0f, 0.0f);
+			}
+			else {
+				glColor3f(1.0f, 1.0f, 1.0f);
+			}
+			glBegin(GL_LINE_STRIP);
+			glVertex2d(GL.x(e->source()), GL.y(e->source()));
+			IPolyline& bends = GL.bends(e);
+			for (ListIterator<IPoint> i = bends.begin(); i.valid(); i++) {
+				glVertex2d((*i).m_x, (*i).m_y);
+			}
+			glVertex2d(GL.x(e->target()), GL.y(e->target()));
+			glEnd();
+		}
+		//afficher les nodes
+		glColor3f(1.0f, 0.0f, 0.0f);
+		glPointSize(5);
+		n = G.firstNode();
+		glBegin(GL_POINTS);
+		while (n != nullptr) {
+			if (n == selectedNode) {
+				glColor3f(0.0f, 0.0f, 1.0f);
+			}
+			else {
+				glColor3f(1.0f, 0.0f, 0.0f);
+			}
+			glVertex2d(GL.x(n), GL.y(n));
+			n = n->succ();
+		}
+		glEnd();
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
+	glfwDestroyWindow(window);
+	glfwTerminate();
 }
 
 
