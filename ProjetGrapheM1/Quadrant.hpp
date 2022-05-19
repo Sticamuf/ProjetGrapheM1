@@ -214,7 +214,7 @@ void embedderCarte(Graph& G, GridLayout& GL) {
 }
 
 //on admet les ajdEntries triés dans l'ordre trigonométrique
-face getFace(ConstCombinatorialEmbedding& CCE, GridLayout& GL, const node& nsrc, int newX, int newY, face  f2) {
+face getFace(ConstCombinatorialEmbedding& CCE, GridLayout& GL, const node& nsrc, int newX, int newY, face& f2) {
 	SListPure<adjEntry> adj;
 	nsrc->allAdjEntries(adj);
 	int sx = GL.x(nsrc);
