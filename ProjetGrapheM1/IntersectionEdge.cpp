@@ -284,21 +284,21 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 			}
 			sourceX2 = GA.x(source2);
             		sourceY2 = GA.y(source2);
-					int endX1=GA.x(target1);
-				int endY1=GA.y(target1);
-				int originX1=GA.x(source1);
-				int originY1=GA.y(source1);
-				if(Croisement(originX1,originY1,endX1,endY1,sourceX1,sourceY1,targetX1,targetY1))
+			int endX1=GA.x(target1);
+			int endY1=GA.y(target1);
+			int originX1=GA.x(source1);
+			int originY1=GA.y(source1);
+			if(Croisement(originX1,originY1,endX1,endY1,sourceX1,sourceY1,targetX1,targetY1))
+			{
+				if((endX1==targetX1&&endY1==targetY1)||(originX1==sourceX1&&originY1==sourceY1))
 				{
-					if((endX1==targetX1&&endY1==targetY1)||(originX1==sourceX1&&originY1==sourceY1))
-					{
-						return false;
-					}
-					else
-					{
-						return true;
-					}					
-				)
+					return false;
+				}
+				else
+				{
+					return true;
+				}					
+			)
             		sourceX1 = targetX1;
             		sourceY1 = targetY1;
         	}
@@ -325,20 +325,20 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 				return true;	
 			}
 			int endX2=GA.x(target2);
-				int endY2=GA.y(target2);
-				int originX2=GA.x(source2);
-				int originY2=GA.y(source2);
-				if(Croisement(originX2,originY2,endX2,endY2,sourceX2,sourceY2,targetX2,targetY2))
+			int endY2=GA.y(target2);
+			int originX2=GA.x(source2);
+			int originY2=GA.y(source2);
+			if(Croisement(originX2,originY2,endX2,endY2,sourceX2,sourceY2,targetX2,targetY2))
+			{
+				if((endX2==targetX2&&endY2==targetY2)||(originX2==sourceX2&&originY2==sourceY2))
 				{
-					if((endX2==targetX2&&endY2==targetY2)||(originX2==sourceX2&&originY2==sourceY2))
-					{
-						return false;
-					}
-					else
-					{
-						return true;
-					}					
-				)
+					return false;
+				}
+				else
+				{
+					return true;
+				}					
+			)
 			sourceX1 = targetX1;
             		sourceY1 = targetY1;
 		}
@@ -362,20 +362,20 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 				return true;	
 			}
 			int endX1=GA.x(target1);
-				int endY1=GA.y(target1);
-				int originX1=GA.x(source1);
-				int originY1=GA.y(source1);
-				if(Croisement(originX1,originY1,endX1,endY1,sourceX1,sourceY1,targetX1,targetY1))
+			int endY1=GA.y(target1);
+			int originX1=GA.x(source1);
+			int originY1=GA.y(source1);
+			if(Croisement(originX1,originY1,endX1,endY1,sourceX1,sourceY1,targetX1,targetY1))
+			{
+				if((endX1==targetX1&&endY1==targetY1)||(originX1==sourceX1&&originY1==sourceY1))
 				{
-					if((endX1==targetX1&&endY1==targetY1)||(originX1==sourceX1&&originY1==sourceY1))
-					{
-						return false;
-					}
-					else
-					{
-						return true;
-					}					
-				)
+					return false;
+				}
+				else
+				{
+					return true;
+				}					
+			)
 			sourceX2 = targetX2;
             		sourceY2 = targetY2;
 		}
