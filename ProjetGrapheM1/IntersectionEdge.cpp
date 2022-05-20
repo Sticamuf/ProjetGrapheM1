@@ -349,7 +349,7 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 			return true;	
 		}
 	}
-	}
+	
 	else
 	{
 		targetX1 = GA.x(target1);
