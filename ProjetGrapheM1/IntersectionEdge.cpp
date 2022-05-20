@@ -278,7 +278,7 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 					{
 						return true;
 					}					
-				)
+				}
 				sourceX2 = targetX2;
             			sourceY2 = targetY2;
 			}
@@ -298,7 +298,7 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 				{
 					return true;
 				}					
-			)
+			}
             		sourceX1 = targetX1;
             		sourceY1 = targetY1;
         	}
@@ -338,7 +338,7 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 				{
 					return true;
 				}					
-			)
+			}
 			sourceX1 = targetX1;
             		sourceY1 = targetY1;
 		}
@@ -375,7 +375,7 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 				{
 					return true;
 				}					
-			)
+			}
 			sourceX2 = targetX2;
             		sourceY2 = targetY2;
 		}
