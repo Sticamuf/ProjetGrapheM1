@@ -263,7 +263,7 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 				if(Croisement(sourceX1,sourceY1,targetX1,targetY1,sourceX2,sourceY2,targetX2,targetY2))
 				{
 					return true;	
-				)
+				}
 				int endX2=GA.x(target2);
 				int endY2=GA.y(target2);
 				int originX2=GA.x(source2);
