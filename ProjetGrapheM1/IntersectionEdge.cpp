@@ -416,7 +416,7 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 
 }
 
-void ModidfierVecteur(const edge& e1,const edge& e2,const GraphAttributes& GA)
+/*void ModidfierVecteur(const edge& e1,const edge& e2,const GraphAttributes& GA)
 {
 	// Si vraie on les ajoutent dans le vector s'ils n'y sont pas
 	if(intersection(e1,e2,GA))
@@ -446,4 +446,4 @@ void ModidfierVecteur(const edge& e1,const edge& e2,const GraphAttributes& GA)
 
 
 	}
-}
+}*/
