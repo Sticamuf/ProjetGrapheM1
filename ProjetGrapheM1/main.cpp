@@ -83,15 +83,6 @@ int main() {
     }
     */
 
-    //faire un nombre de fois
-    for(int i = 0; i < G.nodes.size() * 500; i++) {
-        //choisir une node au hasard
-        //vérifier dans quelle direction on peut la bouger
-        //pour chaque direction lui attribuer une probabilité d'être choisie en fonction de la modification à la variance qu'elle apporte
-        //bouger le neoud choisi
-
-    }
-
     // OpenGL
     srand(static_cast<unsigned int>(time(NULL)));
     dispOpenGL(G, GL, gridWidth, gridHeight, maxX, maxY);
