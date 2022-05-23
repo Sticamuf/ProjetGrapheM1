@@ -75,7 +75,7 @@ bool Alignes(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 		   
 }
 
-bool EstSuperieurX(int px,int rx)
+/*bool EstSuperieurX(int px,int rx)
 {
 	if(px<rx)
 	{
@@ -109,7 +109,7 @@ bool EstInferieurY(int py,int ry)
 		return true;	
 	}
 	return false;
-}
+}*/
 
 int AGauche(int px, int py, int qx, int qy, int rx, int ry)
 {
@@ -219,7 +219,29 @@ bool Croisement(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 	}	
 }
 
-bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
+bool intersec(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
+{
+	if(min(rx,sx) > max(px,qx))
+	{
+		return false;
+	}
+		
+	if(min(px,qx) > max(rx,sx))
+	{
+		return false;
+	}
+	if(min(ry,sy) > max(py,qy))
+	{
+		return false;
+	}
+	
+	if(min(py,qy) > max(ry,sy)) 
+	{
+		return false;
+	}
+}
+
+bool intersection(const edge& e1,const edge& e2,const GridLayout& GA)
 {
 	align=-1;
 	
@@ -417,7 +439,7 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 
 }
 
-/*void ModidfierVecteur(const edge& e1,const edge& e2,const GraphAttributes& GA)
+void ModidfierVecteur(const edge& e1,const edge& e2,const GridLayout& GA)
 {
 	// Si vraie on les ajoutent dans le vector s'ils n'y sont pas
 	if(intersection(e1,e2,GA))
@@ -447,4 +469,4 @@ bool intersection(const edge& e1,const edge& e2,const GraphAttributes& GA)
 
 
 	}
-}*/
+}
