@@ -16,7 +16,7 @@
 #include <ogdf/basic/GraphAttributes.h>
 #include <ogdf/basic/Layout.h>
 #include "edgeMap.hpp"
-#include "Quadrant.hpp"
+#include "embedder.hpp"
 
 using namespace ogdf;
 
