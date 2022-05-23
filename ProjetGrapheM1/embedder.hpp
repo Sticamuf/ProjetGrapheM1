@@ -53,15 +53,15 @@ bool aGauche(int sx, int sy, int tx, int ty, int cx, int cy) {
 }
 
 int aGaucheInt(int sx, int sy, int tx, int ty, int cx, int cy) {
-	int det = ((tx - sx) * (cy - sy) - (ty - sy) * (cx - sx));
+	long long det = ((tx - sx) * (cy - sy) - (ty - sy) * (cx - sx));
 	if (det > 0) return 1;
 	if (det < 0) return -1;
 	return 0;
 }
 
-void embedNode(Graph& G, GridLayout& GL, node nsrc)
-{
+void embedNode(Graph& G, GridLayout& GL, node nsrc) {
 	SListPure<adjEntry> adj;
+	
 	SListPure<adjEntry> newOrder;
 	// Itérateur qui itere sur le tableau des adjacent non trié
 	SListIterator<adjEntry> it;
@@ -87,6 +87,28 @@ void embedNode(Graph& G, GridLayout& GL, node nsrc)
 	// On itere sur tout les éléments de la liste non triée
 	for (; it.valid(); it++) {
 		bool inserted = false;
+		edge tmpEdge2;
+		int qnewnode;
+		//if (newOrder.size() > 0) {
+			tmpEdge2 = (*it)->theEdge();
+			IPolyline& p2 = GL.bends(tmpEdge2);
+			if (p2.size() > 0) {
+				if (tmpEdge2->source() == nsrc) {
+					nx = p2.front().m_x;
+					ny = p2.front().m_y;
+				}
+				else {
+					nx = p2.back().m_x;
+					ny = p2.back().m_y;
+				}
+			}
+			else {
+				node newnode = (*it)->twinNode();
+				nx = GL.x(newnode);
+				ny = GL.y(newnode);
+			}
+			qnewnode = quadrant(sx, sy, nx, ny);
+		//}
 		// On itere sur le deuxieme tableau tant qu'on est pas a la fin et tant qu'on a pas inseré
 		for (it2 = newOrder.begin(), it3 = it2; ((it2.valid()) && (!inserted)); it3 = it2++) {
 			edge tmpEdge = (*it2)->theEdge();
@@ -113,25 +135,6 @@ void embedNode(Graph& G, GridLayout& GL, node nsrc)
 			// Quadrant du noeud/premier bend
 			int qtrg = quadrant(sx, sy, tx, ty);
 
-
-			edge tmpEdge2 = (*it)->theEdge();
-			IPolyline& p2 = GL.bends(tmpEdge2);
-			if (p2.size() > 0) {
-				if (tmpEdge2->source() == nsrc) {
-					nx = p2.front().m_x;
-					ny = p2.front().m_y;
-				}
-				else {
-					nx = p2.back().m_x;
-					ny = p2.back().m_y;
-				}
-			}
-			else {
-				node newnode = (*it)->twinNode();
-				nx = GL.x(newnode);
-				ny = GL.y(newnode);
-			}
-			int qnewnode = quadrant(sx, sy, nx, ny);
 			// Si le quadrant du point que l'on veut inserer est inférieur a celui qu'on compare
 			if (qnewnode < qtrg) {
 				// Si on compare au premier, on insere en premiere place
@@ -146,53 +149,16 @@ void embedNode(Graph& G, GridLayout& GL, node nsrc)
 			}
 			// Si les quadrants sont égaux
 			else if (qnewnode == qtrg) {
-				// Tant que les quadrants sont égaux
-				while ((qnewnode == qtrg) && (!inserted)) {
-					// Si on est a droite on insere apres it3
-					if (!aGauche(sx, sy, tx, ty, nx, ny)) {
-						if (it2 == newOrder.begin()) {
-							newOrder.pushFront((*it));
-						}
-						// Sinon on insere apres it3 car insertBefore n'existe pas :)
-						else {
-							newOrder.insertAfter((*it), it3);
-						}
-						inserted = true;
+				// Si on est a droite on insere apres it3
+				if (!aGauche(sx, sy, tx, ty, nx, ny)) {
+					if (it2 == newOrder.begin()) {
+						newOrder.pushFront((*it));
 					}
-					// Sinon on passe au prochain point
+					// Sinon on insere apres it3 car insertBefore n'existe pas :)
 					else {
-						it3 = it2++;
-						if (it2 != newOrder.end()) {
-							edge tmpEdge3 = (*it2)->theEdge();
-							IPolyline& p3 = GL.bends(tmpEdge3);
-							if (p3.size() > 0) {
-								if (tmpEdge->source() == nsrc) {
-									tx = p3.front().m_x;
-									ty = p3.front().m_y;
-								}
-								else {
-									tx = p3.back().m_x;
-									ty = p3.back().m_y;
-								}
-							}
-							else {
-								ntrg = (*it2)->twinNode();
-								tx = GL.x(ntrg);
-								ty = GL.y(ntrg);
-							}
-							qtrg = quadrant(sx, sy, tx, ty);
-						}
-						else {
-							qnewnode = 5;
-							break;
-						}
+						newOrder.insertAfter((*it), it3);
 					}
-				}
-				// Si on a pas inséré, c'est qu'on est le dernier élément du quadrant, donc on insere apres it3
-				if ((qnewnode != qtrg) && (!inserted)) {
-					newOrder.insertAfter((*it), it3);
 					inserted = true;
-					break;
 				}
 			}
 		}
@@ -206,7 +172,6 @@ void embedNode(Graph& G, GridLayout& GL, node nsrc)
 
 void embedderCarte(Graph& G, GridLayout& GL) {
 	node nsrc = G.firstNode();
-
 	while (nsrc != nullptr) {
 		embedNode(G, GL, nsrc);
 		nsrc = nsrc->succ();
@@ -220,11 +185,9 @@ face getFace(ConstCombinatorialEmbedding& CCE, GridLayout& GL, const node& nsrc,
 	int sx = GL.x(nsrc);
 	int sy = GL.y(nsrc);
 	int tx, ty;
-
 	int qnew = quadrant(sx, sy, newX, newY);
-
+	node ntrg;
 	for (auto it = adj.begin(); it.valid(); it++) {
-		node ntrg;
 		edge tmpEdge = (*it)->theEdge();
 		IPolyline& p = GL.bends(tmpEdge);
 		// Si l'edge contient des bends
@@ -256,57 +219,21 @@ face getFace(ConstCombinatorialEmbedding& CCE, GridLayout& GL, const node& nsrc,
 		}
 		// Si le quadrant du nouveau est le même que celui à comparer
 		else if (qnew == qtrg) {
-			// Tant que les quadrants sont égaux
-			while (qnew == qtrg) {
-				//si le nouveau noeud est à droite de targ on renvoie la face entre targ et son précédent
-				int det = aGaucheInt(sx, sy, tx, ty, newX, newY);
-				if ( det == -1) {
-					return CCE.leftFace(*it);
-				}
-				else if (det == 0) {
-					f2 = CCE.rightFace(*it);
-					return CCE.leftFace(*it);
-				}
-				else {
-					it++;
-					if (it != adj.end()) {
-						edge tmpEdge3 = (*it)->theEdge();
-						IPolyline& p3 = GL.bends(tmpEdge3);
-						if (p3.size() > 0) {
-							if (tmpEdge->source() == nsrc) {
-								tx = p3.front().m_x;
-								ty = p3.front().m_y;
-							}
-							else {
-								tx = p3.back().m_x;
-								ty = p3.back().m_y;
-							}
-						}
-						else {
-							ntrg = (*it)->twinNode();
-							tx = GL.x(ntrg);
-							ty = GL.y(ntrg);
-						}
-						qtrg = quadrant(sx, sy, tx, ty);
-					}
-					else {
-						return CCE.leftFace(*adj.begin());
-					}
-				}
+			//si le nouveau noeud est à droite de targ on renvoie la face entre targ et son précédent
+			int det = aGaucheInt(sx, sy, tx, ty, newX, newY);
+			if (det == -1) {
+				return CCE.leftFace(*it);
 			}
-
-			//on sait qu'on compare à un noeud dans le prochain quadrant donc on renvoie la face droite de targ
-			return CCE.leftFace(*it);
-
+			else if (det == 0) {
+				f2 = CCE.rightFace(*it);
+				return CCE.leftFace(*it);
+			}
 		}
-
-		//le quadrant est plus grand et on passe au prochain noeud
-
+		//le quadrant est plus grand ou égal mais point a gauche: on passe au prochain noeud
 	}
-
 	//Si l'on arrive ici, il faut renvoyer la face entre le dernier et le premier noeud
 	return CCE.leftFace(*adj.begin());
-
 }
+
 
 #endif

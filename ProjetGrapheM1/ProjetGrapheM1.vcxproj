@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="IntersectionEdge.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -152,8 +153,9 @@
     <ClInclude Include="dispOpenGL.hpp" />
     <ClInclude Include="edgeMap.hpp" />
     <ClInclude Include="jsonIO.hpp" />
-    <ClInclude Include="NodeMap.hpp" />
-    <ClInclude Include="Quadrant.hpp" />
+    <ClInclude Include="nodeMap.hpp" />
+    <ClInclude Include="embedder.hpp" />
+    <ClInclude Include="optimAlg.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

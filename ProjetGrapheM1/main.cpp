@@ -60,7 +60,7 @@ int main() {
     std::cout << "Planaire: " << isPlanar(G) << std::endl;
     if (planarize) {
         PlanarStraightLayout PL;
-        PL.separation(-19);
+        PL.separation(-19); // pas par defaut = 20 multiplie les coord par 40, -19 donne le pas 1 (distance minimale entre deux points)
         PL.callGridFixEmbed(G, GL);
         node n = G.firstNode();
         while (n != nullptr) {

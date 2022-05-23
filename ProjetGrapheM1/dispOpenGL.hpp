@@ -224,6 +224,7 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 	double tempX, tempY;
 	selectedEdge = G.firstEdge();
 	selectedNode = G.firstNode();
+	glLineWidth(4);
 	while (!glfwWindowShouldClose(window))
 	{
 		float ratio;
