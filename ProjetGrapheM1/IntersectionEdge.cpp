@@ -138,7 +138,11 @@ bool seCroisent(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
    	int ag4 = AGauche(rx,ry,sx,sy,qx,qy);
 	
 	// cas général
-    	if (ag1 != ag2 && ag3 != ag4)
+	if(ag1*ag2==1||ag3*ag4==1)
+	{
+		return false;
+	}
+    	else if (ag1 != ag2 && ag3 != ag4)
 	{
 		return true;
 	}
@@ -148,78 +152,7 @@ bool seCroisent(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 	}
 }
 
-bool Croisement(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
-{
-	if(Alignes(px,py,qx,qy,rx,ry,sx,sy))
-	{
-		if(align==1)
-		{
-			if((EstInferieurX(px,rx)&&EstSuperieurX(qx,rx))||
-			   (EstSuperieurX(px,rx)&&EstInferieurX(qx,rx))||
-			   (EstSuperieurY(py,ry)&&EstInferieurY(qy,ry))||
-			   (EstInferieurY(py,ry)&&EstSuperieurY(qy,ry)))
-			{
-				return true;	
-			}
-			else
-			{
-				return false;
-			}
-					
-		}
-		else if(align==2)
-		{
-			if((EstInferieurX(px,sx)&&EstSuperieurX(qx,sx))||
-			   (EstSuperieurX(px,sx)&&EstInferieurX(qx,sx))||
-			   (EstSuperieurY(py,sy)&&EstInferieurY(qy,sy))||
-			   (EstInferieurY(py,sy)&&EstSuperieurY(qy,sy)))
-			{
-				return true;	
-			}
-			else
-			{
-				return false;
-			}
-		}
-		else if(align==3)
-		{
-			if((EstInferieurX(rx,px)&&EstSuperieurX(sx,px))||
-			   (EstSuperieurX(rx,px)&&EstInferieurX(sx,px))||
-			   (EstSuperieurY(ry,py)&&EstInferieurY(sy,py))||
-			   (EstInferieurY(ry,py)&&EstSuperieurY(sy,py)))
-			{
-				return true;	
-			}
-			else
-			{
-				return false;
-			}
-		}
-		else if(align==4)
-		{
-			if((EstInferieurX(rx,qx)&&EstSuperieurX(sx,qx))||
-			   (EstSuperieurX(rx,qx)&&EstInferieurX(sx,qx))||
-			   (EstSuperieurY(ry,qy)&&EstInferieurY(sy,qy))||
-			   (EstInferieurY(ry,qy)&&EstSuperieurY(sy,qy)))
-			{
-				return true;	
-			}
-			else
-			{
-				return false;
-			}
-		}
-	}
-	else
-	{
-		if(seCroisent(px,py,qx,qy,rx,ry,sx,sy))
-		{
-			return true;	
-		}
-	}	
-}
-
-bool intersec(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
+bool DansZone(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 {
 	if(min(rx,sx) > max(px,qx))
 	{
@@ -239,7 +172,22 @@ bool intersec(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 	{
 		return false;
 	}
+	return true;
 }
+
+bool Croisement(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
+{
+	if(DansZone(px,py,qx,qy,rx,ry,sx,sy))
+	{
+		
+	}
+	else
+	{
+		return false;
+	}
+}
+
+
 
 bool intersection(const edge& e1,const edge& e2,const GridLayout& GA)
 {
