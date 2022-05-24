@@ -1,17 +1,24 @@
-#include <ogdf/basic/GraphAttributes.h>
+#ifndef INTERSECTION
+#define INTERSECTION
+
+#include <ogdf/basic/GridLayout.h>
+#include <ogdf/basic/geometry.h>
 
 using ogdf::edge;
-using ogdf::GraphAttributes;
 using ogdf::node;
-using ogdf::DPolyline;
+using ogdf::IPolyline;
 using ogdf::ListIterator;
-using ogdf::DPoint;
-
+using ogdf::IPoint;
+using std::min;
+using std::max;
+using ogdf::GridLayout;
 
 std::vector<edge> in;
 int posE1 = -1;
 int posE2 = -1;
 int align = -1;
+
+
 
 
 bool estDansVector(const edge& e)
@@ -34,84 +41,7 @@ bool estDansVector(const edge& e)
 	}
 }
 
-/*bool surSegment(int px, int py, int qx, int qy, int rx, int ry)
-{
-	if (qx <= max(px, rx) && qx >= min(px, rx) && qy <= max(py, ry) && qy >= min(py, ry))
-	{
-		return true;
-	}
-		return false;
-}*/
-
-bool sontAlignes(int px, int py, int qx, int qy, int rx, int ry) // pour vérifier si c'est aligné
-{
-	return((ry - py) / (rx - px) == (qy - py) / (qx - px));
-}
-
-bool Alignes(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
-{
-	if (sontAlignes(px, py, qx, qy, rx, ry))
-	{
-		align = 1;
-		return true;
-	}
-	else if (sontAlignes(px, py, qx, qy, sx, sy))
-	{
-		align = 2;
-		return true;
-	}
-	else if (sontAlignes(rx, ry, sx, sy, px, py))
-	{
-		align = 3;
-		return true;
-	}
-	else if (sontAlignes(rx, ry, sx, sy, qx, qy))
-	{
-		align = 4;
-		return true;
-	}
-	align = -1;
-	return false;
-
-}
-
-bool EstSuperieurX(int px, int rx)
-{
-	if (px < rx)
-	{
-		return true;
-	}
-	return false;
-}
-
-bool EstInferieurX(int px, int rx)
-{
-	if (px > rx)
-	{
-		return true;
-	}
-	return false;
-}
-
-bool EstSuperieurY(int py, int ry)
-{
-	if (py < ry)
-	{
-		return true;
-	}
-	return false;
-}
-
-bool EstInferieurY(int py, int ry)
-{
-	if (py > ry)
-	{
-		return true;
-	}
-	return false;
-}
-
-int AGauche(long px, long py, long qx, long qy, long rx, long ry)
+int AGauche(int px, int py, int qx, int qy, int rx, int ry)
 {
 	long long val = ((qy - py) * (rx - qx)) - ((qx - px) * (ry - qy));
 
@@ -137,8 +67,24 @@ bool seCroisent(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 	int ag3 = AGauche(rx, ry, sx, sy, px, py);
 	int ag4 = AGauche(rx, ry, sx, sy, qx, qy);
 
-	// cas général
-	if (ag1 != ag2 && ag3 != ag4)
+
+	if (ag1 * ag2 == 1 || ag3 * ag4 == 1)
+	{
+		return false;
+	}
+	else if (ag1 * ag2 == -1 && ag3 * ag4 == -1)
+	{
+		return true;
+	}
+	else if (ag1 * ag2 == 0 && ag3 * ag4 == 0)
+	{
+		return true;
+	}
+	else if ((ag1 * ag2 == 0 && ag3 * ag4 == -1) || (ag1 * ag2 == -1 && ag3 * ag4 == 0))
+	{
+		return true;
+	}
+	else if (ag1 != ag2 && ag3 != ag4) // cas général
 	{
 		return true;
 	}
@@ -148,78 +94,51 @@ bool seCroisent(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 	}
 }
 
+bool DansZone(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
+{
+	if (min(rx, sx) > max(px, qx))
+	{
+		return false;
+	}
+
+	if (min(px, qx) > max(rx, sx))
+	{
+		return false;
+	}
+	if (min(ry, sy) > max(py, qy))
+	{
+		return false;
+	}
+
+	if (min(py, qy) > max(ry, sy))
+	{
+		return false;
+	}
+	return true;
+}
+
 bool Croisement(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 {
-	if (Alignes(px, py, qx, qy, rx, ry, sx, sy))
+	if (DansZone(px, py, qx, qy, rx, ry, sx, sy))
 	{
-		if (align == 1)
+		if (seCroisent(px, py, qx, qy, rx, ry, sx, sy))
 		{
-			if ((rx < px && rx > qx) ||
-				(rx > px && EstInferieurX(qx, rx)) ||
-				(EstSuperieurY(py, ry) && EstInferieurY(qy, ry)) ||
-				(EstInferieurY(py, ry) && EstSuperieurY(qy, ry)))
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-
+			return true;
 		}
-		else if (align == 2)
+		else
 		{
-			if ((EstInferieurX(px, sx) && EstSuperieurX(qx, sx)) ||
-				(EstSuperieurX(px, sx) && EstInferieurX(qx, sx)) ||
-				(EstSuperieurY(py, sy) && EstInferieurY(qy, sy)) ||
-				(EstInferieurY(py, sy) && EstSuperieurY(qy, sy)))
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		else if (align == 3)
-		{
-			if ((EstInferieurX(rx, px) && EstSuperieurX(sx, px)) ||
-				(EstSuperieurX(rx, px) && EstInferieurX(sx, px)) ||
-				(EstSuperieurY(ry, py) && EstInferieurY(sy, py)) ||
-				(EstInferieurY(ry, py) && EstSuperieurY(sy, py)))
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		else if (align == 4)
-		{
-			if ((EstInferieurX(rx, qx) && EstSuperieurX(sx, qx)) ||
-				(EstSuperieurX(rx, qx) && EstInferieurX(sx, qx)) ||
-				(EstSuperieurY(ry, qy) && EstInferieurY(sy, qy)) ||
-				(EstInferieurY(ry, qy) && EstSuperieurY(sy, qy)))
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			return false;
 		}
 	}
 	else
 	{
-		if (seCroisent(px, py, qx, qy, rx, ry, sx, sy));
-		{
-			return true;
-		}
+		return false;
 	}
 }
 
-bool intersection(const edge& e1, const edge& e2, const GraphAttributes& GA)
+
+
+bool intersection(const edge& e1, const edge& e2, const GridLayout& GA)
 {
 	align = -1;
 
@@ -238,8 +157,8 @@ bool intersection(const edge& e1, const edge& e2, const GraphAttributes& GA)
 
 	int targetX1, targetY1, targetX2, targetY2;
 
-	DPolyline bends1 = GA.bends(e1);
-	DPolyline bends2 = GA.bends(e2);
+	IPolyline bends1 = GA.bends(e1);
+	IPolyline bends2 = GA.bends(e2);
 	if (bends1.size() == 0 && bends2.size() == 0) {
 		targetX1 = GA.x(target1);
 		targetY1 = GA.y(target1);
@@ -253,10 +172,10 @@ bool intersection(const edge& e1, const edge& e2, const GraphAttributes& GA)
 	}
 	else if (bends1.size() > 0 && bends2.size() > 0)
 	{
-		for (ListIterator<DPoint> i = bends1.begin(); i.valid(); i++) {
+		for (ListIterator<IPoint> i = bends1.begin(); i.valid(); i++) {
 			targetX1 = (*i).m_x;
 			targetY1 = (*i).m_y;
-			for (ListIterator<DPoint> j = bends2.begin(); j.valid(); j++)
+			for (ListIterator<IPoint> j = bends2.begin(); j.valid(); j++)
 			{
 				targetX2 = (*j).m_x;
 				targetY2 = (*j).m_y;
@@ -317,7 +236,7 @@ bool intersection(const edge& e1, const edge& e2, const GraphAttributes& GA)
 	{
 		targetX2 = GA.x(target2);
 		targetY2 = GA.y(target2);
-		for (ListIterator<DPoint> i = bends1.begin(); i.valid(); i++) {
+		for (ListIterator<IPoint> i = bends1.begin(); i.valid(); i++) {
 			targetX1 = (*i).m_x;
 			targetY1 = (*i).m_y;
 			if (Croisement(sourceX1, sourceY1, targetX1, targetY1, sourceX2, sourceY2, targetX2, targetY2))
@@ -354,7 +273,7 @@ bool intersection(const edge& e1, const edge& e2, const GraphAttributes& GA)
 	{
 		targetX1 = GA.x(target1);
 		targetY1 = GA.y(target1);
-		for (ListIterator<DPoint> j = bends2.begin(); j.valid(); j++)
+		for (ListIterator<IPoint> j = bends2.begin(); j.valid(); j++)
 		{
 			targetX2 = (*j).m_x;
 			targetY2 = (*j).m_y;
@@ -417,34 +336,36 @@ bool intersection(const edge& e1, const edge& e2, const GraphAttributes& GA)
 
 }
 
-/*void ModidfierVecteur(const edge& e1,const edge& e2,const GraphAttributes& GA)
+void ModidfierVecteur(const edge& e1, const edge& e2, const GridLayout& GA)
 {
 	// Si vraie on les ajoutent dans le vector s'ils n'y sont pas
-	if(intersection(e1,e2,GA))
+	if (intersection(e1, e2, GA))
 	{
-		if(estDansVector(e1)==false)
+		if (estDansVector(e1) == false)
 		{
 			in.push_back(e1);
 		}
-		if(estDansVector(e2)==false)
+		if (estDansVector(e2) == false)
 		{
 			in.push_back(e2);
 		}
 	}
 	else //Si faux on les enlèvent du vector s'ils s'y trouvent
 	{
-		posE1=-1;
-		posE2=-1;
-		if(estDansVector(e2))
+		posE1 = -1;
+		posE2 = -1;
+		if (estDansVector(e2))
 		{
-			posE2=posE1;
-			in.erase(in.begin()+posE2);
+			posE2 = posE1;
+			in.erase(in.begin() + posE2);
 		}
-		if(estDansVector(e1))
+		if (estDansVector(e1))
 		{
-			in.erase(in.begin()+posE1);
+			in.erase(in.begin() + posE1);
 		}
 
 
 	}
-}*/
+}
+
+#endif

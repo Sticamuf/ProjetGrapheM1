@@ -152,6 +152,8 @@
     <ClInclude Include="calcEdgeLength.hpp" />
     <ClInclude Include="dispOpenGL.hpp" />
     <ClInclude Include="edgeMap.hpp" />
+    <ClInclude Include="geometrie.hpp" />
+    <ClInclude Include="intersection.hpp" />
     <ClInclude Include="jsonIO.hpp" />
     <ClInclude Include="nodeMap.hpp" />
     <ClInclude Include="embedder.hpp" />
