@@ -9,7 +9,7 @@
 #include "dispOpenGL.hpp"
 #include "EdgeMap.hpp"
 #include "NodeMap.hpp"
-#include "Quadrant.hpp"
+#include "embedder.hpp"
 
 using ogdf::Graph;
 using ogdf::GridLayout;
@@ -23,7 +23,7 @@ int main() {
     int gridWidth, gridHeight, maxBends;
 
     // ----- LECTURE D'UN FICHIER JSON DANS UN Graph -----
-    string file = "exemples/test4.json";
+    string file = "exemples/test.json";
     readFromJson(file, G, GL, gridWidth, gridHeight, maxBends);
     writeToJson("output.json", G, GL, gridWidth, gridHeight, maxBends);
     
@@ -54,7 +54,7 @@ int main() {
     std::cout << "Planaire: " << isPlanar(G) << std::endl;
 
     // Affichage des maps
-    /*
+    
     std::map<edge, double>::iterator it;
     for (it = mapEdgeLength.begin(); it != mapEdgeLength.end(); it++) {
         std::cout << "MapEdgeLength: " << it->second << std::endl;
@@ -64,7 +64,7 @@ int main() {
     for (it2 = mapLengthEdgeSet.begin(); it2 != mapLengthEdgeSet.end(); it2++) {
         std::cout << "mapLengthEdgeSet: " << it2->first << std::endl;
     }
-    */
+    
 
     // OpenGL
     srand(static_cast<unsigned int>(time(NULL)));

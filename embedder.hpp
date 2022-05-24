@@ -53,7 +53,7 @@ bool aGauche(int sx, int sy, int tx, int ty, int cx, int cy) {
 }
 
 int aGaucheInt(int sx, int sy, int tx, int ty, int cx, int cy) {
-	int det = ((tx - sx) * (cy - sy) - (ty - sy) * (cx - sx));
+	long long det = ((tx - sx) * (cy - sy) - (ty - sy) * (cx - sx));
 	if (det > 0) return 1;
 	if (det < 0) return -1;
 	return 0;
@@ -61,6 +61,7 @@ int aGaucheInt(int sx, int sy, int tx, int ty, int cx, int cy) {
 
 void embedNode(Graph& G, GridLayout& GL, node nsrc) {
 	SListPure<adjEntry> adj;
+	
 	SListPure<adjEntry> newOrder;
 	// Itérateur qui itere sur le tableau des adjacent non trié
 	SListIterator<adjEntry> it;
@@ -88,7 +89,7 @@ void embedNode(Graph& G, GridLayout& GL, node nsrc) {
 		bool inserted = false;
 		edge tmpEdge2;
 		int qnewnode;
-		if (newOrder.size() > 0) {
+		//if (newOrder.size() > 0) {
 			tmpEdge2 = (*it)->theEdge();
 			IPolyline& p2 = GL.bends(tmpEdge2);
 			if (p2.size() > 0) {
@@ -107,7 +108,7 @@ void embedNode(Graph& G, GridLayout& GL, node nsrc) {
 				ny = GL.y(newnode);
 			}
 			qnewnode = quadrant(sx, sy, nx, ny);
-		}
+		//}
 		// On itere sur le deuxieme tableau tant qu'on est pas a la fin et tant qu'on a pas inseré
 		for (it2 = newOrder.begin(), it3 = it2; ((it2.valid()) && (!inserted)); it3 = it2++) {
 			edge tmpEdge = (*it2)->theEdge();
@@ -233,5 +234,6 @@ face getFace(ConstCombinatorialEmbedding& CCE, GridLayout& GL, const node& nsrc,
 	//Si l'on arrive ici, il faut renvoyer la face entre le dernier et le premier noeud
 	return CCE.leftFace(*adj.begin());
 }
+
 
 #endif

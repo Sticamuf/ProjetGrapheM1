@@ -45,8 +45,7 @@ void readFromJson(string input, Graph& G, GridLayout& GL, int& gridWidth, int& g
         nodeTab[i] = G.newNode();
         GL.x(nodeTab[i]) = j["nodes"][i]["x"];
         GL.y(nodeTab[i]) = j["nodes"][i]["y"];
-        std::pair<int, int> coord((int)GL.x(nodeTab[i]), (int)GL.y(nodeTab[i]));
-        mapPosNode[(int)GL.y(nodeTab[i])][(int)GL.x(nodeTab[i])] = true;
+        mapPosNode[GL.y(nodeTab[i])][GL.x(nodeTab[i])] = true;
     }
     int edgeNumber = static_cast<int>(j["edges"].size());
     edge* edgeTab = new edge[edgeNumber];
@@ -76,7 +75,11 @@ void readFromJson(string input, Graph& G, GridLayout& GL, int& gridWidth, int& g
             IPolyline& p = GL.bends(edgeTab[i]);
             int bendsNumber = static_cast<int>(j["edges"][i]["bends"].size());
             for (int k = 0; k < bendsNumber; k++) {
-                p.pushBack(IPoint(j["edges"][i]["bends"][k]["x"], j["edges"][i]["bends"][k]["y"]));
+                int bendX = j["edges"][i]["bends"][k]["x"];
+                int bendY = j["edges"][i]["bends"][k]["y"];
+                p.pushBack(IPoint(bendX, bendY));
+                // On ajoute les bends dans la nodemap:
+                mapPosNode[bendY][bendX] = true;
             }
         }
         //recuperer longueur edge

@@ -20,7 +20,7 @@ double calcEdgeLength(const edge& e, const GridLayout& GL) {
             //if (sourceX == targetX) { length += abs(targetY - sourceY); }
             //else if (sourceY == sourceX) { length += abs(targetX - sourceX); }
             //else
-            length += pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2);
+            length += sqrt(pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2));
             sourceX = targetX;
             sourceY = targetY;
         }
@@ -31,7 +31,7 @@ double calcEdgeLength(const edge& e, const GridLayout& GL) {
     //if (sourceX == targetX) { length += abs(targetY - sourceY); }
     //else if (sourceY == sourceX) { length += abs(targetX - sourceX); }
     //else
-    length += pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2);
+    length += sqrt(pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2));
     return length;
 }
 
@@ -55,6 +55,50 @@ unsigned long long calcEdgeLengthSquared(const edge& e, const GridLayout& GL) {
     targetX = GL.x(target);
     targetY = GL.y(target);
     length += pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2);
+    return length;
+}
+
+unsigned long long calcTmpEdgeLengthSquared(const edge& e, int srcX, int srcY, const GridLayout& GL) {
+    node target = e->target();
+    unsigned long long length = 0.0;
+    int sourceX = srcX;
+    int sourceY = srcY;
+    int targetX, targetY;
+    IPolyline bends = GL.bends(e);
+    if (bends.size() > 0) {
+        for (ListIterator<IPoint> i = bends.begin(); i.valid(); i++) {
+            targetX = (*i).m_x;
+            targetY = (*i).m_y;
+            length += pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2);
+            sourceX = targetX;
+            sourceY = targetY;
+        }
+    }
+    targetX = GL.x(target);
+    targetY = GL.y(target);
+    length += pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2);
+    return length;
+}
+
+unsigned long long calcTmpEdgeLength(const edge& e, int srcX, int srcY, const GridLayout& GL) {
+    node target = e->target();
+    unsigned long long length = 0.0;
+    int sourceX = srcX;
+    int sourceY = srcY;
+    int targetX, targetY;
+    IPolyline bends = GL.bends(e);
+    if (bends.size() > 0) {
+        for (ListIterator<IPoint> i = bends.begin(); i.valid(); i++) {
+            targetX = (*i).m_x;
+            targetY = (*i).m_y;
+            length += sqrt(pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2));
+            sourceX = targetX;
+            sourceY = targetY;
+        }
+    }
+    targetX = GL.x(target);
+    targetY = GL.y(target);
+    length += sqrt(pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2));
     return length;
 }
 #endif
