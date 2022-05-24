@@ -137,7 +137,7 @@ bool seCroisent(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
     	int ag3 = AGauche(rx,ry,sx,sy,px,py);
    	int ag4 = AGauche(rx,ry,sx,sy,qx,qy);
 	
-	// cas général
+	
 	if(ag1*ag2==1||ag3*ag4==1)
 	{
 		return false;
@@ -150,7 +150,11 @@ bool seCroisent(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 	{
 		return true;	
 	}
-    	else if (ag1 != ag2 && ag3 != ag4)
+	els if((ag1*ag2==0&&ag3*ag4==-1)||(ag1*ag2==-1&&ag3*ag4==0))
+	{
+		return true;
+	}
+    	else if (ag1 != ag2 && ag3 != ag4) // cas général
 	{
 		return true;
 	}
