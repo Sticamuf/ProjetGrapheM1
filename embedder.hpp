@@ -13,7 +13,6 @@ using ogdf::GridLayout;
 
 void embedNode(Graph& G, GridLayout& GL, node nsrc) {
 	SListPure<adjEntry> adj;
-	
 	SListPure<adjEntry> newOrder;
 	// Itérateur qui itere sur le tableau des adjacent non trié
 	SListIterator<adjEntry> it;
