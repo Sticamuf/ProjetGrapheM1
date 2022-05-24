@@ -1,6 +1,7 @@
 #ifndef CALCEDGELENGTH_HPP
 #define CALCEDGELENGTH_HPP
-#include <ogdf/basic/GridLayout.h>
+#include <ogdf/basic/GraphAttributes.h>
+#include <ogdf/basic/EdgeArray.h> //non necessaire car GraphAttributes inclut EdgeArray
 
 using namespace ogdf;
 
@@ -58,47 +59,4 @@ unsigned long long calcEdgeLengthSquared(const edge& e, const GridLayout& GL) {
     return length;
 }
 
-unsigned long long calcTmpEdgeLengthSquared(const edge& e, int srcX, int srcY, const GridLayout& GL) {
-    node target = e->target();
-    unsigned long long length = 0.0;
-    int sourceX = srcX;
-    int sourceY = srcY;
-    int targetX, targetY;
-    IPolyline bends = GL.bends(e);
-    if (bends.size() > 0) {
-        for (ListIterator<IPoint> i = bends.begin(); i.valid(); i++) {
-            targetX = (*i).m_x;
-            targetY = (*i).m_y;
-            length += pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2);
-            sourceX = targetX;
-            sourceY = targetY;
-        }
-    }
-    targetX = GL.x(target);
-    targetY = GL.y(target);
-    length += pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2);
-    return length;
-}
-
-unsigned long long calcTmpEdgeLength(const edge& e, int srcX, int srcY, const GridLayout& GL) {
-    node target = e->target();
-    unsigned long long length = 0.0;
-    int sourceX = srcX;
-    int sourceY = srcY;
-    int targetX, targetY;
-    IPolyline bends = GL.bends(e);
-    if (bends.size() > 0) {
-        for (ListIterator<IPoint> i = bends.begin(); i.valid(); i++) {
-            targetX = (*i).m_x;
-            targetY = (*i).m_y;
-            length += sqrt(pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2));
-            sourceX = targetX;
-            sourceY = targetY;
-        }
-    }
-    targetX = GL.x(target);
-    targetY = GL.y(target);
-    length += sqrt(pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2));
-    return length;
-}
 #endif

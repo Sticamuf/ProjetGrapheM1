@@ -11,24 +11,24 @@ using ogdf::IPolyline;
 using ogdf::IPoint;
 using ogdf::ListIterator;
 
-//calcule la variance en fonction de : la somme des carrés des longueurs divisé par le nombre de edge sommeVar,  et de la moyenne moy
-void calcVarianceEdgeLength(double& var, double sommeVar, double moy) {
-	var = sommeVar - (moy * moy);
-}
-
 //calcule la moyenne des longueurs des edge dans moy
 //la somme des carrés des longueurs divisé par le nombre de edge dans sommeVar (utilisée pour ne pas recalculer toute la somme a chaque changement)
 //la variance dans var
 void prepCalcVariance(double& moy, double& sommeVar, double& var) {
-	moy = 0;
+    double temp;
+    moy = 0; 
 	sommeVar = 0;
-	double temp;
-	for (auto it = mapLengthEdgeSet.begin(); it != mapLengthEdgeSet.end(); it++) {
-		temp = it->first * it->second.size();
-		moy += temp / mapEdgeLength.size();
+    for (auto it = mapLengthEdgeSet.begin(); it != mapLengthEdgeSet.end(); it++) {
+		temp = it->first * it->second.size();//division en cours de route pour ne pas dépasser la taille des double
+		moy += temp / mapEdgeLength.size();//division en cours de route pour ne pas dépasser la taille des double
 		sommeVar += (it->first * temp) / mapEdgeLength.size();
 	}
 	calcVarianceEdgeLength(var, sommeVar, moy);
+}
+
+//calcule la variance en fonction de : la somme des carrés des longueurs divisé par le nombre de edge sommeVar,  et de la moyenne moy
+void calcVarianceEdgeLength(double& var, double sommeVar, double moy) {
+	var = sommeVar - (moy * moy);
 }
 
 //prends en paramètre la longueur d'un edge avant et apres changement puis recalcule moy et sommeVar

@@ -1,8 +1,8 @@
-#ifndef JSONIO
+ï»¿#ifndef JSONIO
 #define JSONIO
 
 #include <string>
-#include <ogdf/basic/GridLayout.h>
+#include <ogdf/basic/GraphAttributes.h>
 #include <ogdf/fileformats/GraphIO.h>
 #include <nlohmann/json.hpp>
 
@@ -35,24 +35,20 @@ void readFromJson(string input, Graph& G, GridLayout& GL, int& gridWidth, int& g
     if (j["nodes"] == nullptr) {
         exit(1);
     }
-
-    // REMPLIR LES MAP ET VECTOR UNIQUEMENT SI GRAPHE PLANAIRE,
-    // VERIF PAR EXEMPLE SI (j["nodes"][0]["x"]!=j["nodes"][1]["x"])&&(j["nodes"][0]["y"]!=j["nodes"][1]["y"])
-
     int nodeNumber = static_cast<int>(j["nodes"].size());
     node* nodeTab = new node[nodeNumber];
     for (int i = 0; i < nodeNumber; i++) {
         nodeTab[i] = G.newNode();
         GL.x(nodeTab[i]) = j["nodes"][i]["x"];
         GL.y(nodeTab[i]) = j["nodes"][i]["y"];
-        mapPosNode[GL.y(nodeTab[i])][GL.x(nodeTab[i])] = true;
+        std::pair<int, int> coord((int)GL.x(nodeTab[i]), (int)GL.y(nodeTab[i]));
+        mapPosNode[(int)GL.y(nodeTab[i])][(int)GL.x(nodeTab[i])] = true;
     }
     int edgeNumber = static_cast<int>(j["edges"].size());
     edge* edgeTab = new edge[edgeNumber];
     for (int i = 0; i < edgeNumber; i++) {
 
         // DEBUT TEST
-        /*
         node n1 = nodeTab[j["edges"][i]["source"]];
         node n2 = nodeTab[j["edges"][i]["target"]];
         if ((n1->lastAdj() != nullptr) && (n2->lastAdj() != nullptr)) {
@@ -67,19 +63,14 @@ void readFromJson(string input, Graph& G, GridLayout& GL, int& gridWidth, int& g
         else {
             edgeTab[i] = G.newEdge(n1->lastAdj(), n2);
         }
-        */
         // -- FIN TEST
-        edgeTab[i] = G.newEdge(nodeTab[j["edges"][i]["source"]], nodeTab[j["edges"][i]["target"]]);
+        //edgeTab[i] = G.newEdge(nodeTab[j["edges"][i]["source"]], nodeTab[j["edges"][i]["target"]]);
 
         if (j["edges"][i]["bends"] != nullptr) {
             IPolyline& p = GL.bends(edgeTab[i]);
             int bendsNumber = static_cast<int>(j["edges"][i]["bends"].size());
             for (int k = 0; k < bendsNumber; k++) {
-                int bendX = j["edges"][i]["bends"][k]["x"];
-                int bendY = j["edges"][i]["bends"][k]["y"];
-                p.pushBack(IPoint(bendX, bendY));
-                // On ajoute les bends dans la nodemap:
-                mapPosNode[bendY][bendX] = true;
+                p.pushBack(IPoint(j["edges"][i]["bends"][k]["x"], j["edges"][i]["bends"][k]["y"]));
             }
         }
         //recuperer longueur edge
@@ -87,11 +78,11 @@ void readFromJson(string input, Graph& G, GridLayout& GL, int& gridWidth, int& g
         mapEdgeLength.insert(std::pair<edge, double>(edgeTab[i], length));
         std::map<double, std::set<edge>>::iterator it2 = mapLengthEdgeSet.begin();
         it2 = mapLengthEdgeSet.find(length);
-        // La valeur est déja présente, on ajoute dans le set
+        // La valeur est deja presente, on ajoute dans le set
         if (it2 != mapLengthEdgeSet.end()) {
             it2->second.insert(edgeTab[i]);
         }
-        // La valeur n'est pas présente, on créer un nouveau set.
+        // La valeur n'est pas presente, on creer un nouveau set.
         else {
             std::set<edge> tmpSet;
             tmpSet.insert(edgeTab[i]);

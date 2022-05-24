@@ -3,61 +3,13 @@
 
 #include <ogdf/basic/Graph_d.h>
 #include <ogdf/basic/GridLayout.h>
-using namespace ogdf;
+#include "geometrie.hpp"
 
 using ogdf::node;
 using ogdf::Graph;
 using ogdf::GridLayout;
 
-const int Q1 = 0;
-const int Q2 = 1;
-const int Q3 = 2;
-const int Q4 = 3;
 
-//renvoie 1,2,3 ou 4 si la node targ est 1: en haut à droite, 2: en haut à gauche, 3: en bas à gauche, 4: en bas à droite de la node src 
-//dans le layout GL
-//on considère src != targ
-int quadrant(const GridLayout& GL, const node& src, const node& targ) {
-	if (GL.x(targ) > GL.x(src)) {
-		if (GL.y(targ) >= GL.y(src)) {
-			return Q1;
-		}
-		return Q4;
-	}
-	if (GL.y(targ) > GL.y(src)) {
-		return Q2;
-	}
-	return Q3;
-}
-
-int quadrant(int sx, int sy, int tx, int ty) {
-	if (tx > sx) {
-		if (ty >= sy) {
-			return Q1;
-		}
-		return Q4;
-	}
-	if (ty > sy) {
-		return Q2;
-	}
-	return Q3;
-}
-
-//on considère dans le meme quadrant
-bool aGauche(const GridLayout& GL, const node& src, const node& targ, const node& comp) {
-	return ((GL.x(targ) - GL.x(src)) * (GL.y(comp) - GL.y(src)) - (GL.y(targ) - GL.y(src)) * (GL.x(comp) - GL.x(src))) > 0;
-}
-//s= source, t=target, c=comp=nouveau noeud à ajouter
-bool aGauche(int sx, int sy, int tx, int ty, int cx, int cy) {
-	return ((tx - sx) * (cy - sy) - (ty - sy) * (cx - sx)) > 0;
-}
-
-int aGaucheInt(int sx, int sy, int tx, int ty, int cx, int cy) {
-	long long det = ((tx - sx) * (cy - sy) - (ty - sy) * (cx - sx));
-	if (det > 0) return 1;
-	if (det < 0) return -1;
-	return 0;
-}
 
 void embedNode(Graph& G, GridLayout& GL, node nsrc) {
 	SListPure<adjEntry> adj;
