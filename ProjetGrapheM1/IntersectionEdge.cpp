@@ -41,7 +41,7 @@ bool estDansVector(const edge& e)
 		return true;
 	}
     	return false;
-}*/
+}
 
 bool sontAlignes(int px, int py, int qx, int qy, int rx, int ry) // pour vérifier si c'est aligné
 {
@@ -75,7 +75,7 @@ bool Alignes(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 		   
 }
 
-/*bool EstSuperieurX(int px,int rx)
+bool EstSuperieurX(int px,int rx)
 {
 	if(px<rx)
 	{
@@ -142,6 +142,14 @@ bool seCroisent(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 	{
 		return false;
 	}
+	else if(ag1*ag2==-1&&ag3*ag4==-1)
+	{
+		return true;	
+	}
+	else if(ag1*ag2==0&&ag3*ag4==0)
+	{
+		return true;	
+	}
     	else if (ag1 != ag2 && ag3 != ag4)
 	{
 		return true;
@@ -179,7 +187,14 @@ bool Croisement(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy)
 {
 	if(DansZone(px,py,qx,qy,rx,ry,sx,sy))
 	{
-		
+		if(seCroisent(px,py,qx,qy,rx,ry,sx,sy))
+		{
+			return true;	
+		}
+		else
+		{
+			return false;
+		}
 	}
 	else
 	{
