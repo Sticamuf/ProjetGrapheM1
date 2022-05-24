@@ -41,7 +41,7 @@ bool seCroisent(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy) 
 	if (ag1 * ag2 == 1 || ag3 * ag4 == 1) {
 		return false;
 	}
-	//Il restetrois cas, SOIT
+	//Il reste trois cas, SOIT
 	//R et S sont de cotes opposes par rapport a PQ ET P et Q sont de cotes opposes par rapport a RS
 	//SOIT
 	//les quatre points sont alignes
