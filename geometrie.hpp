@@ -1,5 +1,6 @@
 #ifndef GEOMETRIE_HPP
 #define GEOMETRIE_HPP
+#include <algorithm>
 
 class Segment {
 public:
@@ -40,6 +41,11 @@ int aGaucheInt(int sx, int sy, int tx, int ty, int cx, int cy) {
 	if (det > 0) return 1;
 	if (det < 0) return -1;
 	return 0;
+}
+
+// Renvoie vrai si c est sur le segment st
+bool surSegment(int sx, int sy, int tx, int ty, int cx, int cy) {
+	return ((cx <= max(sx, tx) && cx >= min(sx, tx) && cy <= max(sy, ty) && cy >= min(sy, ty))&&(aGaucheInt(sx,sy,tx,ty,cx,cy) == 0));
 }
 
 #endif

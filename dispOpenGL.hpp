@@ -148,12 +148,24 @@ std::vector<bool> checkAdjIntersection(const node& n, GridLayout& GL, std::vecto
 			// Et on regarde si une intersection se créer avec la liste des segments non adjacents
 			for (int k = 0; k < vectorSegmentNonAdj.size(); k++) {
 				std::cout << "px: " << vectorMoveCoord[i].first << " py: " << vectorMoveCoord[i].second << " qx: " << vectorTargetAdjNode[j].first << " qy: " << vectorTargetAdjNode[j].second << " rx: " << vectorSegmentNonAdj[k].sourceX << " ry: " << vectorSegmentNonAdj[k].sourceY << " sx: " << vectorSegmentNonAdj[k].targetX << " sy: " << vectorSegmentNonAdj[k].targetY << std::endl;
-				if (seCroisent(vectorMoveCoord[i].first, vectorMoveCoord[i].second, vectorTargetAdjNode[j].first, vectorTargetAdjNode[j].second, vectorSegmentNonAdj[k].sourceX, vectorSegmentNonAdj[k].sourceY, vectorSegmentNonAdj[k].targetX, vectorSegmentNonAdj[k].targetY)) {
-					intersection = true;
+				// On regarde si les segments a vérifier ne sont pas adjacents entre eux
+				if (((vectorTargetAdjNode[j].first != vectorSegmentNonAdj[k].sourceX) || (vectorTargetAdjNode[j].second != vectorSegmentNonAdj[k].sourceY))&& ((vectorTargetAdjNode[j].first != vectorSegmentNonAdj[k].targetX) || (vectorTargetAdjNode[j].second != vectorSegmentNonAdj[k].targetY))) {
+					if (seCroisent(vectorMoveCoord[i].first, vectorMoveCoord[i].second, vectorTargetAdjNode[j].first, vectorTargetAdjNode[j].second, vectorSegmentNonAdj[k].sourceX, vectorSegmentNonAdj[k].sourceY, vectorSegmentNonAdj[k].targetX, vectorSegmentNonAdj[k].targetY)) {
+						intersection = true;
+						std::cout << intersection << std::endl;
+						break;
+					}
 					std::cout << intersection << std::endl;
-					break;
 				}
-				std::cout << intersection << std::endl;
+				// Si ils le sont on regarde si le noeud source ne se trouve pas sur le segment adjacent
+				else {
+					if (surSegment(vectorSegmentNonAdj[k].sourceX, vectorSegmentNonAdj[k].sourceY, vectorSegmentNonAdj[k].targetX, vectorSegmentNonAdj[k].targetY, vectorMoveCoord[i].first, vectorMoveCoord[i].second)) {
+						intersection = true;
+						std::cout << intersection << std::endl;
+						break;
+					}
+					std::cout << intersection << std::endl;
+				}
 			}
 			if (intersection) {
 				break;
