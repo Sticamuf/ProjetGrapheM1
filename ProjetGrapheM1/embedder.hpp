@@ -1,5 +1,5 @@
-#ifndef quad_hpp
-#define quad_hpp
+#ifndef embedder_hpp
+#define embedder_hpp
 
 #include <ogdf/basic/Graph_d.h>
 #include <ogdf/basic/GridLayout.h>

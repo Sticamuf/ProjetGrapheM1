@@ -1,14 +1,7 @@
 ﻿#include <ogdf/basic/GridLayout.h>
-
 #include <ogdf/basic/graph_generators.h>
-
 #include <ogdf/planarity/PlanarizationLayout.h>
-#include <ogdf/planarity/SubgraphPlanarizer.h>
-
 #include <ogdf/planarlayout/PlanarStraightLayout.h>
-
-#include <ogdf/planarity/EmbedderMinDepth.h>
-
 #include <ogdf/basic/simple_graph_alg.h>
 
 #include "jsonIO.hpp"
@@ -20,8 +13,6 @@ using ogdf::Graph;
 using ogdf::GraphAttributes;
 using std::cout, std::endl;
 
-
-
 int main() {
 
     Graph G;
@@ -30,7 +21,7 @@ int main() {
     int gridWidth, gridHeight, maxBends;
 
     // ----- LECTURE D'UN FICHIER JSON DANS UN Graph -----
-    string file = "test4.json";
+    string file = "test.json";
     readFromJson(file, G, GL, gridWidth, gridHeight, maxBends);
     writeToJson("output.json", G, GL, gridWidth, gridHeight, maxBends);
 
