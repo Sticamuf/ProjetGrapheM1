@@ -1,5 +1,5 @@
-#ifndef quad_hpp
-#define quad_hpp
+#ifndef EMBEDDER_HPP
+#define EMBEDDER_HPP
 
 #include <ogdf/basic/Graph_d.h>
 #include <ogdf/basic/GridLayout.h>
@@ -128,63 +128,4 @@ void embedderCarte(Graph& G, GridLayout& GL) {
 		nsrc = nsrc->succ();
 	}
 }
-
-//on admet les ajdEntries triés dans l'ordre trigonométrique
-face getFace(ConstCombinatorialEmbedding& CCE, GridLayout& GL, const node& nsrc, int newX, int newY, face& f2) {
-	SListPure<adjEntry> adj;
-	nsrc->allAdjEntries(adj);
-	int sx = GL.x(nsrc);
-	int sy = GL.y(nsrc);
-	int tx, ty;
-	int qnew = quadrant(sx, sy, newX, newY);
-	node ntrg;
-	for (auto it = adj.begin(); it.valid(); it++) {
-		edge tmpEdge = (*it)->theEdge();
-		IPolyline& p = GL.bends(tmpEdge);
-		// Si l'edge contient des bends
-		if (p.size() > 0) {
-			// Si le noeud source est le meme, on prend le premier bend
-			if (tmpEdge->source() == nsrc) {
-				tx = p.front().m_x;
-				ty = p.front().m_y;
-			}
-			// Sinon on prend le dernier bend
-			else {
-				tx = p.back().m_x;
-				ty = p.back().m_y;
-			}
-		}
-		// Si pas de bends on prends les coordonnées du noeud
-		else {
-			ntrg = (*it)->twinNode();
-			tx = GL.x(ntrg);
-			ty = GL.y(ntrg);
-		}
-		// Quadrant du noeud/premier bend
-		int qtrg = quadrant(sx, sy, tx, ty);
-
-		// Si le quadrant du nouveau point est inférieur a celui qu'on compare
-		if (qnew < qtrg) {
-			//on renvoie la face entre le noeud actuel et le précédent
-			return CCE.leftFace(*it);
-		}
-		// Si le quadrant du nouveau est le même que celui à comparer
-		else if (qnew == qtrg) {
-			//si le nouveau noeud est à droite de targ on renvoie la face entre targ et son précédent
-			int det = aGaucheInt(sx, sy, tx, ty, newX, newY);
-			if (det == -1) {
-				return CCE.leftFace(*it);
-			}
-			else if (det == 0) {
-				f2 = CCE.rightFace(*it);
-				return CCE.leftFace(*it);
-			}
-		}
-		//le quadrant est plus grand ou égal mais point a gauche: on passe au prochain noeud
-	}
-	//Si l'on arrive ici, il faut renvoyer la face entre le dernier et le premier noeud
-	return CCE.leftFace(*adj.begin());
-}
-
-
 #endif
