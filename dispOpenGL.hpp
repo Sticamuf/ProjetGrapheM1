@@ -18,6 +18,7 @@
 
 using namespace ogdf;
 
+bool moveRouletteRusse = false;
 bool move_nodebend = false;
 bool move_randomly = false;
 bool show_move_variance = false;
@@ -34,11 +35,11 @@ ConstCombinatorialEmbedding CCE;
 // Incrément de déplacement du selected node
 int dx, dy;
 
-// Retourne une valeur entiere comprise dans [1,100]
-int generateRand() {
+// Retourne une valeur entiere comprise dans [1,n]
+int generateRand(int n) {
 	std::random_device rd;  // Will be used to obtain a seed for the random number engine
 	std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
-	std::uniform_int_distribution<> dis(1, 100);
+	std::uniform_int_distribution<> dis(1, n);
 	return dis(gen);
 }
 
@@ -231,7 +232,8 @@ std::vector<bool> getLegalMoves(NodeBend& n, GridLayout& GL, std::vector<std::pa
 // Pour les déplacements: 0=droite(x+1) 1=haut(y+1) 2=gauche(x-1) 3=bas(y-1)
 // Cette fonction doit etre appelée avant un déplacement
 // Les poids assignés aux déplacements sont attribués en fonction de leur amélioration de l'écart-type
-std::vector<int> rouletteRusseNodeMove(NodeBend& n, GridLayout& GL, ConstCombinatorialEmbedding& ccem, double& moy, double& sommeVar, double& var) {
+//std::vector<int> rouletteRusseNodeMove(NodeBend& n, GridLayout& GL, ConstCombinatorialEmbedding& ccem, double& moy, double& sommeVar, double& var) {
+std::vector<std::pair<int, std::pair<int, int>>> rouletteRusseNodeMove(NodeBend& n, GridLayout& GL, ConstCombinatorialEmbedding& ccem, double& moy, double& sommeVar, double& var) {
 	int nx = (*n.a_x);
 	int ny = (*n.a_y);
 	// On stocke les changements de variances apres un déplacement
@@ -284,9 +286,10 @@ std::vector<int> rouletteRusseNodeMove(NodeBend& n, GridLayout& GL, ConstCombina
 			std::cout << "Variance apres deplacement " << i << ": " << tmpVar << std::endl;
 		}
 	}
-	std::vector<int> vectorProbaMove;
+	//std::vector<int> vectorProbaMove;
+	std::vector<std::pair<int,std::pair<int,int>>> vectorProbaMove2;
 	if (atLeastOneValidMove) {
-		vectorProbaMove.reserve(vectorMoveAutorised.size());
+		//vectorProbaMove.reserve(vectorMoveAutorised.size());
 		// On soustrait a tout les valeurs la variance maximale
 		for (auto it = mapVarChangeMove.begin(); it != mapVarChangeMove.end(); it++) {
 			it->second = abs(it->second - tmpMaxVariance) + tmpMinVariance;
@@ -302,13 +305,40 @@ std::vector<int> rouletteRusseNodeMove(NodeBend& n, GridLayout& GL, ConstCombina
 				tmpSommeProba += tmpProba;
 				it++;
 			}
-			vectorProbaMove.push_back(tmpSommeProba);
+			//vectorProbaMove.push_back(tmpSommeProba);
+			std::pair<int, std::pair<int, int>> tmpPair(tmpSommeProba,vectorMoveCoord[i]);
+			vectorProbaMove2.push_back(tmpPair);
 		}
-		vectorProbaMove.push_back(100);
+		std::pair<int, std::pair<int, int>> tmpPair(100, vectorMoveCoord[size]);
+		vectorProbaMove2.push_back(tmpPair);
+		//vectorProbaMove.push_back(100);
 	}
-	return vectorProbaMove;
+	//return vectorProbaMove;
+	return vectorProbaMove2;
 }
 
+// Demarre l'algorithme de roulette russe sur le graphe
+void startRouletteRusse(GridLayout& GL, ConstCombinatorialEmbedding& ccem) {
+	// On choisis au hasard un NodeBend
+	int randomNum = generateRand(vectorNodeBends.size()) - 1;
+	NodeBend nb = vectorNodeBends[randomNum];
+	double moyenne = 0.0;
+	double sommeVariance = 0.0;
+	double variance = 0.0;
+	prepCalcVariance(moyenne, sommeVariance, variance);
+	std::vector<std::pair<int, std::pair<int, int>>> probaDeplacement = rouletteRusseNodeMove(nb, GL, ccem, moyenne, sommeVariance, variance);
+	if (probaDeplacement.size() > 0) {
+		int randomChoice = generateRand(100);
+		bool moved = false;
+		for (int i = 0; ((i < probaDeplacement.size())&&(!moved)); i++) {
+			if (randomChoice <= probaDeplacement[i].first) {
+				(*nb.a_x) = probaDeplacement[i].second.first;
+				(*nb.a_y) = probaDeplacement[i].second.second;
+				moved = true;
+			}
+		}
+	}
+}
 
 // Calcul le ratio edge/length. longueur la plus grande divisé par la longueur la plus courte.
 double calcEdgeLengthRatio() {
@@ -422,6 +452,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		case GLFW_KEY_2:
 			show_variance = true;
 			break;
+		case GLFW_KEY_3:
+			moveRouletteRusse = true;
+			break;
 		}
 }
 
@@ -522,22 +555,26 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 			dy = 0;
 			move_randomly = false;
 		}
-		if (show_move_variance) {
+		else if (show_move_variance) {
 			moyenne = 0, sommeVariance = 0, variance = 0;
 			prepCalcVariance(moyenne, sommeVariance, variance);
-			std::vector<int> vectorProba = rouletteRusseNodeMove(vectorNodeBends[selectedNodeBendNum], GL, CCE, moyenne, sommeVariance, variance);
+			std::vector<std::pair<int, std::pair<int, int>>> vectorProba = rouletteRusseNodeMove(vectorNodeBends[selectedNodeBendNum], GL, CCE, moyenne, sommeVariance, variance);
 			for (int i = 0; i < vectorProba.size(); i++) {
-				std::cout << "Probabilite deplacement " << i << ": " << vectorProba[i] << std::endl;
+				std::cout << "Probabilite deplacement " << i << ": " << vectorProba[i].first << std::endl;
 			}
 			show_move_variance = false;
 		}
-		if (show_variance) {
+		else if (show_variance) {
 			moyenne = 0, sommeVariance = 0, variance = 0;
 			prepCalcVariance(moyenne, sommeVariance, variance);
 			std::cout << "Moyenne: " << moyenne << std::endl;
 			std::cout << "Somme Variance: " << sommeVariance << std::endl;
 			std::cout << "Variance: " << variance << std::endl;
 			show_variance = false;
+		}
+		else if (moveRouletteRusse) {
+			startRouletteRusse(GL,CCE);
+			moveRouletteRusse = false;
 		}
 		//afficher les edge
 		glColor3f(1.0f, 1.0f, 1.0f);
