@@ -6,8 +6,6 @@
 #include <ogdf/fileformats/GraphIO.h>
 #include <nlohmann/json.hpp>
 
-#include <ogdf/basic/MinHeap.h>
-#include <ogdf/basic/heap/BinaryHeap.h>
 #include "calcEdgeLength.hpp"
 #include "EdgeMap.hpp"
 #include "NodeMap.hpp"
@@ -80,7 +78,7 @@ void readFromJson(string input, Graph& G, GridLayout& GL, int& gridWidth, int& g
                 int bendX = j["edges"][i]["bends"][k]["x"];
                 int bendY = j["edges"][i]["bends"][k]["y"];
                 p.pushBack(IPoint(bendX, bendY));
-                NodeBend tmpNodeBend(p.back(), edgeTab[i]);
+                NodeBend tmpNodeBend(p.back(), edgeTab[i], k);
                 vectorNodeBends.push_back(tmpNodeBend);
                 // On ajoute les bends dans la nodemap:
                 mapPosNode[bendY][bendX] = true;

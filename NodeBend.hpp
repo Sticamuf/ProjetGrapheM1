@@ -1,22 +1,29 @@
 #ifndef NODEBEND_HPP
 #define NODEBEND_HPP
+#include <ogdf/basic/GridLayout.h>
+#include <ogdf/basic/EdgeArray.h>
+#include <ogdf/fileformats/GraphIO.h>
+using namespace ogdf;
 class NodeBend {
 public:
 	bool isNode;
 	int* a_x;
 	int* a_y;
+	int numero;
 	NodeBend(node n, GridLayout& GL) {
 		isNode = true;
 		m_n = n;
 		a_x = &GL.x(n);
 		a_y = &GL.y(n);
+		numero = -1;
 	}
-	NodeBend(IPoint& p, edge e) {
+	NodeBend(IPoint& p, edge e, int num) {
 		isNode = false;
 		m_p = &p;
 		m_e = e;
 		a_x = &p.m_x;
 		a_y = &p.m_y;
+		numero = num;
 	}
 	node getNode() {
 		return m_n;
