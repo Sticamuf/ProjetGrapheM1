@@ -53,22 +53,22 @@ std::set<edge> getEdgesFromAdjFacesFromNodeBend(NodeBend& n, ConstCombinatorialE
 			edge e = (*i);
 			setAdjFaces.insert(ccem.leftFace(e->adjSource()));
 		}
-		for (auto it = setAdjFaces.begin(); it != setAdjFaces.end(); it++) {
-			adjEntry firstAdj = (*it)->firstAdj();
-			adjEntry nextAdj = firstAdj;
-			if (firstAdj != nullptr) {
-				do {
-					if (nextAdj->theEdge() != nullptr) {
-						setAllEdges.insert(nextAdj->theEdge());
-					}
-					nextAdj = (*it)->nextFaceEdge(nextAdj);
-				} while ((nextAdj != firstAdj) && (nextAdj != nullptr));
-			}
-		}
 	}
 	else {
 		setAdjFaces.insert(ccem.rightFace(n.getEdge()->adjSource()));
 		setAdjFaces.insert(ccem.leftFace(n.getEdge()->adjSource()));
+	}
+	for (auto it = setAdjFaces.begin(); it != setAdjFaces.end(); it++) {
+		adjEntry firstAdj = (*it)->firstAdj();
+		adjEntry nextAdj = firstAdj;
+		if (firstAdj != nullptr) {
+			do {
+				if (nextAdj->theEdge() != nullptr) {
+					setAllEdges.insert(nextAdj->theEdge());
+				}
+				nextAdj = (*it)->nextFaceEdge(nextAdj);
+			} while ((nextAdj != firstAdj) && (nextAdj != nullptr));
+		}
 	}
 	return setAllEdges;
 }
@@ -189,6 +189,7 @@ std::vector<bool> getLegalMoves(NodeBend& n, GridLayout& GL, std::vector<std::pa
 			// Et on regarde si une intersection se créer avec la liste des segments non adjacents
 			for (int k = 0; (k < vectorSegmentNonAdj.size())&&(!intersection); k++) {
 				// On regarde si les segments a vérifier ne sont pas adjacents entre eux
+				//std::cout << " x: " << vectorMoveCoord[i].first << " y: " << vectorMoveCoord[i].second << " x: " << vectorTargetAdjNode[j].first << " y: " << vectorTargetAdjNode[j].second << " x: " << vectorSegmentNonAdj[k].sourceX << " y: " << vectorSegmentNonAdj[k].sourceY << " x: " << vectorSegmentNonAdj[k].targetX << " y: " << vectorSegmentNonAdj[k].targetY << std::endl;
 				if (((vectorTargetAdjNode[j].first != vectorSegmentNonAdj[k].sourceX) || (vectorTargetAdjNode[j].second != vectorSegmentNonAdj[k].sourceY))&& ((vectorTargetAdjNode[j].first != vectorSegmentNonAdj[k].targetX) || (vectorTargetAdjNode[j].second != vectorSegmentNonAdj[k].targetY))) {
 					if (seCroisent(vectorMoveCoord[i].first, vectorMoveCoord[i].second, vectorTargetAdjNode[j].first, vectorTargetAdjNode[j].second, vectorSegmentNonAdj[k].sourceX, vectorSegmentNonAdj[k].sourceY, vectorSegmentNonAdj[k].targetX, vectorSegmentNonAdj[k].targetY)) {
 						intersection = true;

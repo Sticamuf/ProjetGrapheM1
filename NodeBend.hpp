@@ -34,7 +34,12 @@ public:
 	edge getEdge() {
 		return m_e;
 	}
-
+	adjEntry getAdjEntry() {
+		if (isNode) {
+			return m_e->adjSource();
+		}
+		return nullptr;
+	}
 private:
 	node m_n = nullptr;
 	edge m_e = nullptr;
