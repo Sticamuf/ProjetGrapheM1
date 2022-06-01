@@ -53,7 +53,7 @@
     <ClInclude Include="intersection.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="nodeBend.hpp">
+    <ClInclude Include="NodeBend.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>

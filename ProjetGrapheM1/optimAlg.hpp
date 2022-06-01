@@ -78,4 +78,6 @@ void addEdgeNVar2(double edgeLength, double& sommeLong, double& sommeLong2) {
 }
 
 
+
+
 #endif OPTIM_ALG

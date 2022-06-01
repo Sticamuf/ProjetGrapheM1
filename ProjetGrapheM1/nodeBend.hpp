@@ -40,6 +40,15 @@ public:
 		}
 		return nullptr;
 	}
+	bool operator<(const NodeBend& nb) const {
+		return (*a_x < *nb.a_x&& *a_y < *nb.a_y);
+	}
+	int getX() {
+		return *a_x;
+	}
+	int getY() {
+		return *a_y;
+	}
 private:
 	node m_n = nullptr;
 	edge m_e = nullptr;

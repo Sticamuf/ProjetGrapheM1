@@ -70,6 +70,7 @@ int main() {
     while (n != nullptr) {
         NodeBend tmpNodeBend(n, GL);
         vectorNodeBends.push_back(tmpNodeBend);
+        setNodeBends.insert(tmpNodeBend);
         n = n->succ();
     }
 
@@ -80,8 +81,17 @@ int main() {
         int k = 0;
         for (ListIterator<IPoint> i = bends.begin(); i.valid(); i++, k++) {
             NodeBend tmpNodeBend((*i), e, k);
+            vectorNodeBends.push_back(tmpNodeBend);
+            setNodeBends.insert(tmpNodeBend);
         }
         e = e->succ();
+    }
+    for (const auto& it : vectorNodeBends) {
+        cout << "vector : " << *it.a_x << " " << *it.a_y << endl;
+    }
+    for (const auto& it : setNodeBends) {
+        cout << "set : " << *it.a_x << " " << *it.a_y << endl;
+        //cout << "set address " << it.a_x << endl;
     }
 
     // OpenGL
