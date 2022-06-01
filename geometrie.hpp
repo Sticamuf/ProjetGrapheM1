@@ -43,9 +43,14 @@ int aGaucheInt(int sx, int sy, int tx, int ty, int cx, int cy) {
 	return 0;
 }
 
+// Renvoie vrai si c est dans le rectangle formé par st
+bool dansRectangle(int sx,int sy,int tx,int ty,int cx,int cy) {
+	return (cx <= max(sx, tx) && cx >= min(sx, tx) && cy <= max(sy, ty) && cy >= min(sy, ty));
+}
+
 // Renvoie vrai si c est sur le segment st
 bool surSegment(int sx, int sy, int tx, int ty, int cx, int cy) {
-	return ((cx <= max(sx, tx) && cx >= min(sx, tx) && cy <= max(sy, ty) && cy >= min(sy, ty))&&(aGaucheInt(sx,sy,tx,ty,cx,cy) == 0));
+	return (dansRectangle(sx, sy, tx, ty, cx, cy) && (aGaucheInt(sx, sy, tx, ty, cx, cy) == 0));
 }
 
 #endif

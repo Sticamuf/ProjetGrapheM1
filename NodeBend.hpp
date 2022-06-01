@@ -35,10 +35,16 @@ public:
 		return m_e;
 	}
 	adjEntry getAdjEntry() {
-		if (isNode) {
+		if (!isNode) {
 			return m_e->adjSource();
 		}
 		return nullptr;
+	}
+	int getX() {
+		return *a_x;
+	}
+	int getY() {
+		return *a_y;
 	}
 private:
 	node m_n = nullptr;

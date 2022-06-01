@@ -9,7 +9,7 @@
 #include "dispOpenGL.hpp"
 #include "EdgeMap.hpp"
 #include "NodeMap.hpp"
-#include "embedder.hpp"
+#include "graphFunctions.hpp"
 
 using ogdf::Graph;
 using ogdf::GridLayout;
@@ -57,14 +57,33 @@ int main() {
     
     std::map<edge, double>::iterator it;
     for (it = mapEdgeLength.begin(); it != mapEdgeLength.end(); it++) {
-        std::cout << "MapEdgeLength: " << it->second << std::endl;
+        //std::cout << "MapEdgeLength: " << it->second << std::endl;
     }
 
     std::map<double, std::set<edge>>::iterator it2;
     for (it2 = mapLengthEdgeSet.begin(); it2 != mapLengthEdgeSet.end(); it2++) {
-        std::cout << "mapLengthEdgeSet: " << it2->first << std::endl;
+        //std::cout << "mapLengthEdgeSet: " << it2->first << std::endl;
     }
-    
+
+    // Ajout des node dans le vector
+    node n = G.firstNode();
+    while (n != nullptr) {
+        NodeBend tmpNodeBend(n, GL);
+        vectorNodeBends.push_back(tmpNodeBend);
+        n = n->succ();
+    }
+
+    // Ajout des bend dans le vector
+    edge e = G.firstEdge();
+    while (e != nullptr) {
+        IPolyline& bends = GL.bends(e);
+        int k = 0;
+        for (ListIterator<IPoint> i = bends.begin(); i.valid(); i++,k++) {
+            NodeBend tmpNodeBend((*i),e,k);
+            vectorNodeBends.push_back(tmpNodeBend);
+        }
+        e = e->succ();
+    }
 
     // OpenGL
     srand(static_cast<unsigned int>(time(NULL)));
