@@ -33,6 +33,8 @@ void prepCalcVariance(double& moy, double& sommeVar, double& var) {
 	calcVarianceEdgeLength(var, sommeVar, moy);
 }
 
+
+
 //prends en paramètre la longueur d'un edge avant et apres changement puis recalcule moy et sommeVar
 //ATTENTION appeler calcVarianceEdgeLength après cette fonction (n'est pas dans la fonction par souci de temps de calcul)
 void calcVarianceChang(double ancienLongEdge, double nouvLongEdge, double& moy, double& sommeVar) {
@@ -42,5 +44,39 @@ void calcVarianceChang(double ancienLongEdge, double nouvLongEdge, double& moy, 
 	sommeVar -= (ancienLongEdge*ancienLongEdge) / mapEdgeLength.size();
 	sommeVar += (nouvLongEdge * nouvLongEdge) / mapEdgeLength.size();
 }
+
+//renvoie n fois la variance étant données :
+// - la somme des longueurs des edge dans sommeLong
+// - la somme des longeurs des edge au carré dans sommeLong2
+double calcNVar(double sommeLong, double sommeLong2) {
+	return sommeLong2 - mapEdgeLength.size() * sommeLong * sommeLong;
+}
+
+//calcule la somme des longueurs des edge dans sommeLong
+//calcule la somme les longueurs des edge au carre dans sommeLong2
+//calcule n fois la variance dans nVar
+void prepCalcNVar(double& sommeLong, double& sommeLong2, double& nVar) {
+
+	sommeLong = 0;
+	sommeLong2 = 0;
+	for (auto it = mapEdgeLength.begin(); it != mapEdgeLength.end(); it++) {
+		sommeLong += it->second;
+		sommeLong2 += it->second * it->second;
+	}
+	nVar = calcNVar(sommeLong, sommeLong2);
+}
+
+//prend en parametre une longueur d'un edge et la soustrait de sommeLong et sommeLong2
+void deleteEdgeNVar(double edgeLength, double& sommeLong, double& sommelong2) {
+	sommeLong -= edgeLength;
+	sommeLong2 -= edgeLength*edgeLength;
+}
+
+//prend en paramètre une longueur d'un edge et l'ajoute à sommeLong et someLong2
+void addEdgeNVar(double edgeLength, double& sommeLong, double& sommeLong2) {
+	sommeLong += edgeLength;
+	sommeLong2 += edgeLength * edgeLength;
+}
+
 
 #endif OPTIM_ALG
