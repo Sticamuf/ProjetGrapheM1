@@ -56,7 +56,6 @@ double calcNVar(double sommeLong, double sommeLong2) {
 //calcule la somme les longueurs des edge au carre dans sommeLong2
 //calcule n fois la variance dans nVar
 void prepCalcNVar(double& sommeLong, double& sommeLong2, double& nVar) {
-
 	sommeLong = 0;
 	sommeLong2 = 0;
 	for (auto it = mapEdgeLength.begin(); it != mapEdgeLength.end(); it++) {
