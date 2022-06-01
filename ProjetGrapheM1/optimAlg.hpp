@@ -24,10 +24,12 @@ void prepCalcVariance(double& moy, double& sommeVar, double& var) {
     moy = 0; 
 	sommeVar = 0;
     for (auto it = mapLengthEdgeSet.begin(); it != mapLengthEdgeSet.end(); it++) {
-		temp = it->first * it->second.size();//division en cours de route pour ne pas dépasser la taille des double
-		moy += temp / mapEdgeLength.size();//division en cours de route pour ne pas dépasser la taille des double
-		sommeVar += (it->first * temp) / mapEdgeLength.size();
+		temp = it->first * it->second.size();
+		moy += temp;
+		sommeVar += (it->first * temp);
 	}
+	moy /= mapEdgeLength.size();
+	sommeVar /= mapEdgeLength.size();
 	calcVarianceEdgeLength(var, sommeVar, moy);
 }
 

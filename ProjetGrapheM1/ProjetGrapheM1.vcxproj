@@ -154,6 +154,7 @@
     <ClInclude Include="geometrie.hpp" />
     <ClInclude Include="intersection.hpp" />
     <ClInclude Include="jsonIO.hpp" />
+    <ClInclude Include="nodeBend.hpp" />
     <ClInclude Include="nodeMap.hpp" />
     <ClInclude Include="embedder.hpp" />
     <ClInclude Include="optimAlg.hpp" />
