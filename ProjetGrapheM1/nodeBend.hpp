@@ -21,7 +21,7 @@ public:
 		isNode = false;
 		m_p = &p;
 		m_e = e;
-		a_x = &p.m_x;
+		a_x = &p.m_x; 
 		a_y = &p.m_y;
 		numero = num;
 	}

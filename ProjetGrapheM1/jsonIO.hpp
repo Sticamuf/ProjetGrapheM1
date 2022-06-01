@@ -44,8 +44,8 @@ void readFromJson(string input, Graph& G, GridLayout& GL, int& gridWidth, int& g
         GL.x(nodeTab[i]) = j["nodes"][i]["x"];
         GL.y(nodeTab[i]) = j["nodes"][i]["y"];
         mapPosNode[GL.y(nodeTab[i])][GL.x(nodeTab[i])] = true;
-        NodeBend tmpNodeBend(nodeTab[i], GL);
-        vectorNodeBends.push_back(tmpNodeBend);
+        //NodeBend tmpNodeBend(nodeTab[i], GL);
+        //vectorNodeBends.push_back(tmpNodeBend);
     }
     int edgeNumber = static_cast<int>(j["edges"].size());
     edge* edgeTab = new edge[edgeNumber];
@@ -78,8 +78,8 @@ void readFromJson(string input, Graph& G, GridLayout& GL, int& gridWidth, int& g
                 int bendX = j["edges"][i]["bends"][k]["x"];
                 int bendY = j["edges"][i]["bends"][k]["y"];
                 p.pushBack(IPoint(bendX, bendY));
-                NodeBend tmpNodeBend(p.back(), edgeTab[i], k);
-                vectorNodeBends.push_back(tmpNodeBend);
+                //NodeBend tmpNodeBend(p.back(), edgeTab[i], k);
+                //vectorNodeBends.push_back(tmpNodeBend);
                 // On ajoute les bends dans la nodemap:
                 mapPosNode[bendY][bendX] = true;
             }
@@ -101,6 +101,8 @@ void readFromJson(string input, Graph& G, GridLayout& GL, int& gridWidth, int& g
         }
 
     }
+
+
 
     delete[] nodeTab;
     delete[] edgeTab;

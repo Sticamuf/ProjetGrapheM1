@@ -23,7 +23,7 @@ int main() {
     int gridWidth, gridHeight, maxBends;
 
     // ----- LECTURE D'UN FICHIER JSON DANS UN Graph -----
-    string file = "exemples/test.json";
+    string file = "exemples/exempleBonEmbedding.json";
     readFromJson(file, G, GL, gridWidth, gridHeight, maxBends);
     writeToJson("output.json", G, GL, gridWidth, gridHeight, maxBends);
 
@@ -65,6 +65,24 @@ int main() {
         std::cout << "mapLengthEdgeSet: " << it2->first << std::endl;
     }
 
+    // Ajout des node dans le vector
+    node n = G.firstNode();
+    while (n != nullptr) {
+        NodeBend tmpNodeBend(n, GL);
+        vectorNodeBends.push_back(tmpNodeBend);
+        n = n->succ();
+    }
+
+    // Ajout des bend dans le vector
+    edge e = G.firstEdge();
+    while (e != nullptr) {
+        IPolyline& bends = GL.bends(e);
+        int k = 0;
+        for (ListIterator<IPoint> i = bends.begin(); i.valid(); i++, k++) {
+            NodeBend tmpNodeBend((*i), e, k);
+        }
+        e = e->succ();
+    }
 
     // OpenGL
     srand(static_cast<unsigned int>(time(NULL)));

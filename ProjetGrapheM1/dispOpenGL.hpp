@@ -14,6 +14,7 @@
 #include "optimAlg.hpp"
 #include "intersection.hpp"
 #include "NodeBend.hpp"
+#include "NodeMap.hpp"
 #include <random>
 
 using namespace ogdf;
@@ -509,9 +510,9 @@ void move(NodeBend n, int dx, int dy) {
 
 void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHeight, int maxX, int maxY) {
 
-	for (auto ti : vectorNodeBends) {
-		std::cout << "IsNode: " << ti.isNode << " x: " << (*ti.a_x) << " y: " << (*ti.a_y) << std::endl;
-	}
+	//for (auto ti : vectorNodeBends) {
+	//	std::cout << "IsNode: " << ti.isNode << " x: " << (*ti.a_x) << " y: " << (*ti.a_y) << std::endl;
+	//}
 
 
 	//debut ogdf
