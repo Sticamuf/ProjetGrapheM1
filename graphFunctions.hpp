@@ -382,6 +382,44 @@ bool orderNodeAdjChanged(NodeBend nb, GridLayout& GL, int newX, int newY) {
 			}
 		}
 	}
+	// Si on est un bend on regarde si un noeud est directement adjacent ou non
+	else {
+		adjEntry adj = nb.getAdjEntry();
+		edge e = nb.getEdge();
+		IPolyline& bends = GL.bends(e);
+		std::vector<node> adjNodes;
+		// Numero 0 = on est adjacent au noeud source de l'edge
+		if (nb.numero == 0) {
+			adjNodes.push_back(e->source());
+		}
+		// Numero = bends.size() - 1 = on est adjacent au noeud target de l'edge
+		if (nb.numero == bends.size() - 1) {
+			adjNodes.push_back(e->target());
+		}
+		for (int i = 0; i < adjNodes.size(); i++) {
+			// Pas de changement d'ordre possible si degre < 3
+			if (adjNodes[i]->degree() >= 3) {
+				// On recupere l'adjentry du bon coté
+				if (adj->theNode() != adjNodes[i]) {
+					adj = adj->twin();
+				}
+				ListPure<adjEntry> adjNodeAdjEntries;
+				ListPure<adjEntry> adjNodeNewAdjEntriesOrder;
+				adjNodeAdjEntries.clear();
+				adjNodeNewAdjEntriesOrder.clear();
+				adjNodeAdjEntries.pushBack(adj->cyclicPred());
+				adjNodeAdjEntries.pushBack(adj);
+				adjNodeAdjEntries.pushBack(adj->cyclicSucc());
+				adjNodeNewAdjEntriesOrder.pushBack(adj->cyclicPred());
+				adjNodeNewAdjEntriesOrder.pushBack(adj);
+				adjNodeNewAdjEntriesOrder.pushBack(adj->cyclicSucc());
+				adjNodeNewAdjEntriesOrder = orderAroundNodeAfterAdjNodeMove(adjNodes[i], GL, adjNodeNewAdjEntriesOrder, adj, newX, newY);
+				if (!sameOrderList(adjNodeAdjEntries, adjNodeNewAdjEntriesOrder)) {
+					return true;
+				}
+			}
+		}
+	}
 	return false;
 }
 
@@ -514,14 +552,9 @@ std::vector<bool> getLegalMoves(NodeBend& n, GridLayout& GL, std::vector<std::pa
 		}
 		// On regarde si la face s'inverse ou que l'ordre autour d'un noeud change
 		if (!intersection) {
-			if (n.isNode) {
-				// On regarde si les ordre du noeud source ou des adjacents ont changé
-				if (orderNodeAdjChanged(n,GL, vectorMoveCoord[i].first, vectorMoveCoord[i].second)) {
-					intersection = true;
-				}
-			}
-			else {
-
+			// On regarde si les ordre du noeud source ou des adjacents ont changé
+			if (orderNodeAdjChanged(n,GL, vectorMoveCoord[i].first, vectorMoveCoord[i].second)) {
+				intersection = true;
 			}
 		}
 		// Intersection = déplacement pas autorisé

@@ -12,11 +12,13 @@
 #include "EdgeMap.hpp"
 #include "graphFunctions.hpp"
 #include "NodeBend.hpp"
+#include "jsonIO.hpp"
 #include <random>
 
 using namespace ogdf;
 
 bool moveRouletteRusse = false;
+bool autoRouletteRusse = false;
 bool move_nodebend = false;
 bool move_randomly = false;
 bool show_move_variance = false;
@@ -142,6 +144,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		case GLFW_KEY_3:
 			moveRouletteRusse = true;
 			break;
+		case GLFW_KEY_4:
+			autoRouletteRusse = !autoRouletteRusse;
+			break;
 		}
 }
 
@@ -168,12 +173,13 @@ void changeEdgeMapValue(edge e, GridLayout& GL) {
 	}
 }
 
-void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHeight, int maxX, int maxY) {
+void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHeight, int maxX, int maxY, int maxBends) {
 	//debut ogdf
 	node n = G.firstNode();
 	CCE = ConstCombinatorialEmbedding{ G };
 	double sommeLong = 0, sommeLong2 = 0, variance = 0;
 	prepCalcNVar(sommeLong, sommeLong2, variance);
+	double bestVariance = variance;
 	std::cout << "sommeLong: " << sommeLong << std::endl;
 	std::cout << "sommeLong sommeLong: " << sommeLong2 << std::endl;
 	std::cout << "Variance: " << variance << std::endl;
@@ -237,6 +243,13 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 		else if (moveRouletteRusse) {
 			selectedNodeBendNum = startRouletteRusse(GL, CCE, sommeLong, sommeLong2, variance);
 			moveRouletteRusse = false;
+		}
+		else if (autoRouletteRusse) {
+			selectedNodeBendNum = startRouletteRusse(GL, CCE, sommeLong, sommeLong2, variance);
+			if (variance < bestVariance) {
+				bestVariance = variance;
+				writeToJson("bestResult.json", G, GL, gridWidth, gridHeight, maxBends);
+			}
 		}
 		//afficher les edge
 		glColor3f(1.0f, 1.0f, 1.0f);

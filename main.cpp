@@ -23,7 +23,7 @@ int main() {
     int gridWidth, gridHeight, maxBends;
 
     // ----- LECTURE D'UN FICHIER JSON DANS UN Graph -----
-    string file = "exemples/exemple9.json";
+    string file = "exemples/exemple10.json";
     readFromJson(file, G, GL, gridWidth, gridHeight, maxBends);
     writeToJson("output.json", G, GL, gridWidth, gridHeight, maxBends);
     
@@ -87,6 +87,6 @@ int main() {
 
     // OpenGL
     srand(static_cast<unsigned int>(time(NULL)));
-    dispOpenGL(G,GL,gridWidth,gridHeight,maxX,maxY);
+    dispOpenGL(G,GL,gridWidth,gridHeight,maxX,maxY, maxBends);
     return 0;
 }
