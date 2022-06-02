@@ -229,7 +229,7 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 			move_randomly = false;
 		}
 		else if (show_move_variance) {
-			std::vector<std::pair<int, std::pair<int, int>>> vectorProba = rouletteRusseNodeMove(vectorNodeBends[selectedNodeBendNum], GL, CCE, sommeLong, sommeLong2, variance);
+			std::vector<std::pair<int, std::pair<int, int>>> vectorProba = rouletteRusseNodeMove(vectorNodeBends[selectedNodeBendNum], GL, CCE, sommeLong, sommeLong2, variance,gridHeight,gridWidth);
 			show_move_variance = false;
 		}
 		else if (show_variance) {
@@ -238,14 +238,15 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 			std::cout << "sommeLong: " << tmpSommeLong << std::endl;
 			std::cout << "sommeLong sommeLong: " << tmpSommeLong2 << std::endl;
 			std::cout << "Variance: " << tmpVariance << std::endl;
+			std::cout << "Best Variance: " << bestVariance << std::endl;
 			show_variance = false;
 		}
 		else if (moveRouletteRusse) {
-			selectedNodeBendNum = startRouletteRusse(GL, CCE, sommeLong, sommeLong2, variance);
+			selectedNodeBendNum = startRouletteRusse(GL, CCE, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
 			moveRouletteRusse = false;
 		}
 		else if (autoRouletteRusse) {
-			selectedNodeBendNum = startRouletteRusse(GL, CCE, sommeLong, sommeLong2, variance);
+			selectedNodeBendNum = startRouletteRusse(GL, CCE, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
 			if (variance < bestVariance) {
 				bestVariance = variance;
 				writeToJson("bestResult.json", G, GL, gridWidth, gridHeight, maxBends);
