@@ -36,56 +36,20 @@ double calcEdgeLength(const edge& e, const GridLayout& GL) {
     return length;
 }
 
-unsigned long long calcEdgeLengthSquared(const edge& e, const GridLayout& GL) {
+unsigned long long calcTmpEdgeLength(const adjEntry& ad, int srcX, int srcY, const GridLayout& GL) {
+    edge e = ad->theEdge();
+    // Si la source de l'edge est la source de l'adjEntry
+    int sourceX, sourceY;
     node source = e->source();
-    node target = e->target();
-    unsigned long long length = 0.0;
-    double sourceX = GL.x(source);
-    double sourceY = GL.y(source);
-    double targetX, targetY;
-    IPolyline bends = GL.bends(e);
-    if (bends.size() > 0) {
-        for (ListIterator<IPoint> i = bends.begin(); i.valid(); i++) {
-            targetX = (*i).m_x;
-            targetY = (*i).m_y;
-            length += pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2);
-            sourceX = targetX;
-            sourceY = targetY;
-        }
+    if (source == ad->theNode()) {
+        sourceX = srcX;
+        sourceY = srcY;
     }
-    targetX = GL.x(target);
-    targetY = GL.y(target);
-    length += pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2);
-    return length;
-}
-
-unsigned long long calcTmpEdgeLengthSquared(const edge& e, int srcX, int srcY, const GridLayout& GL) {
-    node target = e->target();
-    unsigned long long length = 0.0;
-    int sourceX = srcX;
-    int sourceY = srcY;
-    int targetX, targetY;
-    IPolyline bends = GL.bends(e);
-    if (bends.size() > 0) {
-        for (ListIterator<IPoint> i = bends.begin(); i.valid(); i++) {
-            targetX = (*i).m_x;
-            targetY = (*i).m_y;
-            length += pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2);
-            sourceX = targetX;
-            sourceY = targetY;
-        }
+    else {
+        sourceX = GL.x(source);
+        sourceY = GL.y(source);
     }
-    targetX = GL.x(target);
-    targetY = GL.y(target);
-    length += pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2);
-    return length;
-}
-
-unsigned long long calcTmpEdgeLength(const edge& e, int srcX, int srcY, const GridLayout& GL) {
-    node target = e->target();
     unsigned long long length = 0.0;
-    int sourceX = srcX;
-    int sourceY = srcY;
     int targetX, targetY;
     IPolyline bends = GL.bends(e);
     if (bends.size() > 0) {
@@ -97,8 +61,16 @@ unsigned long long calcTmpEdgeLength(const edge& e, int srcX, int srcY, const Gr
             sourceY = targetY;
         }
     }
-    targetX = GL.x(target);
-    targetY = GL.y(target);
+    node target = e->target();
+    // Si la target de l'edge est le noeud qu'on deplace
+    if (target == ad->theNode()) {
+        targetX = srcX;
+        targetY = srcY;
+    }
+    else {
+        targetX = GL.x(target);
+        targetY = GL.y(target);
+    }
     length += sqrt(pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2));
     return length;
 }

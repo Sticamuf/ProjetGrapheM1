@@ -152,11 +152,11 @@
     <ClInclude Include="dispOpenGL.hpp" />
     <ClInclude Include="edgeMap.hpp" />
     <ClInclude Include="geometrie.hpp" />
+    <ClInclude Include="graphFunctions.hpp" />
     <ClInclude Include="intersection.hpp" />
     <ClInclude Include="jsonIO.hpp" />
     <ClInclude Include="NodeBend.hpp" />
     <ClInclude Include="nodeMap.hpp" />
-    <ClInclude Include="embedder.hpp" />
     <ClInclude Include="optimAlg.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

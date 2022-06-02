@@ -101,9 +101,6 @@ void readFromJson(string input, Graph& G, GridLayout& GL, int& gridWidth, int& g
         }
 
     }
-
-
-
     delete[] nodeTab;
     delete[] edgeTab;
 }

@@ -35,13 +35,19 @@ public:
 		return m_e;
 	}
 	adjEntry getAdjEntry() {
-		if (isNode) {
+		if (!isNode) {
 			return m_e->adjSource();
 		}
 		return nullptr;
 	}
 	bool operator<(const NodeBend& nb) const {
-		return (*a_x < *nb.a_x&& *a_y < *nb.a_y);
+		if (*a_x < *nb.a_x ) {
+			return true;
+		}
+		if (*a_x > *nb.a_x) {
+			return false;
+		}
+		return (*a_y < *nb.a_y);
 	}
 	int getX() {
 		return *a_x;
