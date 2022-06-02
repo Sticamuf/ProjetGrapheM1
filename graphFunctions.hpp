@@ -24,7 +24,7 @@ int generateRand(int n) {
 	return dis(gen);
 }
 
-// Renvoie un set composé de tout les edges qui composent les faces adjacentes a un edge
+// Renvoie un vecteur composé de tout les segments qui composent les faces adjacentes a un adjentry
 std::vector<Segment> getSegmentFromAdjFacesFromAdjEntry(adjEntry& adj, ConstCombinatorialEmbedding& ccem, GridLayout& GL) {
 	std::set<edge> setAllEdges;
 	std::set<face> setAdjFaces;
@@ -123,16 +123,266 @@ void getTargetCoord(GridLayout& GL, const adjEntry& adj, int& trgX, int& trgY) {
 	}
 }
 
-// Renvoie vrai si le noeud n ou un de ses noeuds adjacent a un ordre différent apres le déplacement du node n
-bool orderNodeAdjChanged(NodeBend n, int newX, int newY) {
-	bool orderChanged = false;
-	if (n.isNode) {
-		// On regarde l'ordre autour du noeud
-		List<adjEntry> nodeAdjEntries;
-		n.getNode()->allAdjEntries(nodeAdjEntries);
-		// a completer
+// Renvoie l'ordre des adjentry autour d'un noeud apres déplacement d'un noeud adjacent
+ListPure<adjEntry> orderAroundNodeAfterAdjNodeMove(node nsrc, GridLayout& GL, ListPure<adjEntry> adj, adjEntry moved, int newX, int newY) {
+	ListPure<adjEntry> newOrder;
+	// Coordonnées: s = source, t = target, n = node a ajouter
+	int sx, sy, tx, ty, nx, ny;
+	sx = GL.x(nsrc);
+	sy = GL.y(nsrc);
+	// Itérateur qui itere sur le tableau des adjacent non trié
+	auto it = adj.begin();
+	// On insere le premier element et on passe directement au prochain
+	newOrder.pushBack((*it));
+	it++;
+	// On itere sur tout les éléments de la liste non triée
+	for (; it.valid(); it++) {
+		bool inserted = false;
+		edge tmpEdge2;
+		int qnewnode;
+		if ((*it) == moved) {
+			nx = newX;
+			ny = newY;
+		}
+		else {
+			getTargetCoord(GL, (*it), nx, ny);
+		}
+		qnewnode = quadrant(sx, sy, nx, ny);
+		// On itere sur le deuxieme tableau tant qu'on est pas a la fin et tant qu'on a pas inseré
+		for (auto it2 = newOrder.begin(); ((it2.valid()) && (!inserted)); it2++) {
+			if ((*it2) == moved) {
+				tx = newX;
+				ty = newY;
+			}
+			else {
+				getTargetCoord(GL, (*it2), tx, ty);
+			}
+			// Quadrant du noeud/premier bend
+			int qtrg = quadrant(sx, sy, tx, ty);
+			// Si le quadrant du point que l'on veut inserer est inférieur a celui qu'on compare
+			if (qnewnode < qtrg) {
+				// Si on compare au premier, on insere en premiere place
+				if (it2 == newOrder.begin()) {
+					newOrder.pushFront((*it));
+				}
+				else {
+					it2--;
+					newOrder.insertAfter((*it), it2);
+					it2++;
+				}
+				inserted = true;
+			}
+			// Si les quadrants sont égaux
+			else if (qnewnode == qtrg) {
+				// Si on est a droite on insere apres it3
+				if (!aGauche(sx, sy, tx, ty, nx, ny)) {
+					if (it2 == newOrder.begin()) {
+						newOrder.pushFront((*it));
+					}
+					else {
+						it2--;
+						newOrder.insertAfter((*it), it2);
+						it2++;
+					}
+					inserted = true;
+				}
+			}
+		}
+		// Si on a toujours pas inseré, c'est qu'on est le dernier element
+		if (!inserted) {
+			newOrder.pushBack((*it));
+		}
 	}
-	return orderChanged;
+	return newOrder;
+}
+
+// Renvoie l'ordre des adjentry autour d'un noeud apres déplacement de ce noeud
+ListPure<adjEntry> orderAroundNodeAfterMove(node nsrc, GridLayout& GL, ListPure<adjEntry> adj, int newX, int newY) {
+	ListPure<adjEntry> newOrder;
+	// Coordonnées: s = source, t = target, n = node a ajouter
+	int sx, sy, tx, ty, nx, ny;
+	sx = newX;
+	sy = newY;
+	// Itérateur qui itere sur le tableau des adjacent non trié
+	auto it = adj.begin();
+	// On insere le premier element et on passe directement au prochain
+	newOrder.pushBack((*it));
+	it++;
+	// On itere sur tout les éléments de la liste non triée
+	for (; it.valid(); it++) {
+		bool inserted = false;
+		edge tmpEdge2;
+		int qnewnode;
+		getTargetCoord(GL, (*it), nx, ny);
+		qnewnode = quadrant(sx, sy, nx, ny);
+		// On itere sur le deuxieme tableau tant qu'on est pas a la fin et tant qu'on a pas inseré
+		for (auto it2 = newOrder.begin(); ((it2.valid()) && (!inserted)); it2++) {
+			getTargetCoord(GL, (*it2), tx, ty);
+			// Quadrant du noeud/premier bend
+			int qtrg = quadrant(sx, sy, tx, ty);
+			// Si le quadrant du point que l'on veut inserer est inférieur a celui qu'on compare
+			if (qnewnode < qtrg) {
+				// Si on compare au premier, on insere en premiere place
+				if (it2 == newOrder.begin()) {
+					newOrder.pushFront((*it));
+				}
+				else {
+					it2--;
+					newOrder.insertAfter((*it), it2);
+					it2++;
+				}
+				inserted = true;
+			}
+			// Si les quadrants sont égaux
+			else if (qnewnode == qtrg) {
+				// Si on est a droite on insere apres it3
+				if (!aGauche(sx, sy, tx, ty, nx, ny)) {
+					if (it2 == newOrder.begin()) {
+						newOrder.pushFront((*it));
+					}
+					else {
+						it2--;
+						newOrder.insertAfter((*it), it2);
+						it2++;
+					}
+					inserted = true;
+				}
+			}
+		}
+		// Si on a toujours pas inseré, c'est qu'on est le dernier element
+		if (!inserted) {
+			newOrder.pushBack((*it));
+		}
+	}
+	return newOrder;
+}
+
+// Renvoie l'ordre des adjentry autour d'un noeud
+ListPure<adjEntry> orderAroundNode(node nsrc, GridLayout& GL, ListPure<adjEntry> adj) {
+	ListPure<adjEntry> newOrder;
+	// Coordonnées: s = source, t = target, n = node a ajouter
+	int sx, sy, tx, ty, nx, ny;
+	sx = GL.x(nsrc);
+	sy = GL.y(nsrc);
+	// Itérateur qui itere sur le tableau des adjacent non trié
+	auto it = adj.begin();
+	// On insere le premier element et on passe directement au prochain
+	newOrder.pushBack((*it));
+	it++;
+	// On itere sur tout les éléments de la liste non triée
+	for (; it.valid(); it++) {
+		bool inserted = false;
+		edge tmpEdge2;
+		int qnewnode;
+		getTargetCoord(GL, (*it), nx, ny);
+		qnewnode = quadrant(sx, sy, nx, ny);
+		// On itere sur le deuxieme tableau tant qu'on est pas a la fin et tant qu'on a pas inseré
+		for (auto it2 = newOrder.begin(); ((it2.valid()) && (!inserted)); it2++) {
+			getTargetCoord(GL, (*it2), tx, ty);
+			// Quadrant du noeud/premier bend
+			int qtrg = quadrant(sx, sy, tx, ty);
+			// Si le quadrant du point que l'on veut inserer est inférieur a celui qu'on compare
+			if (qnewnode < qtrg) {
+				// Si on compare au premier, on insere en premiere place
+				if (it2 == newOrder.begin()) {
+					newOrder.pushFront((*it));
+				}
+				else {
+					it2--;
+					newOrder.insertAfter((*it), it2);
+					it2++;
+				}
+				inserted = true;
+			}
+			// Si les quadrants sont égaux
+			else if (qnewnode == qtrg) {
+				// Si on est a droite on insere apres it3
+				if (!aGauche(sx, sy, tx, ty, nx, ny)) {
+					if (it2 == newOrder.begin()) {
+						newOrder.pushFront((*it));
+					}
+					else {
+						it2--;
+						newOrder.insertAfter((*it), it2);
+						it2++;
+					}
+					inserted = true;
+				}
+			}
+		}
+		// Si on a toujours pas inseré, c'est qu'on est le dernier element
+		if (!inserted) {
+			newOrder.pushBack((*it));
+		}
+	}
+	return newOrder;
+}
+
+// Renvoie vrai si les deux listes ont les memes suivants/precedent de leur contenu (ABC == BCA)
+// Fonction utilisée pour des listes ayant les memes adjentry en contenu mais pas forcément dans le meme ordre
+bool sameOrderList(ListPure<adjEntry> l1, ListPure<adjEntry> l2) {
+	ListIterator<adjEntry> it = l1.begin();
+	ListIterator<adjEntry> it2 = l2.begin();
+	for (; (*it2) != (*it); it2++);
+	while (l1.cyclicSucc(it) != l1.begin()) {
+		it = l1.cyclicSucc(it);
+		it2 = l2.cyclicSucc(it2);
+		if ((*it) != (*it2)) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool hasBends(adjEntry adj, GridLayout& GL) {
+	edge tmpEdge = adj->theEdge();
+	IPolyline& p = GL.bends(tmpEdge);
+	// Si l'edge contient des bends
+	return (p.size() > 0);
+}
+
+// Renvoie vrai si le noeud n ou un de ses noeuds adjacent a un ordre différent apres le déplacement du node n
+bool orderNodeAdjChanged(NodeBend nb, GridLayout& GL, int newX, int newY) {
+	if (nb.isNode) {
+		int degre = nb.getNode()->degree();
+		node n = nb.getNode();
+		// On regarde l'ordre autour du noeud
+		if (degre >= 3) {
+			ListPure<adjEntry> nodeAdjEntries;
+			n->allAdjEntries(nodeAdjEntries);
+			ListPure<adjEntry> newAdjEntriesOrder;
+			n->allAdjEntries(newAdjEntriesOrder);
+			newAdjEntriesOrder = orderAroundNodeAfterMove(n, GL, newAdjEntriesOrder, newX, newY);
+			if (!sameOrderList(nodeAdjEntries, newAdjEntriesOrder)) {
+				return true;
+			}
+		}
+		ListPure<adjEntry> nodeAdjEntries;
+		n->allAdjEntries(nodeAdjEntries);
+		ListPure<adjEntry> adjNodeAdjEntries;
+		ListPure<adjEntry> adjNodeNewAdjEntriesOrder;
+		// On regarde l'ordre de tout les noeuds adjacents
+		for (auto it = nodeAdjEntries.begin(); it.valid(); it++) {
+			node na = (*it)->twinNode();
+			// Uniquement si le degree >=3 l'ordre peut changer et que l'edge ne contient pas de bend
+			if ((!hasBends((*it), GL))&&(na->degree() >= 3)) {
+				adjNodeAdjEntries.clear();
+				adjNodeNewAdjEntriesOrder.clear();
+				adjEntry oppose = (*it)->twin();
+				adjNodeAdjEntries.pushBack(oppose->cyclicPred());
+				adjNodeAdjEntries.pushBack(oppose);
+				adjNodeAdjEntries.pushBack(oppose->cyclicSucc());
+				adjNodeNewAdjEntriesOrder.pushBack(oppose->cyclicPred());
+				adjNodeNewAdjEntriesOrder.pushBack(oppose);
+				adjNodeNewAdjEntriesOrder.pushBack(oppose->cyclicSucc());
+				adjNodeNewAdjEntriesOrder = orderAroundNodeAfterAdjNodeMove(na,GL, adjNodeNewAdjEntriesOrder, oppose,newX,newY);
+				if (!sameOrderList(adjNodeAdjEntries, adjNodeNewAdjEntriesOrder)) {
+					return true;
+				}
+			}
+		}
+	}
+	return false;
 }
 
 // Renvoie un vecteur de booléen de meme taille que "vectorMoveCoord". Ces booleen indiquent si le déplacement a la meme position dans ce vecteur est valide ou non.
@@ -190,6 +440,7 @@ std::vector<bool> getLegalMoves(NodeBend& n, GridLayout& GL, std::vector<std::pa
 	// Pour chaque déplacement, on regarde si il y a une intersection associé
 	int segmentSourceTrgX, segmentSourceTrgY;
 	for (int i = 0; i < vectorMoveCoord.size(); i++) {
+		std::cout << "Check Deplacement " << i << std::endl;
 		intersection = false;
 		// On parcour la liste des adjentry du point de départ
 		int j = 0;
@@ -262,16 +513,16 @@ std::vector<bool> getLegalMoves(NodeBend& n, GridLayout& GL, std::vector<std::pa
 			}
 		}
 		// On regarde si la face s'inverse ou que l'ordre autour d'un noeud change
-		if (n.isNode) {
-			// Si le noeud a 3 edge adjacent ou plus, alors on regarde si l'ordre autour de son noeud ou de ses noeud adjacents ont changés
-			if (n.getNode()->degree() >= 3) {
-				if (orderNodeAdjChanged(n, vectorMoveCoord[i].first, vectorMoveCoord[i].second)) {
+		if (!intersection) {
+			if (n.isNode) {
+				// On regarde si les ordre du noeud source ou des adjacents ont changé
+				if (orderNodeAdjChanged(n,GL, vectorMoveCoord[i].first, vectorMoveCoord[i].second)) {
 					intersection = true;
 				}
 			}
-		}
-		else {
+			else {
 
+			}
 		}
 		// Intersection = déplacement pas autorisé
 		vectorMoveAutorised.push_back(!intersection);
@@ -296,6 +547,11 @@ std::vector<std::pair<int, std::pair<int, int>>> rouletteRusseNodeMove(NodeBend&
 	vectorMoveCoord.push_back(std::pair<int, int>(nx, ny + 1));
 	vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny));
 	vectorMoveCoord.push_back(std::pair<int, int>(nx, ny - 1));
+	//vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny+1));
+	//vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny-1));
+	//vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny+1));
+	//vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny-1));
+	//vectorMoveCoord.push_back(std::pair<int, int>(nx+2, ny)); // POUR TEST UNIQUEMENT A SUPPRIMER PLUS TARD
 	// On stocke si les déplacements sont autorisés, donc s'il n'y a pas de node ou de bend a ces coordonnées
 	std::vector<bool> vectorMoveAutorised = getLegalMoves(n, GL, vectorMoveCoord, ccem);
 	SListPure<adjEntry> adjEntries;
@@ -465,66 +721,6 @@ void move(NodeBend n, GridLayout& GL, int dx, int dy, double& sommeLong, double&
 	changeVariance(n, GL, newX, newY, sommeLong, sommeLong2, variance);
 	(*n.a_x) = newX;
 	(*n.a_y) = newY;
-}
-
-ListPure<adjEntry> orderAroundNode(node nsrc, GridLayout& GL, ListPure<adjEntry> adj) {
-	ListPure<adjEntry> newOrder;
-	// Coordonnées: s = source, t = target, n = node a ajouter
-	int sx, sy, tx, ty, nx, ny;
-	sx = GL.x(nsrc);
-	sy = GL.y(nsrc);
-	// Itérateur qui itere sur le tableau des adjacent non trié
-	auto it = adj.begin();
-	// On insere le premier element et on passe directement au prochain
-	newOrder.pushBack((*it));
-	it++;
-	// On itere sur tout les éléments de la liste non triée
-	for (; it.valid(); it++) {
-		bool inserted = false;
-		edge tmpEdge2;
-		int qnewnode;
-		getTargetCoord(GL,(*it),nx,ny);
-		qnewnode = quadrant(sx, sy, nx, ny);
-		// On itere sur le deuxieme tableau tant qu'on est pas a la fin et tant qu'on a pas inseré
-		for (auto it2 = newOrder.begin(); ((it2.valid()) && (!inserted)); it2++) {
-			getTargetCoord(GL, (*it2), tx, ty);
-			// Quadrant du noeud/premier bend
-			int qtrg = quadrant(sx, sy, tx, ty);
-			// Si le quadrant du point que l'on veut inserer est inférieur a celui qu'on compare
-			if (qnewnode < qtrg) {
-				// Si on compare au premier, on insere en premiere place
-				if (it2 == newOrder.begin()) {
-					newOrder.pushFront((*it));
-				}
-				else {
-					it2--;
-					newOrder.insertAfter((*it), it2);
-					it2++;
-				}
-				inserted = true;
-			}
-			// Si les quadrants sont égaux
-			else if (qnewnode == qtrg) {
-				// Si on est a droite on insere apres it3
-				if (!aGauche(sx, sy, tx, ty, nx, ny)) {
-					if (it2 == newOrder.begin()) {
-						newOrder.pushFront((*it));
-					}
-					else {
-						it2--;
-						newOrder.insertAfter((*it), it2);
-						it2++;
-					}
-					inserted = true;
-				}
-			}
-		}
-		// Si on a toujours pas inseré, c'est qu'on est le dernier element
-		if (!inserted) {
-			newOrder.pushBack((*it));
-		}
-	}
-	return newOrder;
 }
 
 // Renvoie l'ordre trigonométrique de tout les adjEntry autour d'un noeud
