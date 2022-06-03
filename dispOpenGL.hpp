@@ -17,6 +17,8 @@
 
 using namespace ogdf;
 
+bool moveRecuitSimule = false;
+bool autoRecuitSimule = false;
 bool moveRouletteRusse = false;
 bool autoRouletteRusse = false;
 bool move_nodebend = false;
@@ -147,6 +149,12 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		case GLFW_KEY_4:
 			autoRouletteRusse = !autoRouletteRusse;
 			break;
+		case GLFW_KEY_5:
+			moveRecuitSimule = true;
+			break;
+		case GLFW_KEY_6:
+			autoRecuitSimule = !autoRecuitSimule;
+			break;
 		}
 }
 
@@ -173,6 +181,37 @@ void changeEdgeMapValue(edge e, GridLayout& GL) {
 	}
 }
 
+// Fonction qui modifie le coefficient de recuit simulé, le nombre de tour et le booleen qui indique la phase du recuit
+void modifCoeffRecuit(double& coeff,double coeffDesc,double coeffMont,double coeffMax,double coeffMin,bool& recuitMontant,int& nbTour,int nbTourModifCoeff) {
+	nbTour++;
+	// Si assez de tour sont passé on décalle le coefficient
+	if (nbTour >= nbTourModifCoeff) {
+		nbTour = 0;
+		// Si la phase est montante on augmente le coefficient
+		if (recuitMontant) {
+			if (coeff < 1.0) {
+				coeff += coeffDesc;
+			}
+			else {
+				coeff += coeffMont;
+			}
+		}
+		else {
+			if (coeff <= 1.0) {
+				coeff -= coeffDesc;
+			}
+			else {
+				coeff -= coeffMont;
+			}
+		}
+		// Si on atteind le max ou le min, on change de phase
+		double epsilon = 0.05;
+		if ((coeff > coeffMax - epsilon) || (coeff < coeffMin + epsilon)) {
+			recuitMontant = !recuitMontant;
+		}
+	}
+}
+
 void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHeight, int maxX, int maxY, int maxBends) {
 	//debut ogdf
 	node n = G.firstNode();
@@ -183,6 +222,22 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 	std::cout << "sommeLong: " << sommeLong << std::endl;
 	std::cout << "sommeLong sommeLong: " << sommeLong2 << std::endl;
 	std::cout << "Variance: " << variance << std::endl;
+
+	// Parametre pour le recuit simulé
+	double coeff = 1.0;
+	// Decallage coeff descendant, on soustrait cette valeur
+	double coeffDesc = 0.1;
+	// Decallage coeff montant, on ajoute cette valeur
+	double coeffMont = 0.5;
+	// Max et Min du coeff
+	double coeffMax = 5;
+	double coeffMin = 0.1;
+	// Indique si on est sur la vague montante du recuit simulé
+	bool recuitMontant = false;
+	// Nombre d'execution du recuit simule
+	int nbTour = 0;
+	// Nombre d'execution requise pour modifier le coeff
+	int nbTourModifCoeff = 100;
 
 	//fin ogdf
 	if (!glfwInit())
@@ -247,6 +302,20 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 		}
 		else if (autoRouletteRusse) {
 			selectedNodeBendNum = startRouletteRusse(GL, CCE, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
+			if (variance < bestVariance) {
+				bestVariance = variance;
+				writeToJson("bestResult.json", G, GL, gridWidth, gridHeight, maxBends);
+			}
+		}
+		else if (moveRecuitSimule) {
+			selectedNodeBendNum = startRecuitSimule(coeff, GL, CCE, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
+			modifCoeffRecuit(coeff,coeffDesc,coeffMont,coeffMax,coeffMin,recuitMontant,nbTour,nbTourModifCoeff);
+			moveRecuitSimule = false;
+		}
+		else if (autoRecuitSimule) {
+			selectedNodeBendNum = startRecuitSimule(coeff, GL, CCE, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
+			modifCoeffRecuit(coeff, coeffDesc, coeffMont, coeffMax, coeffMin, recuitMontant, nbTour, nbTourModifCoeff);
+			//std::cout << "Coeff: " << coeff << " Tour: " << nbTour << " Phase: " << recuitMontant << std::endl;
 			if (variance < bestVariance) {
 				bestVariance = variance;
 				writeToJson("bestResult.json", G, GL, gridWidth, gridHeight, maxBends);

@@ -760,6 +760,178 @@ int startRouletteRusse(GridLayout& GL, ConstCombinatorialEmbedding& ccem, double
 	std::cout << "Nouvelle variance " << variance << std::endl;
 }
 
+// Renvoie un vecteur qui attribue une probabilité a un déplacement
+// Cette fonction doit etre appelée avant un déplacement
+// Les poids assignés aux déplacements sont attribués en fonction de leur amélioration de l'écart-type et du coefficient de recuit simulé
+std::vector<std::pair<int, std::pair<int, int>>> recuitSimuleNodeMove(NodeBend& n, double coeff, GridLayout& GL, ConstCombinatorialEmbedding& ccem, double& sommeLong, double& sommeLong2, double& variance, int gridHeight, int gridWidth) {
+	int nx = (*n.a_x);
+	int ny = (*n.a_y);
+	// On stocke les changements de variances apres un déplacement
+	std::vector<double> vectorVarChangeMove;
+	// On stocke les coordonnées d'arrivée qu'on aurait apres le déplacement
+	std::vector<std::pair<int, int>> vectorMoveCoord;
+	if ((nx + 1) <= gridWidth)
+		vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny));
+	if ((ny + 1) <= gridHeight)
+		vectorMoveCoord.push_back(std::pair<int, int>(nx, ny + 1));
+	if ((nx - 1) >= 0)
+		vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny));
+	if ((ny - 1) >= 0)
+		vectorMoveCoord.push_back(std::pair<int, int>(nx, ny - 1));
+	if (((nx + 1) <= gridWidth) && ((ny + 1) <= gridHeight))
+		vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny + 1));
+	if (((nx + 1) <= gridWidth) && ((ny - 1) >= 0))
+		vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny - 1));
+	if (((nx - 1) >= 0) && ((ny + 1) <= gridHeight))
+		vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny + 1));
+	if (((nx - 1) >= 0) && ((ny - 1) >= 0))
+		vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny - 1));
+	// On stocke si les déplacements sont autorisés, donc s'il n'y a pas de node ou de bend a ces coordonnées
+	std::vector<bool> vectorMoveAutorised = getLegalMoves(n, GL, vectorMoveCoord, ccem);
+	SListPure<adjEntry> adjEntries;
+	bool isNode = true;
+	if (n.isNode) {
+		n.getNode()->allAdjEntries(adjEntries);
+	}
+	else {
+		adjEntries.pushBack(n.getAdjEntry());
+		isNode = false;
+	}
+	// Minimum et Maximum des variances des différents déplacements pour calcul de probabilité plus tard
+	double tmpMaxContribution = 0;
+	double tmpMinContribution = 0;
+	int numberMoveAutorised = 1;
+	// Boucle sur tout les déplacements possibles
+	for (int i = 0; i < vectorMoveAutorised.size(); i++) {
+		// On regarde si le déplacement est autorisé (si on ne se déplace par sur une node ou un bend)
+		if (vectorMoveAutorised[i]) {
+			numberMoveAutorised++;
+			double tmpSommeLong = sommeLong;
+			double tmpSommeLong2 = sommeLong2;
+			double tmpVariance = variance;
+			for (auto it = adjEntries.begin(); it.valid(); it++) {
+				auto it2 = mapEdgeLength.find((*it)->theEdge());
+				double tmpOldLength = it2->second;
+				double tmpNewLength;
+				if (isNode) {
+					tmpNewLength = calcTmpEdgeLength((*it), vectorMoveCoord[i].first, vectorMoveCoord[i].second, GL);
+				}
+				else {
+					tmpNewLength = calcTmpEdgeLengthBends((*it)->theEdge(), n, vectorMoveCoord[i].first, vectorMoveCoord[i].second, GL);
+				}
+				deleteEdgeNVar(tmpOldLength, tmpSommeLong, tmpSommeLong2);
+				addEdgeNVar(tmpNewLength, tmpSommeLong, tmpSommeLong2);
+			}
+			tmpVariance = calcNVar(tmpSommeLong, tmpSommeLong2);
+			double tmpContribution = tmpVariance - variance;
+			vectorVarChangeMove.push_back(tmpContribution);
+			if (tmpContribution > tmpMaxContribution) {
+				tmpMaxContribution = tmpContribution;
+			}
+			if (tmpContribution < tmpMinContribution) {
+				tmpMinContribution = tmpContribution;
+			}
+
+		}
+		else {
+			vectorVarChangeMove.push_back(-1);
+		}
+	}
+	//pas de mouvement -> déplacement 4
+	vectorMoveCoord.push_back(std::pair<int, int>(nx, ny));
+	vectorMoveAutorised.push_back(true);
+	vectorVarChangeMove.push_back(0);
+	std::vector<std::pair<int, std::pair<int, int>>> vectorProbaMove;
+	double tmpVarSomme = 0;
+	// On soustrait a tout les valeurs la variance maximale
+	for (int i = 0; i < vectorVarChangeMove.size(); i++) {
+		if (vectorMoveAutorised[i]) {
+			std::cout << "Contribution Variance deplacement " << i << ": " << vectorVarChangeMove[i] << std::endl;
+			vectorVarChangeMove[i] = (-vectorVarChangeMove[i]) + (2 * tmpMaxContribution);
+			tmpVarSomme += vectorVarChangeMove[i];
+		}
+	}
+	// Si la somme des variance est égale a 0, alors tout les déplacements ont la meme proba, pas besoin d'appliquer le coeff
+	int size = vectorMoveAutorised.size() - 1;
+	int tmpSommeProba = 0;
+	if (tmpVarSomme == 0) {
+		for (int i = 0; i < size; i++) {
+			if (vectorMoveAutorised[i]) {
+				int tmpProba = round(100 / numberMoveAutorised);
+				tmpSommeProba += tmpProba;
+				std::cout << "Deplacement " << i << " Proba: " << tmpProba << " SommeProba: " << tmpSommeProba << std::endl;
+			}
+			if (tmpSommeProba > 100)
+				tmpSommeProba = 100;
+			std::pair<int, std::pair<int, int>> tmpPair(tmpSommeProba, vectorMoveCoord[i]);
+			vectorProbaMove.push_back(tmpPair);
+		}
+	}
+	// Il y a au moin un déplacement qui change la variance
+	else {
+		// On applique le coefficient aux probabilités
+		double tmpSommeProbaFraction = 0;
+		std::vector<double> vectorTmpProba;
+		for (int i = 0; i < size; i++) {
+			if (vectorMoveAutorised[i]) {
+				double tmpProbaFraction = vectorVarChangeMove[i] / tmpVarSomme;
+				tmpProbaFraction = pow(tmpProbaFraction, coeff);
+				tmpSommeProbaFraction += tmpProbaFraction;
+				vectorTmpProba.push_back(tmpProbaFraction);
+			}
+			else {
+				vectorTmpProba.push_back(-1.0);
+			}
+		}
+		// On transforme ces valeurs en probabilité
+		for (int i = 0; i < size; i++) {
+			if (vectorMoveAutorised[i]) {
+				int tmpProba = round((vectorTmpProba[i] / tmpSommeProbaFraction) * 100);
+				tmpSommeProba += tmpProba;
+				std::cout << "Deplacement " << i << " Proba: " << tmpProba << " SommeProba: " << tmpSommeProba << std::endl;
+			}
+			if (tmpSommeProba > 100)
+				tmpSommeProba = 100;
+			std::pair<int, std::pair<int, int>> tmpPair(tmpSommeProba, vectorMoveCoord[i]);
+			vectorProbaMove.push_back(tmpPair);
+		}
+	}
+
+	std::cout << "Deplacement " << size << " Proba: " << 100 - tmpSommeProba << " SommeProba: " << 100 << std::endl;
+	std::pair<int, std::pair<int, int>> tmpPair(100, vectorMoveCoord[size]);
+	vectorProbaMove.push_back(tmpPair);
+	return vectorProbaMove;
+}
+
+// Demarre l'algorithme de recuit simulé sur le graphe
+// Les probas sont calculés avec l'algorithme roulette russe et modifiée avec un coefficient évoluant avec le temps
+// retourne le numero du nodebend choisi, uniquement utile pour l'affichage opengl
+int startRecuitSimule(double coeff, GridLayout& GL, ConstCombinatorialEmbedding& ccem, double& sommeLong, double& sommeLong2, double& variance, int gridHeight, int gridWidth) {
+	// On choisis au hasard un NodeBend
+	int randomNum = generateRand(vectorNodeBends.size()) - 1;
+	std::cout << "Numero selectionne: " << randomNum << std::endl;
+	NodeBend nb = vectorNodeBends[randomNum];
+	std::vector<std::pair<int, std::pair<int, int>>> probaDeplacement = recuitSimuleNodeMove(nb, coeff, GL, ccem, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
+	std::vector<double> tmpProba;
+	double tmpSommeProba = 0;
+	if (probaDeplacement.size() > 0) {
+		int randomChoice = generateRand(100);
+		bool moved = false;
+		// Le déplacement est choisi aléatoirement
+		for (int i = 0; ((i < probaDeplacement.size()) && (!moved)); i++) {
+			if (randomChoice <= probaDeplacement[i].first) {
+				std::cout << "Nombre aleatoire: " << randomChoice << " Deplacement choisi : " << i << std::endl;
+				changeVariance(nb, GL, probaDeplacement[i].second.first, probaDeplacement[i].second.second, sommeLong, sommeLong2, variance);
+				(*nb.a_x) = probaDeplacement[i].second.first;
+				(*nb.a_y) = probaDeplacement[i].second.second;
+				moved = true;
+			}
+		}
+	}
+	return randomNum;
+	std::cout << "Nouvelle variance " << variance << std::endl;
+}
+
 // Calcul le ratio edge/length. longueur la plus grande divisé par la longueur la plus courte.
 double calcEdgeLengthRatio() {
 	double ratio = (mapLengthEdgeSet.rbegin()->first / mapLengthEdgeSet.begin()->first);
