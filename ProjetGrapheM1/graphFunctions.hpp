@@ -761,7 +761,7 @@ int startRouletteRusse(GridLayout& GL, ConstCombinatorialEmbedding& ccem, double
 }
 
 
-std::vector<std::pair<int, std::pair<int, int>>> bestNodeMove(NodeBend& n, GridLayout& GL, ConstCombinatorialEmbedding& ccem, double& sommeLong, double& sommeLong2, double& variance, int gridHeight, int gridWidth) {
+/*std::vector<std::pair<int, std::pair<int, int>>> bestNodeMove(NodeBend& n, GridLayout& GL, ConstCombinatorialEmbedding& ccem, double& sommeLong, double& sommeLong2, double& variance, int gridHeight, int gridWidth) {
 	std::cout << "Variance avant roulette: " << variance << std::endl;
 	int nx = (*n.a_x);
 	int ny = (*n.a_y);
@@ -875,19 +875,27 @@ std::vector<std::pair<int, std::pair<int, int>>> bestNodeMove(NodeBend& n, GridL
 	std::pair<int, std::pair<int, int>> tmpPair(100, vectorMoveCoord[size]);
 	vectorProbaMove.push_back(tmpPair);
 	return vectorProbaMove;
-}
+}*/
 
 int startBest(GridLayout& GL, ConstCombinatorialEmbedding& ccem, double& sommeLong, double& sommeLong2, double& variance, int gridHeight, int gridWidth) {
 	// On choisis au hasard un NodeBend
 	int randomNum = generateRand(vectorNodeBends.size()) - 1;
 	std::cout << "Numero selectionne: " << randomNum << std::endl;
 	NodeBend nb = vectorNodeBends[randomNum];
-	std::vector<std::pair<int, std::pair<int, int>>> bestDeplacement = bestNodeMove(nb, GL, ccem, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
+	std::vector<std::pair<int, std::pair<int, int>>> bestDeplacement = rouletteRusseNodeMove(nb, GL, ccem, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
 	if (bestDeplacement.size() > 0) {
 		int j=0;
 		for (int i = 0; i < bestDeplacement.size(); i++) {
-			if (bestDeplacement[j].first<bestDeplacement[i].first) {
+			if(bestDeplacement[j].first<bestDeplacement[i].first) {
 				j=i;
+			}
+			else(bestDeplacement[j].first==bestDeplacement[i].first)
+			{
+				int randomchoi = generateRand(1);
+				if(randomchoi==1)
+				{
+					j=1;	
+				}
 			}
 		}
 		std::cout<< " Deplacement selectionné : " << j << std::endl;
