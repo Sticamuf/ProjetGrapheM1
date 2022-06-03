@@ -4,6 +4,7 @@
 #include <ogdf/planarity/EmbedderMinDepth.h>
 #include <ogdf/planarity/SimpleEmbedder.h>
 #include <ogdf/basic/simple_graph_alg.h>
+#include <ogdf/planarity/EmbedderMaxFaceLayers.h>
 
 #include "jsonIO.hpp"
 #include "dispOpenGL.hpp"
@@ -34,6 +35,7 @@ int main() {
 		std::cout << "Planarizing..." << std::endl;
 		PlanarStraightLayout PL;
 		PL.separation(-19);
+		//PL.setEmbedder(new EmbedderMaxFaceLayers);
 		PL.callGrid(G, GL);
 		node n = G.firstNode();
 		while (n != nullptr) {
@@ -88,36 +90,6 @@ int main() {
 		}
 		e = e->succ();
 	}
-
-	//for (const auto& it : vectorNodeBends) {
-	//    cout << "vector : " << *it.a_x << " " << *it.a_y << endl;
-	//}
-	//for (const auto& it : setNodeBends) {
-	//    cout << "set : " << *it.a_x << " " << *it.a_y << endl;
-	//    //cout << "set address " << it.a_x << endl;
-	//}
-	//cout << "vector size : " << vectorNodeBends.size() << endl;
-	//cout << "set size : " << setNodeBends.size() << endl;
-	//for (int i = 0; i < mapPosNode.size(); i++) {
-	//    for (int j = 0; j < mapPosNode[i].size(); j++) {
-	//        cout << mapPosNode[i][j] << " ";
-	//    }
-	//    cout << endl;
-	//}
-	//cout << gridWidth << " " << gridHeight << endl;
-
-	////test pour vérifier que changer la valeur du set la change dans le vector -> fonctionne || l'autre sens fonctionne aussi
-	//int i = 0;
-	//NodeBend nb = vectorNodeBends[i];
-	//auto itnb = setNodeBends.find(nb);
-	//cout << "vetor : " << *vectorNodeBends[i].a_x << " " << *vectorNodeBends[i].a_y << endl;
-	//cout << "nb : " << *nb.a_x << " " << *nb.a_y << endl;
-	//cout << "itnb : " << *(*itnb).a_x << " " << *(*itnb).a_y << endl;
-	//*(nb).a_x += 1;
-	//*(nb).a_y -= 1;
-	//cout << "vetor : " << *vectorNodeBends[i].a_x << " " << *vectorNodeBends[i].a_y << endl;
-	//cout << "nb : " << *nb.a_x << " " << *nb.a_y << endl;
-	//cout << "itnb : " << *(*itnb).a_x << " " << *(*itnb).a_y << endl;
 
 	// OpenGL
 	srand(static_cast<unsigned int>(time(NULL)));
