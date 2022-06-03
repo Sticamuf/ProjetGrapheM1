@@ -840,7 +840,7 @@ std::vector<std::pair<int, std::pair<int, int>>> bestNodeMove(NodeBend& n, GridL
 	vectorMoveCoord.push_back(std::pair<int, int>(nx, ny));
 	vectorMoveAutorised.push_back(true);
 	vectorVarChangeMove.push_back(0);
-	std::vector<std::pair<int, std::pair<int, int>>> vectorVarMove;
+	std::vector<std::pair<int, std::pair<int, int>>> vectorProbaMove;
 	double tmpVarSomme = 0;
 	// On soustrait a tout les valeurs la variance maximale
 	for (int i = 0; i < vectorVarChangeMove.size(); i++) {
@@ -848,11 +848,33 @@ std::vector<std::pair<int, std::pair<int, int>>> bestNodeMove(NodeBend& n, GridL
 			std::cout << "Contribution Variance deplacement " << i << ": " << vectorVarChangeMove[i] << std::endl;
 			vectorVarChangeMove[i] = (-vectorVarChangeMove[i]) + (2 * tmpMaxContribution);
 			tmpVarSomme += vectorVarChangeMove[i];
-			vectorVarMove.pushBack(vectorVarChangeMove[i]);
 		}
 	}
-	
-	return vectorVarMove;
+	// On transforme les valeurs en proba
+	int tmpSommeProba = 0;
+	int size = vectorMoveAutorised.size() - 1;
+	for (int i = 0; i < size; i++) {
+		if (vectorMoveAutorised[i]) {
+			if (tmpVarSomme == 0) {
+				int tmpProba = round(100 / numberMoveAutorised);
+				tmpSommeProba += tmpProba;
+				std::cout << "Deplacement " << i << " Proba: " << tmpProba << " SommeProba: " << tmpSommeProba << std::endl;
+			}
+			else {
+				int tmpProba = round((vectorVarChangeMove[i] / tmpVarSomme) * 100);
+				tmpSommeProba += tmpProba;
+				std::cout << "Deplacement " << i << " Proba: " << tmpProba << " SommeProba: " << tmpSommeProba << std::endl;
+			}
+		}
+		if (tmpSommeProba > 100)
+			tmpSommeProba = 100;
+		std::pair<int, std::pair<int, int>> tmpPair(tmpSommeProba, vectorMoveCoord[i]);
+		vectorProbaMove.push_back(tmpPair);
+	}
+	std::cout << "Deplacement " << size << " Proba: " << 100 - tmpSommeProba << " SommeProba: " << 100 << std::endl;
+	std::pair<int, std::pair<int, int>> tmpPair(100, vectorMoveCoord[size]);
+	vectorProbaMove.push_back(tmpPair);
+	return vectorProbaMove;
 }
 
 int startBest(GridLayout& GL, ConstCombinatorialEmbedding& ccem, double& sommeLong, double& sommeLong2, double& variance, int gridHeight, int gridWidth) {
@@ -864,7 +886,7 @@ int startBest(GridLayout& GL, ConstCombinatorialEmbedding& ccem, double& sommeLo
 	if (bestDeplacement.size() > 0) {
 		int j=0;
 		for (int i = 0; i < bestDeplacement.size(); i++) {
-			if (bestDeplacement[j].first>bestDeplacement[i].first) {
+			if (bestDeplacement[j].first<bestDeplacement[i].first) {
 				j=i;
 			}
 		}
