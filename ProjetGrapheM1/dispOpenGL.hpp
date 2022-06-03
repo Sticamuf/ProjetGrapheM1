@@ -14,6 +14,9 @@
 #include "NodeBend.hpp"
 #include <random>
 
+#undef max
+#undef min
+
 using namespace ogdf;
 
 bool moveRouletteRusse = false;
@@ -21,6 +24,7 @@ bool move_nodebend = false;
 bool move_randomly = false;
 bool show_move_variance = false;
 bool show_variance = false;
+bool put_in_grid = false;
 int selectedNodeBendNum;
 edge selectedEdge;
 adjEntry selectedAdj;
@@ -142,6 +146,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		case GLFW_KEY_3:
 			moveRouletteRusse = true;
 			break;
+		case GLFW_KEY_4:
+			put_in_grid = true;
+			break;
 		}
 }
 
@@ -180,18 +187,46 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 	//fin ogdf
 
 	//debut mettre le graphe dans la grille
-	//récupérer le premier et dernier nodebend (le plus petit/grand);
-	auto start = setNodeBends.begin();
-	auto end = setNodeBends.end();
-	end--;
-	//tant que le plus grand nodebend est en dehors de la grille
-	
+	////récupérer les coordonnées extrémales du graphe
+	//NodeBend* NodeBendMinX = &vectorNodeBends[0],
+	//	*NodeBendMinY = &vectorNodeBends[0],
+	//	*NodeBendMaxX = &vectorNodeBends[0],
+	//	*NodeBendMaxY = &vectorNodeBends[0];
+	//for (int i = 0; i < vectorNodeBends.size(); i++) {
+	//	if (NodeBendMaxX->getX() < vectorNodeBends[i].getX()) {
+	//		(NodeBendMaxX) = &vectorNodeBends[i];
+	//	}
+	//	if (NodeBendMaxY->getY() < vectorNodeBends[i].getY()) {
+	//		(NodeBendMaxY) = &vectorNodeBends[i];
+	//	}
+	//	if (NodeBendMinX->getX() > vectorNodeBends[i].getX()) {
+	//		(NodeBendMinX) = &vectorNodeBends[i];
+	//	}
+	//	if (NodeBendMinY->getY() > vectorNodeBends[i].getY()) {
+	//		(NodeBendMinY) = &vectorNodeBends[i];
+	//	}
+	//}
+	//tant qu'il y a des nodebend en dehors de la grille
+	//calculer le centre de gravité
+	long long centreX = 0;
+	long long centreY = 0;
+	for (int i = 0; i < vectorNodeBends.size(); i++) {
+		centreX += *vectorNodeBends[i].a_x;
+		centreY += *vectorNodeBends[i].a_y;
+	}
+	centreX /= vectorNodeBends.size();
+	centreY /= vectorNodeBends.size();
+	// put_in_grid = false;
+
+
 	//fin mettre le graphe dans la grille
 
-	for (const auto& it : setNodeBends) {
-	    std::cout << "set : " << *it.a_x << " " << *it.a_y << std::endl;
-	    //cout << "set address " << it.a_x << endl;
-	}
+	//for (const auto& it : setNodeBends) {
+	//	std::cout << "set : " << *it.a_x << " " << *it.a_y << std::endl;
+	//	//cout << "set address " << it.a_x << endl;
+	//}
+	//std::cout << "set size " << setNodeBendsX.size() << std::endl;
+	//std::cout << "vec size " << vectorNodeBends.size() << std::endl;
 
 	//debut openGL
 	if (!glfwInit())
@@ -216,8 +251,9 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 
 
 
-
-		if ((*(*end).a_x > gridWidth || *(*end).a_y > gridHeight) || (*(*start).a_x < 0 || *(*start).a_y < 0)) {
+		//if (put_in_grid) {
+			if (*(*endX).a_x - *(*startX).a_x > gridWidth || *(*endY).a_y - *(*startY).a_y > gridHeight) {
+		//if (NodeBendMinX->getX() < 0 || NodeBendMinY->getY() < 0 || NodeBendMaxX->getX() > gridWidth || NodeBendMaxY->getY() > gridHeight) {
 			//choisir un nodebend au hasard
 			int randomNum = generateRand(vectorNodeBends.size()) - 1;
 			NodeBend nb = vectorNodeBends[randomNum];
@@ -229,64 +265,130 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 			vectorMoveCoord.push_back(std::pair<int, int>(nx, ny + 1));
 			vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny));
 			vectorMoveCoord.push_back(std::pair<int, int>(nx, ny - 1));
+			vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny + 1));
+			vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny - 1));
+			vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny + 1));
+			vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny - 1));
 			std::vector<bool> vectorMoveAutorised = getLegalMoves(nb, GL, vectorMoveCoord, CCE);
-			vectorMoveCoord.push_back(std::pair<int, int>(nx, ny));
-			vectorMoveAutorised.push_back(true);
-			int centreX = gridWidth / 2;
-			int centreY = gridWidth / 2;
+			//vectorMoveCoord.push_back(std::pair<int, int>(nx, ny));
+			//vectorMoveAutorised.push_back(true);
+
 			std::vector<double> vecDistCentre;
 			vecDistCentre.reserve(vectorMoveCoord.size());
+			//double moyDist = 0;
 			double sumDist = 0;
+			double minDist = std::numeric_limits<double>::max();
+			double maxDist = -1;
+			int nbLegalMoves = 0;
 			// Boucle sur tout les d�placements possibles
 			for (int i = 0; i < vectorMoveAutorised.size(); i++) {
 				// On regarde si le d�placement est autoris� (si on ne se d�place par sur une node ou un bend ou qu'on ne crée pas d'intersection ou d'inversion de face)
 				if (vectorMoveAutorised[i]) {
 					//si le déplacement est autorisé on calcule sa distance au centre de la grille;
+					//vecDistCentre.push_back(sqrt(pow(centreX - vectorMoveCoord[i].first, 2) + pow(centreY - vectorMoveCoord[i].second, 2)));
 					vecDistCentre.push_back(pow(centreX - vectorMoveCoord[i].first, 2) + pow(centreY - vectorMoveCoord[i].second, 2));
 					sumDist += vecDistCentre[i];
+					if (minDist > vecDistCentre[i]) {
+						minDist = vecDistCentre[i];
+					}
+					if (maxDist < vecDistCentre[i]) {
+						maxDist = vecDistCentre[i];
+					}
+					nbLegalMoves++;
 				}
 				else {
 					vecDistCentre.push_back(-1);
 				}
 			}
-			//s'il existe un déplacement autorisé
-			if (sumDist != 0) {
-				//pour chaque déplacement autorisé lui affecter une probabilité d'apparaitre
-				std::vector<double> vecSumProba;
-				vecSumProba.resize(vectorMoveCoord.size());
-				//atteindre la première proba non nulle
-				int i = 0;
-				while (i < vectorMoveAutorised.size() && !vectorMoveAutorised[i]) {
-					vecSumProba[i] = 0;
-					i++;
-				}
-				//donner un pourcentage au premier déplacement légal
-				vecSumProba[i] = (vecDistCentre[i] / sumDist) * 100;
-				i++;
-				//pour tous les déplacements suivants
-				while (i < vectorMoveAutorised.size() - 1) {
-					//initialiser à la proba précédente
-					vecSumProba[i] = vecSumProba[i - 1];
+			//moyDist = sumDist/nbLegalMoves;
+
+			if (nbLegalMoves != 0) {
+				////pour chaque déplacement autorisé lui affecter une probabilité d'apparaitre
+				//std::vector<double> vecSumProba;
+				//vecSumProba.reserve(vectorMoveCoord.size());
+				////atteindre la première proba non nulle
+				//int i = 0;
+				//while (i < vectorMoveAutorised.size() && !vectorMoveAutorised[i]) {
+				//	vecSumProba.push_back(0);
+				//	i++;
+				//}
+				////donner un pourcentage au premier déplacement légal
+				//vecSumProba.push_back((abs(vecDistCentre[i]-maxDist)+minDist)/sumDist * 100);
+				//i++;
+				////pour tous les déplacements suivants
+				//while (i < vectorMoveAutorised.size()-1) {
+				//	//initialiser à la proba précédente
+				//	vecSumProba.push_back(vecSumProba[i - 1]);
+				//	if (vectorMoveAutorised[i]) {
+				//		vecSumProba[i] += (abs(vecDistCentre[i] - maxDist) + minDist)/sumDist * 100;
+				//	}
+				//	i++;
+				//}
+				////impose le dernier déplacement à 100 -> faisable car le dernier déplacement sera de ne pas bouger et donc toujours légal
+				//vecSumProba.push_back(100);
+				////choisir un nombre aléatoire
+				//int randomChoice = generateRand(100);
+				////choisir une direction de déplacement en fonction du nombre aléatoire
+				//int choix = 0;
+				//while (randomChoice > vecSumProba[choix]) {
+				//	choix++;
+				//}
+
+				//déscente -> la distance la plus faible est choisie
+				int choix = -1;
+				int dist = std::numeric_limits<int>::max();
+				for (int i = 0; i < vecDistCentre.size(); i++) {
 					if (vectorMoveAutorised[i]) {
-						vecSumProba[i] += (vecDistCentre[i] / sumDist) * 100;
+						if (vecDistCentre[i] < dist) {
+							choix = i;
+							dist = vecDistCentre[i];
+						}
 					}
-					i++;
 				}
-				//impose le dernier déplacement à 100 -> faisable car le dernier déplacement sera de ne pas bouger et donc toujours légal
-				vecSumProba[vectorMoveAutorised.size() - 1] = 100;
-				//choisir un nombre aléatoire
-				int randomChoice = generateRand(100);
-				//choisir une direction de déplacement en fonction du nombre
-				i = 0;
-				while (randomChoice > vecSumProba[i]) {
-					i++;
-				}
+
 				//changer les coordonnées du noeud
-				*(nb).a_x = vectorMoveCoord[i].first;
-				*(nb).a_y = vectorMoveCoord[i].second;
-				std::cout << "bouger noeud " << randomNum << " vers x: " << *(nb).a_x << " y: " << *(nb).a_y << std::endl;
+				//setNodeBendsX.erase(nb);
+				//setNodeBendsY.erase(nb);
+				*(nb).a_x = vectorMoveCoord[choix].first;
+				*(nb).a_y = vectorMoveCoord[choix].second;
+				//if (NodeBendMaxX->getX() < nb.getX()) {
+				//	NodeBendMaxX = &nb;
+				//}
+				//if (NodeBendMaxY->getY() < nb.getY()) {
+				//	NodeBendMaxY = &nb;
+				//}
+				//if (NodeBendMinX->getX() > nb.getX()) {
+				//	NodeBendMinX = &nb;
+				//}
+				//if (NodeBendMinY->getY() > nb.getY()) {
+				//	NodeBendMinY = &nb;
+				//}
+				setNodeBendsX.insert(nb);
+				setNodeBendsY.insert(nb);
+				startX = setNodeBendsX.begin();
+				endX = setNodeBendsX.end();
+				endX--;
+				startY = setNodeBendsY.begin();
+				endY = setNodeBendsY.end();
+				endY--;
+				//std::cout << "min : " << *(*start).a_x << " " << *(*start).a_y << std::endl;
+				//std::cout << "max : " << *(*end).a_x << " " << *(*end).a_y << std::endl;
+
+				//for (int j = 0; j < vecSumProba.size(); j++) {
+				//	std::cout << "proba " << j << " : " << vecSumProba[j] << std::endl;
+				//}
+
+				//std::cout << "bouger noeud " << randomNum << " vers x: " << *(nb).a_x << " y: " << *(nb).a_y << std::endl;
 			}
 		}
+		int mx = *(*startX).a_x, my = *(*startY).a_y;
+		for (int i = 0; i < vectorNodeBends.size(); i++) {
+			*vectorNodeBends[i].a_x -= mx;
+			*vectorNodeBends[i].a_y -= my;
+			//std::cout << "x;y : " << *vectorNodeBends[i].a_x << " " << *vectorNodeBends[i].a_y << std::endl;
+		}
+		//}
+
 
 
 

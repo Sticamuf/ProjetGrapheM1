@@ -40,24 +40,55 @@ public:
 		}
 		return nullptr;
 	}
-	bool operator<(const NodeBend& nb) const {
-		if (*a_x < *nb.a_x ) {
-			return true;
-		}
-		if (*a_x > *nb.a_x) {
-			return false;
-		}
-		return (*a_y < *nb.a_y);
-	}
-	int getX() {
+	//const bool operator<(const NodeBend& nb) const {
+	//	if (*a_x < *nb.a_x) {
+	//		return (*a_y < *nb.a_y);
+	//		//{
+	//		//	return true;
+	//		//}
+	//		//return false;
+	//	}
+	//	return false;
+	//	/*if (*a_x >= *nb.a_x) {
+	//		return (*a_y < *nb.a_y);
+	//	}
+	//	if (*a_y >= *nb.a_y) {
+	//		return (*a_x < *nb.a_x);
+	//	}*/
+	//}
+	int getX() const {
 		return *a_x;
 	}
-	int getY() {
+	int getY() const {
 		return *a_y;
 	}
 private:
 	node m_n = nullptr;
 	edge m_e = nullptr;
 	IPoint* m_p = nullptr;
+};
+
+struct NodeBendXComp {
+	const bool operator() (const NodeBend& p1, const NodeBend& p2) const {
+		if (p1.getX() < p2.getX()) {
+			return true;
+		}
+		if (p1.getX() > p2.getX()) {
+			return false;
+		}
+		return p1.getY() < p2.getY();
+	}
+};
+
+struct NodeBendYComp {
+	const bool operator() (const NodeBend& p1, const NodeBend& p2) const {
+		if (p1.getY() < p2.getY()) {
+			return true;
+		}
+		if (p1.getY() > p2.getY()) {
+			return false;
+		}
+		return p1.getX() < p2.getX();
+	}
 };
 #endif
