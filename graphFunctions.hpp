@@ -666,11 +666,11 @@ std::vector<std::pair<int, std::pair<int, int>>> rouletteRusseNodeMove(NodeBend&
 				tmpSommeProba += tmpProba;
 				//std::cout << "Deplacement " << i << " Proba: " << tmpProba << " SommeProba: " << tmpSommeProba << std::endl;
 			}
+			if (tmpSommeProba > 100)
+				tmpSommeProba = 100;
+			std::pair<int, std::pair<int, int>> tmpPair(tmpSommeProba, vectorMoveCoord[i]);
+			vectorProbaMove.push_back(tmpPair);
 		}
-		if (tmpSommeProba > 100)
-			tmpSommeProba = 100;
-		std::pair<int, std::pair<int, int>> tmpPair(tmpSommeProba, vectorMoveCoord[i]);
-		vectorProbaMove.push_back(tmpPair);
 	}
 	//std::cout << "Deplacement " << size << " Proba: " << 100 - tmpSommeProba << " SommeProba: " << 100 << std::endl;
 	std::pair<int, std::pair<int, int>> tmpPair(100, vectorMoveCoord[size]);
@@ -851,11 +851,11 @@ std::vector<std::pair<int, std::pair<int, int>>> recuitSimuleNodeMove(NodeBend& 
 				int tmpProba = round(100 / numberMoveAutorised);
 				tmpSommeProba += tmpProba;
 				//std::cout << "Deplacement " << i << " Proba: " << tmpProba << " SommeProba: " << tmpSommeProba << std::endl;
+				if (tmpSommeProba > 100)
+					tmpSommeProba = 100;
+				std::pair<int, std::pair<int, int>> tmpPair(tmpSommeProba, vectorMoveCoord[i]);
+				vectorProbaMove.push_back(tmpPair);
 			}
-			if (tmpSommeProba > 100)
-				tmpSommeProba = 100;
-			std::pair<int, std::pair<int, int>> tmpPair(tmpSommeProba, vectorMoveCoord[i]);
-			vectorProbaMove.push_back(tmpPair);
 		}
 	}
 	// Il y a au moin un déplacement qui change la variance
@@ -880,11 +880,11 @@ std::vector<std::pair<int, std::pair<int, int>>> recuitSimuleNodeMove(NodeBend& 
 				int tmpProba = round((vectorTmpProba[i] / tmpSommeProbaFraction) * 100);
 				tmpSommeProba += tmpProba;
 				//std::cout << "Deplacement " << i << " Proba: " << tmpProba << " SommeProba: " << tmpSommeProba << std::endl;
+				if (tmpSommeProba > 100)
+					tmpSommeProba = 100;
+				std::pair<int, std::pair<int, int>> tmpPair(tmpSommeProba, vectorMoveCoord[i]);
+				vectorProbaMove.push_back(tmpPair);
 			}
-			if (tmpSommeProba > 100)
-				tmpSommeProba = 100;
-			std::pair<int, std::pair<int, int>> tmpPair(tmpSommeProba, vectorMoveCoord[i]);
-			vectorProbaMove.push_back(tmpPair);
 		}
 	}
 
@@ -1013,6 +1013,7 @@ std::vector<std::pair<int, int>> bestVarianceNodeMove(NodeBend& n, GridLayout& G
 // Demarre l'algorithme de best variance
 // On choisis uniquement les déplacements qui améliorent le plus la variance, s'ils sont egaux on tire au hasard.
 // retourne le numero du nodebend choisi, uniquement utile pour l'affichage opengl
+// On itere sur les noeuds dans l'ordre
 int startBestVariance(GridLayout& GL, ConstCombinatorialEmbedding& ccem,int numCourant,int& numLastMoved, double& sommeLong, double& sommeLong2, double& variance, int gridHeight, int gridWidth) {
 	NodeBend nb = vectorNodeBends[numCourant];
 	std::vector<std::pair<int, int>> deplacements = bestVarianceNodeMove(nb, GL, ccem, sommeLong, sommeLong2, variance, gridHeight, gridWidth);

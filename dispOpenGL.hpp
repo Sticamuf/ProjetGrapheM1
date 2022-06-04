@@ -18,6 +18,7 @@
 
 using namespace ogdf;
 
+bool autoMixte = false;
 bool moveBestVariance = false;
 bool autoBestVariance = false;
 bool moveRecuitSimule = false;
@@ -161,6 +162,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		case GLFW_KEY_7:
 			moveBestVariance = true;
 			break;
+		case GLFW_KEY_9:
+			autoMixte = !autoMixte;
+			break;
 		case GLFW_KEY_8:
 			autoBestVariance = !autoBestVariance;
 			break;
@@ -204,6 +208,13 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 	// Numéro du dernier NodeBend déplacé pour l'algo bestVariance
 	int numLastMoved = -1;
 	int numCourant = 0;
+
+	// Utilisé pour l'algo mixte
+	int nbTourDepuisBestVar = 0;
+
+	// On ecris les données de départ dans les csv
+	writeCsvULL("dataTurn.csv", nbTour, variance);
+	writeCsvDouble("dataTime.csv", 0, variance);
 
 	//fin ogdf
 	if (!glfwInit())
@@ -272,8 +283,8 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 				bestVariance = variance;
 				writeToJson("bestResult.json", G, GL, gridWidth, gridHeight, maxBends);
 			}
-			checkTime(start, lastWritten, 10, variance);
-			checkTour(totalTurn, lastWrittenTurn, 20000, variance);
+			checkTime(start, lastWritten, 10, variance,false);
+			checkTour(totalTurn, lastWrittenTurn, 20000, variance, false);
 		}
 		else if (moveRecuitSimule) {
 			selectedNodeBendNum = startRecuitSimule(coeff, GL, CCE, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
@@ -288,8 +299,8 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 				bestVariance = variance;
 				writeToJson("bestResult.json", G, GL, gridWidth, gridHeight, maxBends);
 			}
-			checkTime(start, lastWritten,10, variance);
-			checkTour(totalTurn, lastWrittenTurn, 20000, variance);
+			checkTime(start, lastWritten,10, variance, false);
+			checkTour(totalTurn, lastWrittenTurn, 20000, variance, false);
 		}
 		else if (moveBestVariance) {
 			selectedNodeBendNum = startBestVariance(GL, CCE, numCourant, numLastMoved, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
@@ -303,8 +314,24 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 				bestVariance = variance;
 				writeToJson("bestResult.json", G, GL, gridWidth, gridHeight, maxBends);
 			}
-			checkTime(start, lastWritten, 10, variance);
-			checkTour(totalTurn, lastWrittenTurn, 20000, variance);
+			checkTime(start, lastWritten, 10, variance, false);
+			checkTour(totalTurn, lastWrittenTurn, 20000, variance, false);
+		}
+		else if (autoMixte) {
+			if (nbTourDepuisBestVar < 500) {
+				startRecuitSimule(coeff, GL, CCE, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
+				modifCoeffRecuit(coeff, coeffDesc, coeffMont, coeffMax, coeffMin, recuitMontant, nbTour, nbTourModifCoeff);
+				nbTourDepuisBestVar++;
+			}
+			else {
+				if (numLastMoved == numCourant) {
+					nbTourDepuisBestVar = 0;
+				}
+				startBestVariance(GL, CCE, numCourant, numLastMoved, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
+				numCourant = (numCourant + 1) % vectorNodeBends.size();
+			}
+			checkTime(start, lastWritten, 10, variance, false);
+			checkTour(totalTurn, lastWrittenTurn, 20000, variance, false);
 		}
 		//afficher les edge
 		glColor3f(1.0f, 1.0f, 1.0f);

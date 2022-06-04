@@ -51,16 +51,26 @@ void runAlgo(int i, Graph& G, GridLayout& GL, const int gridWidth, const int gri
 	int numLastMoved = -1;
 	int numCourant = 0;
 
+	// Utilisé pour l'algo mixte
+	int nbTourDepuisBestVar = 0;
+
+	// On ecris les données de départ
+	writeCsvULL("dataTurn.csv", nbTour, variance);
+	writeCsvDouble("dataTime.csv", 0, variance);
+
 	int width, height;
 	while (variance > 1.00005) {
 		float ratio;
+		// Roulette russe
 		if (i == 0) {
 			startRouletteRusse(GL, CCE, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
 		}
+		// Recuit simulé
 		else if (i == 1) {
 			startRecuitSimule(coeff, GL, CCE, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
 			modifCoeffRecuit(coeff, coeffDesc, coeffMont, coeffMax, coeffMin, recuitMontant, nbTour, nbTourModifCoeff);
 		}
+		// Best Variance
 		else if (i == 2) {
 			if (numLastMoved == numCourant) {
 				break;
@@ -68,13 +78,32 @@ void runAlgo(int i, Graph& G, GridLayout& GL, const int gridWidth, const int gri
 			startBestVariance(GL, CCE, numCourant, numLastMoved, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
 			numCourant = (numCourant + 1) % vectorNodeBends.size();
 		}
+		// Mixe recuit et bestVariance
+		else if (i == 10) {
+			if (nbTourDepuisBestVar < 5000) {
+				startRecuitSimule(coeff, GL, CCE, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
+				modifCoeffRecuit(coeff, coeffDesc, coeffMont, coeffMax, coeffMin, recuitMontant, nbTour, nbTourModifCoeff);
+				nbTourDepuisBestVar++;
+			}
+			else {
+				if (numLastMoved == numCourant) {
+					nbTourDepuisBestVar = 0;
+				}
+				startBestVariance(GL, CCE, numCourant, numLastMoved, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
+				numCourant = (numCourant + 1) % vectorNodeBends.size();
+			}
+		}
 		// Sauvegarde du nouveau meilleur graphe
 		if (variance < bestVariance) {
 			bestVariance = variance;
 			writeToJson("bestResult.json", G, GL, gridWidth, gridHeight, maxBends);
+			checkTime(start, lastWritten, 10, variance,true);
+			checkTour(totalTurn, lastWrittenTurn, 10000, variance,true);
 		}
-		checkTime(start, lastWritten, 10, variance);
-		checkTour(totalTurn, lastWrittenTurn, 20000, variance);
+		else {
+			checkTime(start, lastWritten, 10, variance,false);
+			checkTour(totalTurn, lastWrittenTurn, 10000, variance,false);
+		}
 	}
 }
 

@@ -46,37 +46,47 @@ void addEdgeNVar(double edgeLength, double& sommeLong, double& sommeLong2) {
 	sommeLong2 += edgeLength * edgeLength;
 }
 
+// Ecris dans le CSV pour un double
+void writeCsvDouble(string nom, double data, double variance) {
+	std::ofstream csv(nom, std::ios::app);
+	if (csv.is_open()) {
+		csv << data;
+		csv << ",";
+		csv << variance;
+		csv << '\n';
+		csv.close();
+	}
+}
+
+// Ecris dans le CSV pour un Unsigned long long
+void writeCsvULL(string nom, unsigned long long data, double variance) {
+	std::ofstream csv(nom, std::ios::app);
+	if (csv.is_open()) {
+		csv << data;
+		csv << ",";
+		csv << variance;
+		csv << '\n';
+		csv.close();
+	}
+}
+
 // Ecris le nombre de tour et la variance dans un fichier tout les intervalle de tours
-void checkTour(unsigned long long& nbTour, unsigned long long& lastWrittenTour, int intervalle, double variance) {
+void checkTour(unsigned long long& nbTour, unsigned long long& lastWrittenTour, int intervalle, double variance, bool forceWrite) {
 	nbTour++;
-	if (nbTour - lastWrittenTour > intervalle) {
+	if ((nbTour - lastWrittenTour > intervalle)||forceWrite) {
 		lastWrittenTour = nbTour;
-		std::ofstream csv("dataTurn.csv", std::ios::app);
-		if (csv.is_open()) {
-			csv << nbTour;
-			csv << ",";
-			csv << variance;
-			csv << '\n';
-			csv.close();
-		}
+		writeCsvULL("dataTurn.csv", nbTour, variance);
 	}
 }
 
 // Ecris le temps d'exécution et la variance dans un fichier csv tout les intervalle de temps
-void checkTime(std::chrono::system_clock::time_point start, std::chrono::system_clock::time_point& lastWritten, double intervalle, double variance) {
+void checkTime(std::chrono::system_clock::time_point start, std::chrono::system_clock::time_point& lastWritten, double intervalle, double variance, bool forceWrite) {
 	auto end = std::chrono::system_clock::now();
 	std::chrono::duration<double> secondsBetweenWrites = end - lastWritten;
-	if (secondsBetweenWrites.count() > intervalle) {
+	if ((secondsBetweenWrites.count() > intervalle)||(forceWrite)) {
 		lastWritten = end;
 		std::chrono::duration<double> secondsTotal = end - start;
-		std::ofstream csv("dataTime.csv", std::ios::app);
-		if (csv.is_open()) {
-			csv << secondsTotal.count();
-			csv << ",";
-			csv << variance;
-			csv << '\n';
-			csv.close();
-		}
+		writeCsvDouble("dataTime.csv", secondsTotal.count(), variance);
 	}
 }
 
