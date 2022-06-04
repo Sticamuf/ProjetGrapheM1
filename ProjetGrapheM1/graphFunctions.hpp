@@ -478,7 +478,7 @@ std::vector<bool> getLegalMoves(NodeBend& n, GridLayout& GL, std::vector<std::pa
 	// Pour chaque d�placement, on regarde si il y a une intersection associ�
 	int segmentSourceTrgX, segmentSourceTrgY;
 	for (int i = 0; i < vectorMoveCoord.size(); i++) {
-		//std::cout << "Check Deplacement " << i << std::endl;
+		std::cout << "Check Deplacement " << i << std::endl;
 		intersection = false;
 		// On parcour la liste des adjentry du point de d�part
 		int j = 0;
@@ -567,8 +567,7 @@ std::vector<bool> getLegalMoves(NodeBend& n, GridLayout& GL, std::vector<std::pa
 // Pour les d�placements: 0=droite(x+1) 1=haut(y+1) 2=gauche(x-1) 3=bas(y-1)
 // Cette fonction doit etre appel�e avant un d�placement
 // Les poids assign�s aux d�placements sont attribu�s en fonction de leur am�lioration de l'�cart-type
-//std::vector<int> rouletteRusseNodeMove(NodeBend& n, GridLayout& GL, ConstCombinatorialEmbedding& ccem, double& moy, double& sommeVar, double& var) {
-std::vector<std::pair<int, std::pair<int, int>>> rouletteRusseNodeMove(NodeBend& n, GridLayout& GL, ConstCombinatorialEmbedding& ccem, double& sommeLong, double& sommeLong2, double& variance) {
+std::vector<std::pair<int, std::pair<int, int>>> rouletteRusseNodeMove(NodeBend& n, GridLayout& GL, ConstCombinatorialEmbedding& ccem, double& sommeLong, double& sommeLong2, double& variance, int gridHeight, int gridWidth) {
 	std::cout << "Variance avant roulette: " << variance << std::endl;
 	int nx = (*n.a_x);
 	int ny = (*n.a_y);
@@ -576,15 +575,22 @@ std::vector<std::pair<int, std::pair<int, int>>> rouletteRusseNodeMove(NodeBend&
 	std::vector<double> vectorVarChangeMove;
 	// On stocke les coordonn�es d'arriv�e qu'on aurait apres le d�placement
 	std::vector<std::pair<int, int>> vectorMoveCoord;
-	vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny));
-	vectorMoveCoord.push_back(std::pair<int, int>(nx, ny + 1));
-	vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny));
-	vectorMoveCoord.push_back(std::pair<int, int>(nx, ny - 1));
-	//vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny+1));
-	//vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny-1));
-	//vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny+1));
-	//vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny-1));
-	//vectorMoveCoord.push_back(std::pair<int, int>(nx+2, ny)); // POUR TEST UNIQUEMENT A SUPPRIMER PLUS TARD
+	if ((nx + 1) <= gridWidth)
+		vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny));
+	if ((ny + 1) <= gridHeight)
+		vectorMoveCoord.push_back(std::pair<int, int>(nx, ny + 1));
+	if ((nx - 1) >= 0)
+		vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny));
+	if ((ny - 1) >= 0)
+		vectorMoveCoord.push_back(std::pair<int, int>(nx, ny - 1));
+	if (((nx + 1) <= gridWidth) && ((ny + 1) <= gridHeight))
+		vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny + 1));
+	if (((nx + 1) <= gridWidth) && ((ny - 1) >= 0))
+		vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny - 1));
+	if (((nx - 1) >= 0) && ((ny + 1) <= gridHeight))
+		vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny + 1));
+	if (((nx - 1) >= 0) && ((ny - 1) >= 0))
+		vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny - 1));
 	// On stocke si les d�placements sont autoris�s, donc s'il n'y a pas de node ou de bend a ces coordonn�es
 	std::vector<bool> vectorMoveAutorised = getLegalMoves(n, GL, vectorMoveCoord, ccem);
 	SListPure<adjEntry> adjEntries;
@@ -597,12 +603,14 @@ std::vector<std::pair<int, std::pair<int, int>>> rouletteRusseNodeMove(NodeBend&
 		isNode = false;
 	}
 	// Minimum et Maximum des variances des diff�rents d�placements pour calcul de probabilit� plus tard
-	double tmpMaxVariance = variance;
-	double tmpMinVariance = variance;
+	double tmpMaxContribution = 0;
+	double tmpMinContribution = 0;
+	int numberMoveAutorised = 1;
 	// Boucle sur tout les d�placements possibles
 	for (int i = 0; i < vectorMoveAutorised.size(); i++) {
 		// On regarde si le d�placement est autoris� (si on ne se d�place par sur une node ou un bend)
 		if (vectorMoveAutorised[i]) {
+			numberMoveAutorised++;
 			double tmpSommeLong = sommeLong;
 			double tmpSommeLong2 = sommeLong2;
 			double tmpVariance = variance;
@@ -620,12 +628,13 @@ std::vector<std::pair<int, std::pair<int, int>>> rouletteRusseNodeMove(NodeBend&
 				addEdgeNVar(tmpNewLength, tmpSommeLong, tmpSommeLong2);
 			}
 			tmpVariance = calcNVar(tmpSommeLong, tmpSommeLong2);
-			vectorVarChangeMove.push_back(tmpVariance);
-			if (tmpVariance > tmpMaxVariance) {
-				tmpMaxVariance = tmpVariance;
+			double tmpContribution = tmpVariance - variance;
+			vectorVarChangeMove.push_back(tmpContribution);
+			if (tmpContribution > tmpMaxContribution) {
+				tmpMaxContribution = tmpContribution;
 			}
-			if (tmpVariance < tmpMinVariance) {
-				tmpMinVariance = tmpVariance;
+			if (tmpContribution < tmpMinContribution) {
+				tmpMinContribution = tmpContribution;
 			}
 
 		}
@@ -636,14 +645,14 @@ std::vector<std::pair<int, std::pair<int, int>>> rouletteRusseNodeMove(NodeBend&
 	//pas de mouvement -> d�placement 4
 	vectorMoveCoord.push_back(std::pair<int, int>(nx, ny));
 	vectorMoveAutorised.push_back(true);
-	vectorVarChangeMove.push_back(variance);
+	vectorVarChangeMove.push_back(0);
 	std::vector<std::pair<int, std::pair<int, int>>> vectorProbaMove;
 	double tmpVarSomme = 0;
 	// On soustrait a tout les valeurs la variance maximale
 	for (int i = 0; i < vectorVarChangeMove.size(); i++) {
 		if (vectorMoveAutorised[i]) {
-			std::cout << "Variance deplacement " << i << ": " << vectorVarChangeMove[i] << std::endl;
-			vectorVarChangeMove[i] = abs(vectorVarChangeMove[i] - tmpMaxVariance) + tmpMinVariance;
+			std::cout << "Contribution Variance deplacement " << i << ": " << vectorVarChangeMove[i] << std::endl;
+			vectorVarChangeMove[i] = (-vectorVarChangeMove[i]) + (2 * tmpMaxContribution);
 			tmpVarSomme += vectorVarChangeMove[i];
 		}
 	}
@@ -652,10 +661,19 @@ std::vector<std::pair<int, std::pair<int, int>>> rouletteRusseNodeMove(NodeBend&
 	int size = vectorMoveAutorised.size() - 1;
 	for (int i = 0; i < size; i++) {
 		if (vectorMoveAutorised[i]) {
-			int tmpProba = round((vectorVarChangeMove[i] / tmpVarSomme) * 100);
-			tmpSommeProba += tmpProba;
-			std::cout << "Deplacement " << i << " Proba: " << tmpProba << " SommeProba: " << tmpSommeProba << std::endl;
+			if (tmpVarSomme == 0) {
+				int tmpProba = round(100 / numberMoveAutorised);
+				tmpSommeProba += tmpProba;
+				std::cout << "Deplacement " << i << " Proba: " << tmpProba << " SommeProba: " << tmpSommeProba << std::endl;
+			}
+			else {
+				int tmpProba = round((vectorVarChangeMove[i] / tmpVarSomme) * 100);
+				tmpSommeProba += tmpProba;
+				std::cout << "Deplacement " << i << " Proba: " << tmpProba << " SommeProba: " << tmpSommeProba << std::endl;
+			}
 		}
+		if (tmpSommeProba > 100)
+			tmpSommeProba = 100;
 		std::pair<int, std::pair<int, int>> tmpPair(tmpSommeProba, vectorMoveCoord[i]);
 		vectorProbaMove.push_back(tmpPair);
 	}
@@ -719,15 +737,187 @@ void changeVariance(NodeBend n, GridLayout& GL, int newSrcX, int newSrcY, double
 
 // Demarre l'algorithme de roulette russe sur le graphe
 // retourne le numero du nodebend choisi, uniquement utile pour l'affichage opengl
-int startRouletteRusse(GridLayout& GL, ConstCombinatorialEmbedding& ccem, double& sommeLong, double& sommeLong2, double& variance) {
+int startRouletteRusse(GridLayout& GL, ConstCombinatorialEmbedding& ccem, double& sommeLong, double& sommeLong2, double& variance, int gridHeight, int gridWidth) {
 	// On choisis au hasard un NodeBend
 	int randomNum = generateRand(vectorNodeBends.size()) - 1;
 	std::cout << "Numero selectionne: " << randomNum << std::endl;
 	NodeBend nb = vectorNodeBends[randomNum];
-	std::vector<std::pair<int, std::pair<int, int>>> probaDeplacement = rouletteRusseNodeMove(nb, GL, ccem, sommeLong, sommeLong2, variance);
+	std::vector<std::pair<int, std::pair<int, int>>> probaDeplacement = rouletteRusseNodeMove(nb, GL, ccem, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
 	if (probaDeplacement.size() > 0) {
 		int randomChoice = generateRand(100);
 		bool moved = false;
+		for (int i = 0; ((i < probaDeplacement.size()) && (!moved)); i++) {
+			if (randomChoice <= probaDeplacement[i].first) {
+				std::cout << "Nombre aleatoire: " << randomChoice << " Deplacement choisi : " << i << std::endl;
+				changeVariance(nb, GL, probaDeplacement[i].second.first, probaDeplacement[i].second.second, sommeLong, sommeLong2, variance);
+				(*nb.a_x) = probaDeplacement[i].second.first;
+				(*nb.a_y) = probaDeplacement[i].second.second;
+				moved = true;
+			}
+		}
+	}
+	return randomNum;
+	std::cout << "Nouvelle variance " << variance << std::endl;
+}
+
+// Renvoie un vecteur qui attribue une probabilit� a un d�placement
+// Cette fonction doit etre appel�e avant un d�placement
+// Les poids assign�s aux d�placements sont attribu�s en fonction de leur am�lioration de l'�cart-type et du coefficient de recuit simul�
+std::vector<std::pair<int, std::pair<int, int>>> recuitSimuleNodeMove(NodeBend& n, double coeff, GridLayout& GL, ConstCombinatorialEmbedding& ccem, double& sommeLong, double& sommeLong2, double& variance, int gridHeight, int gridWidth) {
+	int nx = (*n.a_x);
+	int ny = (*n.a_y);
+	// On stocke les changements de variances apres un d�placement
+	std::vector<double> vectorVarChangeMove;
+	// On stocke les coordonn�es d'arriv�e qu'on aurait apres le d�placement
+	std::vector<std::pair<int, int>> vectorMoveCoord;
+	if ((nx + 1) <= gridWidth)
+		vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny));
+	if ((ny + 1) <= gridHeight)
+		vectorMoveCoord.push_back(std::pair<int, int>(nx, ny + 1));
+	if ((nx - 1) >= 0)
+		vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny));
+	if ((ny - 1) >= 0)
+		vectorMoveCoord.push_back(std::pair<int, int>(nx, ny - 1));
+	if (((nx + 1) <= gridWidth) && ((ny + 1) <= gridHeight))
+		vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny + 1));
+	if (((nx + 1) <= gridWidth) && ((ny - 1) >= 0))
+		vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny - 1));
+	if (((nx - 1) >= 0) && ((ny + 1) <= gridHeight))
+		vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny + 1));
+	if (((nx - 1) >= 0) && ((ny - 1) >= 0))
+		vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny - 1));
+	// On stocke si les d�placements sont autoris�s, donc s'il n'y a pas de node ou de bend a ces coordonn�es
+	std::vector<bool> vectorMoveAutorised = getLegalMoves(n, GL, vectorMoveCoord, ccem);
+	SListPure<adjEntry> adjEntries;
+	bool isNode = true;
+	if (n.isNode) {
+		n.getNode()->allAdjEntries(adjEntries);
+	}
+	else {
+		adjEntries.pushBack(n.getAdjEntry());
+		isNode = false;
+	}
+	// Minimum et Maximum des variances des diff�rents d�placements pour calcul de probabilit� plus tard
+	double tmpMaxContribution = 0;
+	double tmpMinContribution = 0;
+	int numberMoveAutorised = 1;
+	// Boucle sur tout les d�placements possibles
+	for (int i = 0; i < vectorMoveAutorised.size(); i++) {
+		// On regarde si le d�placement est autoris� (si on ne se d�place par sur une node ou un bend)
+		if (vectorMoveAutorised[i]) {
+			numberMoveAutorised++;
+			double tmpSommeLong = sommeLong;
+			double tmpSommeLong2 = sommeLong2;
+			double tmpVariance = variance;
+			for (auto it = adjEntries.begin(); it.valid(); it++) {
+				auto it2 = mapEdgeLength.find((*it)->theEdge());
+				double tmpOldLength = it2->second;
+				double tmpNewLength;
+				if (isNode) {
+					tmpNewLength = calcTmpEdgeLength((*it), vectorMoveCoord[i].first, vectorMoveCoord[i].second, GL);
+				}
+				else {
+					tmpNewLength = calcTmpEdgeLengthBends((*it)->theEdge(), n, vectorMoveCoord[i].first, vectorMoveCoord[i].second, GL);
+				}
+				deleteEdgeNVar(tmpOldLength, tmpSommeLong, tmpSommeLong2);
+				addEdgeNVar(tmpNewLength, tmpSommeLong, tmpSommeLong2);
+			}
+			tmpVariance = calcNVar(tmpSommeLong, tmpSommeLong2);
+			double tmpContribution = tmpVariance - variance;
+			vectorVarChangeMove.push_back(tmpContribution);
+			if (tmpContribution > tmpMaxContribution) {
+				tmpMaxContribution = tmpContribution;
+			}
+			if (tmpContribution < tmpMinContribution) {
+				tmpMinContribution = tmpContribution;
+			}
+
+		}
+		else {
+			vectorVarChangeMove.push_back(-1);
+		}
+	}
+	//pas de mouvement -> d�placement 4
+	vectorMoveCoord.push_back(std::pair<int, int>(nx, ny));
+	vectorMoveAutorised.push_back(true);
+	vectorVarChangeMove.push_back(0);
+	std::vector<std::pair<int, std::pair<int, int>>> vectorProbaMove;
+	double tmpVarSomme = 0;
+	// On soustrait a tout les valeurs la variance maximale
+	for (int i = 0; i < vectorVarChangeMove.size(); i++) {
+		if (vectorMoveAutorised[i]) {
+			std::cout << "Contribution Variance deplacement " << i << ": " << vectorVarChangeMove[i] << std::endl;
+			vectorVarChangeMove[i] = (-vectorVarChangeMove[i]) + (2 * tmpMaxContribution);
+			tmpVarSomme += vectorVarChangeMove[i];
+		}
+	}
+	// Si la somme des variance est �gale a 0, alors tout les d�placements ont la meme proba, pas besoin d'appliquer le coeff
+	int size = vectorMoveAutorised.size() - 1;
+	int tmpSommeProba = 0;
+	if (tmpVarSomme == 0) {
+		for (int i = 0; i < size; i++) {
+			if (vectorMoveAutorised[i]) {
+				int tmpProba = round(100 / numberMoveAutorised);
+				tmpSommeProba += tmpProba;
+				std::cout << "Deplacement " << i << " Proba: " << tmpProba << " SommeProba: " << tmpSommeProba << std::endl;
+			}
+			if (tmpSommeProba > 100)
+				tmpSommeProba = 100;
+			std::pair<int, std::pair<int, int>> tmpPair(tmpSommeProba, vectorMoveCoord[i]);
+			vectorProbaMove.push_back(tmpPair);
+		}
+	}
+	// Il y a au moin un d�placement qui change la variance
+	else {
+		// On applique le coefficient aux probabilit�s
+		double tmpSommeProbaFraction = 0;
+		std::vector<double> vectorTmpProba;
+		for (int i = 0; i < size; i++) {
+			if (vectorMoveAutorised[i]) {
+				double tmpProbaFraction = vectorVarChangeMove[i] / tmpVarSomme;
+				tmpProbaFraction = pow(tmpProbaFraction, coeff);
+				tmpSommeProbaFraction += tmpProbaFraction;
+				vectorTmpProba.push_back(tmpProbaFraction);
+			}
+			else {
+				vectorTmpProba.push_back(-1.0);
+			}
+		}
+		// On transforme ces valeurs en probabilit�
+		for (int i = 0; i < size; i++) {
+			if (vectorMoveAutorised[i]) {
+				int tmpProba = round((vectorTmpProba[i] / tmpSommeProbaFraction) * 100);
+				tmpSommeProba += tmpProba;
+				std::cout << "Deplacement " << i << " Proba: " << tmpProba << " SommeProba: " << tmpSommeProba << std::endl;
+			}
+			if (tmpSommeProba > 100)
+				tmpSommeProba = 100;
+			std::pair<int, std::pair<int, int>> tmpPair(tmpSommeProba, vectorMoveCoord[i]);
+			vectorProbaMove.push_back(tmpPair);
+		}
+	}
+
+	std::cout << "Deplacement " << size << " Proba: " << 100 - tmpSommeProba << " SommeProba: " << 100 << std::endl;
+	std::pair<int, std::pair<int, int>> tmpPair(100, vectorMoveCoord[size]);
+	vectorProbaMove.push_back(tmpPair);
+	return vectorProbaMove;
+}
+
+// Demarre l'algorithme de recuit simul� sur le graphe
+// Les probas sont calcul�s avec l'algorithme roulette russe et modifi�e avec un coefficient �voluant avec le temps
+// retourne le numero du nodebend choisi, uniquement utile pour l'affichage opengl
+int startRecuitSimule(double coeff, GridLayout& GL, ConstCombinatorialEmbedding& ccem, double& sommeLong, double& sommeLong2, double& variance, int gridHeight, int gridWidth) {
+	// On choisis au hasard un NodeBend
+	int randomNum = generateRand(vectorNodeBends.size()) - 1;
+	std::cout << "Numero selectionne: " << randomNum << std::endl;
+	NodeBend nb = vectorNodeBends[randomNum];
+	std::vector<std::pair<int, std::pair<int, int>>> probaDeplacement = recuitSimuleNodeMove(nb, coeff, GL, ccem, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
+	std::vector<double> tmpProba;
+	double tmpSommeProba = 0;
+	if (probaDeplacement.size() > 0) {
+		int randomChoice = generateRand(100);
+		bool moved = false;
+		// Le d�placement est choisi al�atoirement
 		for (int i = 0; ((i < probaDeplacement.size()) && (!moved)); i++) {
 			if (randomChoice <= probaDeplacement[i].first) {
 				std::cout << "Nombre aleatoire: " << randomChoice << " Deplacement choisi : " << i << std::endl;

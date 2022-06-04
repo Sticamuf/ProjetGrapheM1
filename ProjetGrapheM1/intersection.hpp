@@ -38,9 +38,9 @@ bool seCroisent(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy) 
 
 	//R et S sont du meme cote par rapport a PQ
 	//OU P et Q sont du meme cote par rapport a RS
-	if (ag1 * ag2 == 1 || ag3 * ag4 == 1) {
+	return !(ag1 * ag2 == 1 || ag3 * ag4 == 1); /*{
 		return false;
-	}
+	}*/
 	//Il reste trois cas, SOIT
 	//R et S sont de cotes opposes par rapport a PQ ET P et Q sont de cotes opposes par rapport a RS
 	//SOIT
@@ -50,7 +50,8 @@ bool seCroisent(int px, int py, int qx, int qy, int rx, int ry, int sx, int sy) 
 	//trois points sont alignes
 	//deux points sont de cotes opposes par rapport a un segment
 	//les segments se croisent forcement
-	return true;
+	//return true;
+	
 }
 
 #endif
