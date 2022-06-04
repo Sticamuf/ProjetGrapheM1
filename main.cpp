@@ -4,6 +4,8 @@
 #include <ogdf/planarity/EmbedderMinDepth.h>
 #include <ogdf/planarity/SimpleEmbedder.h>
 #include <ogdf/basic/simple_graph_alg.h>
+#include <string>
+
 
 #include "jsonIO.hpp"
 #include "dispOpenGL.hpp"
@@ -23,7 +25,7 @@ int main() {
     int gridWidth, gridHeight, maxBends;
 
     // ----- LECTURE D'UN FICHIER JSON DANS UN Graph -----
-    string file = "exemples/exempleBonEmbedding.json";
+    string file = "F:/The World/Cours/M1S2/Graphe/GitHub/ProjetGrapheM1-BinaryHeap/ProjetGrapheM1/exemples/exempleBonEmbedding.json";
     readFromJson(file, G, GL, gridWidth, gridHeight, maxBends);
     writeToJson("output.json", G, GL, gridWidth, gridHeight, maxBends);
     

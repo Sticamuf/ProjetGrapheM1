@@ -14,6 +14,9 @@
 #include "NodeBend.hpp"
 #include "jsonIO.hpp"
 #include <random>
+#include <chrono>
+#include <cmath>
+#include <fstream>
 
 using namespace ogdf;
 
@@ -158,25 +161,19 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		}
 }
 
-void changeEdgeMapValue(edge e, GridLayout& GL) {
-	auto it = mapEdgeLength.find(e);
-	double length = it->second;
-	double newLength = calcEdgeLength(e, GL);
-	if (length != newLength) {
-		it->second = newLength;
-		auto it2 = mapLengthEdgeSet.find(newLength);
-		if (it2 != mapLengthEdgeSet.end()) {
-			it2->second.insert(e);
-		}
-		else {
-			std::set<edge> tmpSet;
-			tmpSet.insert(e);
-			mapLengthEdgeSet.insert(std::pair<double, std::set<edge>>(newLength, tmpSet));
-		}
-		auto it3 = mapLengthEdgeSet.find(length);
-		it3->second.erase(e);
-		if (it3->second.empty()) {
-			mapLengthEdgeSet.erase(length);
+void checkTime(std::chrono::system_clock::time_point start, std::chrono::system_clock::time_point& lastWritten,double intervalle, double variance) {
+	auto end = std::chrono::system_clock::now();
+	std::chrono::duration<double> secondsBetweenWrites = end - lastWritten;
+	if (secondsBetweenWrites.count() > intervalle) {
+		lastWritten = end;
+		std::chrono::duration<double> secondsTotal = end - start;
+		std::ofstream csv("data.csv", std::ios::app);
+		if (csv.is_open()) {
+			csv << secondsTotal.count();
+			csv << ",";
+			csv << variance;
+			csv << '\n';
+			csv.close();
 		}
 	}
 }
@@ -222,6 +219,10 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 	std::cout << "sommeLong: " << sommeLong << std::endl;
 	std::cout << "sommeLong sommeLong: " << sommeLong2 << std::endl;
 	std::cout << "Variance: " << variance << std::endl;
+
+	// Chrono pour le temps d'exec, utilisé pour le stockage de donnée pour la création de graphiques, a supprimer lors de vrai tests
+	auto start = std::chrono::system_clock::now();
+	auto lastWritten = std::chrono::system_clock::now();
 
 	// Parametre pour le recuit simulé
 	double coeff = 1.0;
@@ -320,6 +321,7 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 				bestVariance = variance;
 				writeToJson("bestResult.json", G, GL, gridWidth, gridHeight, maxBends);
 			}
+			checkTime(start, lastWritten,10, variance);
 		}
 		//afficher les edge
 		glColor3f(1.0f, 1.0f, 1.0f);
