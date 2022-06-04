@@ -604,7 +604,6 @@ std::vector<std::pair<int, std::pair<int, int>>> rouletteRusseNodeMove(NodeBend&
 	}
 	// Minimum et Maximum des variances des différents déplacements pour calcul de probabilité plus tard
 	double tmpMaxContribution = 0;
-	double tmpMinContribution = 0;
 	int numberMoveAutorised = 1;
 	// Boucle sur tout les déplacements possibles
 	for (int i = 0; i < vectorMoveAutorised.size(); i++) {
@@ -633,10 +632,6 @@ std::vector<std::pair<int, std::pair<int, int>>> rouletteRusseNodeMove(NodeBend&
 			if (tmpContribution > tmpMaxContribution) {
 				tmpMaxContribution = tmpContribution;
 			}
-			if (tmpContribution < tmpMinContribution) {
-				tmpMinContribution = tmpContribution;
-			}
-
 		}
 		else {
 			vectorVarChangeMove.push_back(-1);
@@ -799,7 +794,6 @@ std::vector<std::pair<int, std::pair<int, int>>> recuitSimuleNodeMove(NodeBend& 
 	}
 	// Minimum et Maximum des variances des différents déplacements pour calcul de probabilité plus tard
 	double tmpMaxContribution = 0;
-	double tmpMinContribution = 0;
 	int numberMoveAutorised = 1;
 	// Boucle sur tout les déplacements possibles
 	for (int i = 0; i < vectorMoveAutorised.size(); i++) {
@@ -827,9 +821,6 @@ std::vector<std::pair<int, std::pair<int, int>>> recuitSimuleNodeMove(NodeBend& 
 			vectorVarChangeMove.push_back(tmpContribution);
 			if (tmpContribution > tmpMaxContribution) {
 				tmpMaxContribution = tmpContribution;
-			}
-			if (tmpContribution < tmpMinContribution) {
-				tmpMinContribution = tmpContribution;
 			}
 
 		}
@@ -932,12 +923,120 @@ int startRecuitSimule(double coeff, GridLayout& GL, ConstCombinatorialEmbedding&
 	return randomNum;
 }
 
+// Renvoie un vecteur composé des meilleurs déplacements améliorant la variance
+// Cette fonction doit etre appelée avant un déplacement
+std::vector<std::pair<int, int>> bestVarianceNodeMove(NodeBend& n, GridLayout& GL, ConstCombinatorialEmbedding& ccem, double& sommeLong, double& sommeLong2, double& variance, int gridHeight, int gridWidth) {
+	int nx = (*n.a_x);
+	int ny = (*n.a_y);
+	// On stocke les changements de variances apres un déplacement
+	std::vector<double> vectorVarChangeMove;
+	// On stocke les coordonnées d'arrivée qu'on aurait apres le déplacement
+	std::vector<std::pair<int, int>> vectorMoveCoord;
+	if ((nx + 1) <= gridWidth)
+		vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny));
+	if ((ny + 1) <= gridHeight)
+		vectorMoveCoord.push_back(std::pair<int, int>(nx, ny + 1));
+	if ((nx - 1) >= 0)
+		vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny));
+	if ((ny - 1) >= 0)
+		vectorMoveCoord.push_back(std::pair<int, int>(nx, ny - 1));
+	if (((nx + 1) <= gridWidth) && ((ny + 1) <= gridHeight))
+		vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny + 1));
+	if (((nx + 1) <= gridWidth) && ((ny - 1) >= 0))
+		vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny - 1));
+	if (((nx - 1) >= 0) && ((ny + 1) <= gridHeight))
+		vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny + 1));
+	if (((nx - 1) >= 0) && ((ny - 1) >= 0))
+		vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny - 1));
+	// On stocke si les déplacements sont autorisés, donc s'il n'y a pas de node ou de bend a ces coordonnées
+	std::vector<bool> vectorMoveAutorised = getLegalMoves(n, GL, vectorMoveCoord, ccem);
+	SListPure<adjEntry> adjEntries;
+	bool isNode = true;
+	if (n.isNode) {
+		n.getNode()->allAdjEntries(adjEntries);
+	}
+	else {
+		adjEntries.pushBack(n.getAdjEntry());
+		isNode = false;
+	}
+	// Minimum et Maximum des variances des différents déplacements pour calcul de probabilité plus tard
+	double tmpMinContribution = 0;
+	int numberMoveAutorised = 1;
+	// Boucle sur tout les déplacements possibles
+	for (int i = 0; i < vectorMoveAutorised.size(); i++) {
+		// On regarde si le déplacement est autorisé (si on ne se déplace par sur une node ou un bend)
+		if (vectorMoveAutorised[i]) {
+			numberMoveAutorised++;
+			double tmpSommeLong = sommeLong;
+			double tmpSommeLong2 = sommeLong2;
+			double tmpVariance = variance;
+			for (auto it = adjEntries.begin(); it.valid(); it++) {
+				auto it2 = mapEdgeLength.find((*it)->theEdge());
+				double tmpOldLength = it2->second;
+				double tmpNewLength;
+				if (isNode) {
+					tmpNewLength = calcTmpEdgeLength((*it), vectorMoveCoord[i].first, vectorMoveCoord[i].second, GL);
+				}
+				else {
+					tmpNewLength = calcTmpEdgeLengthBends((*it)->theEdge(), n, vectorMoveCoord[i].first, vectorMoveCoord[i].second, GL);
+				}
+				deleteEdgeNVar(tmpOldLength, tmpSommeLong, tmpSommeLong2);
+				addEdgeNVar(tmpNewLength, tmpSommeLong, tmpSommeLong2);
+			}
+			tmpVariance = calcNVar(tmpSommeLong, tmpSommeLong2);
+			double tmpContribution = tmpVariance - variance;
+			vectorVarChangeMove.push_back(tmpContribution);
+			if (tmpContribution < tmpMinContribution) {
+				tmpMinContribution = tmpContribution;
+			}
+
+		}
+		else {
+			vectorVarChangeMove.push_back(-1);
+		}
+	}
+	std::vector<std::pair<int, int>> vectorMove;
+	// S'il y a au moin un déplacement améliorant la variance
+	if (tmpMinContribution < -0.00001) {
+		// On stocke ces déplacements
+		for (int i = 0; i < vectorVarChangeMove.size(); i++) {
+			if (vectorMoveAutorised[i]) {
+				if ((vectorVarChangeMove[i] < tmpMinContribution + 0.000001)&&(vectorVarChangeMove[i] > tmpMinContribution - 0.000001)) {
+					vectorMove.push_back(vectorMoveCoord[i]);
+				}
+			}
+		}
+	}
+	return vectorMove;
+}
+
+// Demarre l'algorithme de best variance
+// On choisis uniquement les déplacements qui améliorent le plus la variance, s'ils sont egaux on tire au hasard.
+// retourne le numero du nodebend choisi, uniquement utile pour l'affichage opengl
+int startBestVariance(GridLayout& GL, ConstCombinatorialEmbedding& ccem,int numCourant,int& numLastMoved, double& sommeLong, double& sommeLong2, double& variance, int gridHeight, int gridWidth) {
+	NodeBend nb = vectorNodeBends[numCourant];
+	std::vector<std::pair<int, int>> deplacements = bestVarianceNodeMove(nb, GL, ccem, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
+	std::vector<double> tmpProba;
+	double tmpSommeProba = 0;
+	int size = deplacements.size();
+	if (size > 0) {
+		numLastMoved = numCourant;
+		int randomChoice = generateRand(size)-1;
+		changeVariance(nb, GL, deplacements[randomChoice].first, deplacements[randomChoice].second, sommeLong, sommeLong2, variance);
+		(*nb.a_x) = deplacements[randomChoice].first;
+		(*nb.a_y) = deplacements[randomChoice].second;
+	}
+	//std::cout << "Nouvelle variance " << variance << std::endl;
+	return numCourant;
+}
+
 // Calcul le ratio edge/length. longueur la plus grande divisé par la longueur la plus courte.
 double calcEdgeLengthRatio() {
 	double ratio = (mapLengthEdgeSet.rbegin()->first / mapLengthEdgeSet.begin()->first);
 	return ratio;
 }
 
+// Fonction de déplacement utilisée avec les raccourcis openGL, pas utilisée pour les tests finaux
 void move(NodeBend n, GridLayout& GL, int dx, int dy, double& sommeLong, double& sommeLong2, double& variance) {
 	int newX = (*n.a_x) + dx;
 	int newY = (*n.a_y) + dy;
@@ -953,6 +1052,7 @@ ListPure<adjEntry> embedNode(Graph& G, GridLayout& GL, node nsrc) {
 	return orderAroundNode(nsrc, GL, adj);
 }
 
+// Creer l'embedding du graphe avec le concept de carte que l'on a vu au premier semestre.
 void embedderCarte(Graph& G, GridLayout& GL) {
 	ListPure<adjEntry> newOrder;
 	node nsrc = G.firstNode();

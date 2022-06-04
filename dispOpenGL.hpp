@@ -18,6 +18,8 @@
 
 using namespace ogdf;
 
+bool moveBestVariance = false;
+bool autoBestVariance = false;
 bool moveRecuitSimule = false;
 bool autoRecuitSimule = false;
 bool moveRouletteRusse = false;
@@ -156,6 +158,12 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		case GLFW_KEY_6:
 			autoRecuitSimule = !autoRecuitSimule;
 			break;
+		case GLFW_KEY_7:
+			moveBestVariance = true;
+			break;
+		case GLFW_KEY_8:
+			autoBestVariance = !autoBestVariance;
+			break;
 		}
 }
 
@@ -192,6 +200,10 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 	int nbTour = 0;
 	// Nombre d'execution requise pour modifier le coeff
 	int nbTourModifCoeff = 100;
+
+	// Numéro du dernier NodeBend déplacé pour l'algo bestVariance
+	int numLastMoved = -1;
+	int numCourant = 0;
 
 	//fin ogdf
 	if (!glfwInit())
@@ -261,7 +273,7 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 				writeToJson("bestResult.json", G, GL, gridWidth, gridHeight, maxBends);
 			}
 			checkTime(start, lastWritten, 10, variance);
-			checkTour(totalTurn, lastWrittenTurn, 100, variance);
+			checkTour(totalTurn, lastWrittenTurn, 20000, variance);
 		}
 		else if (moveRecuitSimule) {
 			selectedNodeBendNum = startRecuitSimule(coeff, GL, CCE, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
@@ -277,7 +289,22 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 				writeToJson("bestResult.json", G, GL, gridWidth, gridHeight, maxBends);
 			}
 			checkTime(start, lastWritten,10, variance);
-			checkTour(totalTurn, lastWrittenTurn, 100, variance);
+			checkTour(totalTurn, lastWrittenTurn, 20000, variance);
+		}
+		else if (moveBestVariance) {
+			selectedNodeBendNum = startBestVariance(GL, CCE, numCourant, numLastMoved, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
+			numCourant = (numCourant + 1) % vectorNodeBends.size();
+			moveBestVariance = false;
+		}
+		else if (autoBestVariance) {
+			selectedNodeBendNum = startBestVariance(GL, CCE, numCourant, numLastMoved, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
+			numCourant = (numCourant + 1) % vectorNodeBends.size();
+			if (variance < bestVariance) {
+				bestVariance = variance;
+				writeToJson("bestResult.json", G, GL, gridWidth, gridHeight, maxBends);
+			}
+			checkTime(start, lastWritten, 10, variance);
+			checkTour(totalTurn, lastWrittenTurn, 20000, variance);
 		}
 		//afficher les edge
 		glColor3f(1.0f, 1.0f, 1.0f);

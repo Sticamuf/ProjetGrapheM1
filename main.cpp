@@ -88,7 +88,7 @@ int main() {
         e = e->succ();
     }
 
-    bool useOpenGL = false;
+    bool useOpenGL = true;
 
     // OpenGL
     srand(static_cast<unsigned int>(time(NULL)));
@@ -96,7 +96,7 @@ int main() {
         dispOpenGL(G, GL, gridWidth, gridHeight, maxX, maxY, maxBends);
     }
     else {
-        runAlgo(0, G, GL, gridWidth, gridHeight, maxX, maxY, maxBends);
+        runAlgo(2, G, GL, gridWidth, gridHeight, maxX, maxY, maxBends);
     }
     return 0;
 }

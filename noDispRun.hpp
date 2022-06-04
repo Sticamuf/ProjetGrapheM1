@@ -47,30 +47,34 @@ void runAlgo(int i, Graph& G, GridLayout& GL, const int gridWidth, const int gri
 	int nbTour = 0;
 	// Nombre d'execution requise pour modifier le coeff
 	int nbTourModifCoeff = 100;
+	// Numéro du dernier NodeBend déplacé pour l'algo bestVariance
+	int numLastMoved = -1;
+	int numCourant = 0;
 
 	int width, height;
 	while (variance > 1.00005) {
 		float ratio;
 		if (i == 0) {
 			startRouletteRusse(GL, CCE, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
-			if (variance < bestVariance) {
-				bestVariance = variance;
-				writeToJson("bestResult.json", G, GL, gridWidth, gridHeight, maxBends);
-			}
-			checkTime(start, lastWritten, 10, variance);
-			checkTour(totalTurn, lastWrittenTurn,100,variance);
 		}
 		else if (i == 1) {
 			startRecuitSimule(coeff, GL, CCE, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
 			modifCoeffRecuit(coeff, coeffDesc, coeffMont, coeffMax, coeffMin, recuitMontant, nbTour, nbTourModifCoeff);
-			//std::cout << "Coeff: " << coeff << " Tour: " << nbTour << " Phase: " << recuitMontant << std::endl;
-			if (variance < bestVariance) {
-				bestVariance = variance;
-				writeToJson("bestResult.json", G, GL, gridWidth, gridHeight, maxBends);
-			}
-			checkTime(start, lastWritten, 10, variance);
-			checkTour(totalTurn, lastWrittenTurn, 100, variance);
 		}
+		else if (i == 2) {
+			if (numLastMoved == numCourant) {
+				break;
+			}
+			startBestVariance(GL, CCE, numCourant, numLastMoved, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
+			numCourant = (numCourant + 1) % vectorNodeBends.size();
+		}
+		// Sauvegarde du nouveau meilleur graphe
+		if (variance < bestVariance) {
+			bestVariance = variance;
+			writeToJson("bestResult.json", G, GL, gridWidth, gridHeight, maxBends);
+		}
+		checkTime(start, lastWritten, 10, variance);
+		checkTour(totalTurn, lastWrittenTurn, 20000, variance);
 	}
 }
 
