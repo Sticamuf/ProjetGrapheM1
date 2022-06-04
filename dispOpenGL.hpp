@@ -173,6 +173,9 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 	// Chrono pour le temps d'exec, utilisé pour le stockage de donnée pour la création de graphiques, a supprimer lors de vrai tests
 	auto start = std::chrono::system_clock::now();
 	auto lastWritten = std::chrono::system_clock::now();
+	// NB tour pour le stockage de donnée pour les graphiques, a supprimer lors de vrai executions
+	unsigned long long totalTurn = 0;
+	unsigned long long lastWrittenTurn = 0;
 
 	// Parametre pour le recuit simulé
 	double coeff = 1.0;
@@ -258,6 +261,7 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 				writeToJson("bestResult.json", G, GL, gridWidth, gridHeight, maxBends);
 			}
 			checkTime(start, lastWritten, 10, variance);
+			checkTour(totalTurn, lastWrittenTurn, 100, variance);
 		}
 		else if (moveRecuitSimule) {
 			selectedNodeBendNum = startRecuitSimule(coeff, GL, CCE, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
@@ -273,6 +277,7 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 				writeToJson("bestResult.json", G, GL, gridWidth, gridHeight, maxBends);
 			}
 			checkTime(start, lastWritten,10, variance);
+			checkTour(totalTurn, lastWrittenTurn, 100, variance);
 		}
 		//afficher les edge
 		glColor3f(1.0f, 1.0f, 1.0f);
