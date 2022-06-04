@@ -12,6 +12,7 @@
 #include "EdgeMap.hpp"
 #include "NodeMap.hpp"
 #include "graphFunctions.hpp"
+#include "noDispRun.hpp"
 
 using ogdf::Graph;
 using ogdf::GridLayout;
@@ -87,8 +88,15 @@ int main() {
         e = e->succ();
     }
 
+    bool useOpenGL = false;
+
     // OpenGL
     srand(static_cast<unsigned int>(time(NULL)));
-    dispOpenGL(G,GL,gridWidth,gridHeight,maxX,maxY, maxBends);
+    if (useOpenGL) {
+        dispOpenGL(G, GL, gridWidth, gridHeight, maxX, maxY, maxBends);
+    }
+    else {
+        runAlgo(0, G, GL, gridWidth, gridHeight, maxX, maxY, maxBends);
+    }
     return 0;
 }
