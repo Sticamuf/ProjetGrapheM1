@@ -58,15 +58,15 @@ int main() {
 
     // Affichage des maps
     
-    std::map<edge, double>::iterator it;
+    /*std::map<edge, double>::iterator it;
     for (it = mapEdgeLength.begin(); it != mapEdgeLength.end(); it++) {
-        //std::cout << "MapEdgeLength: " << it->second << std::endl;
+        std::cout << "MapEdgeLength: " << it->second << std::endl;
     }
 
     std::map<double, std::set<edge>>::iterator it2;
     for (it2 = mapLengthEdgeSet.begin(); it2 != mapLengthEdgeSet.end(); it2++) {
-        //std::cout << "mapLengthEdgeSet: " << it2->first << std::endl;
-    }
+        std::cout << "mapLengthEdgeSet: " << it2->first << std::endl;
+    }*/
 
     // Ajout des node dans le vector
     node n = G.firstNode();
@@ -87,8 +87,12 @@ int main() {
         }
         e = e->succ();
     }
+    // On melange le vecteur de nodebend pour affecter de l'aléatoire sur certains algo
+    auto rd = std::random_device{};
+    auto rng = std::default_random_engine{ rd() };
+    std::shuffle(std::begin(vectorNodeBends), std::end(vectorNodeBends), rng);
 
-    bool useOpenGL = false;
+    bool useOpenGL = true;
 
     // OpenGL
     srand(static_cast<unsigned int>(time(NULL)));

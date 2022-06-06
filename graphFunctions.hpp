@@ -961,12 +961,10 @@ std::vector<std::pair<int, int>> bestVarianceNodeMove(NodeBend& n, GridLayout& G
 	}
 	// Minimum et Maximum des variances des différents déplacements pour calcul de probabilité plus tard
 	double tmpMinContribution = 0;
-	int numberMoveAutorised = 1;
 	// Boucle sur tout les déplacements possibles
 	for (int i = 0; i < vectorMoveAutorised.size(); i++) {
 		// On regarde si le déplacement est autorisé (si on ne se déplace par sur une node ou un bend)
 		if (vectorMoveAutorised[i]) {
-			numberMoveAutorised++;
 			double tmpSommeLong = sommeLong;
 			double tmpSommeLong2 = sommeLong2;
 			double tmpVariance = variance;
@@ -1023,6 +1021,97 @@ int startBestVariance(GridLayout& GL, ConstCombinatorialEmbedding& ccem,int numC
 	if (size > 0) {
 		numLastMoved = numCourant;
 		int randomChoice = generateRand(size)-1;
+		changeVariance(nb, GL, deplacements[randomChoice].first, deplacements[randomChoice].second, sommeLong, sommeLong2, variance);
+		(*nb.a_x) = deplacements[randomChoice].first;
+		(*nb.a_y) = deplacements[randomChoice].second;
+	}
+	//std::cout << "Nouvelle variance " << variance << std::endl;
+	return numCourant;
+}
+
+// Renvoie un vecteur composé des meilleurs déplacements réduisant les longueurs autour d'un noeud
+// Cette fonction doit etre appelée avant un déplacement
+std::vector<std::pair<int, int>> shortestLengthNodeMove(NodeBend& n, GridLayout& GL, ConstCombinatorialEmbedding& ccem, double& sommeLong, double& sommeLong2, double& variance, int gridHeight, int gridWidth) {
+	int nx = (*n.a_x);
+	int ny = (*n.a_y);
+	// On stocke les coordonnées d'arrivée qu'on aurait apres le déplacement
+	std::vector<std::pair<int, int>> vectorMoveCoord;
+	if ((nx + 1) <= gridWidth)
+		vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny));
+	if ((ny + 1) <= gridHeight)
+		vectorMoveCoord.push_back(std::pair<int, int>(nx, ny + 1));
+	if ((nx - 1) >= 0)
+		vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny));
+	if ((ny - 1) >= 0)
+		vectorMoveCoord.push_back(std::pair<int, int>(nx, ny - 1));
+	if (((nx + 1) <= gridWidth) && ((ny + 1) <= gridHeight))
+		vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny + 1));
+	if (((nx + 1) <= gridWidth) && ((ny - 1) >= 0))
+		vectorMoveCoord.push_back(std::pair<int, int>(nx + 1, ny - 1));
+	if (((nx - 1) >= 0) && ((ny + 1) <= gridHeight))
+		vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny + 1));
+	if (((nx - 1) >= 0) && ((ny - 1) >= 0))
+		vectorMoveCoord.push_back(std::pair<int, int>(nx - 1, ny - 1));
+	// On stocke si les déplacements sont autorisés, donc s'il n'y a pas de node ou de bend a ces coordonnées
+	std::vector<bool> vectorMoveAutorised = getLegalMoves(n, GL, vectorMoveCoord, ccem);
+	SListPure<adjEntry> adjEntries;
+	bool isNode = true;
+	if (n.isNode) {
+		n.getNode()->allAdjEntries(adjEntries);
+	}
+	else {
+		adjEntries.pushBack(n.getAdjEntry());
+		isNode = false;
+	}
+	// On stocke les changements de longueurs apres un déplacement
+	std::vector<double> vectorLengthChangeMove;
+	// Minimum et Maximum des variances des différents déplacements pour calcul de probabilité plus tard
+	double longueurActuelle = totalLengthAroundNodeBend(n,GL,nx,ny);
+	double minLongeurs = longueurActuelle;
+	int numberMoveAutorised = 1;
+	// Boucle sur tout les déplacements possibles
+	for (int i = 0; i < vectorMoveAutorised.size(); i++) {
+		// On regarde si le déplacement est autorisé (si on ne se déplace par sur une node ou un bend)
+		if (vectorMoveAutorised[i]) {
+			numberMoveAutorised++;
+			double tmpLongueur = totalLengthAroundNodeBend(n,GL,vectorMoveCoord[i].first, vectorMoveCoord[i].second);
+			vectorLengthChangeMove.push_back(tmpLongueur);
+			if (tmpLongueur < minLongeurs) {
+				minLongeurs = tmpLongueur;
+			}
+		}
+		else {
+			vectorLengthChangeMove.push_back(-1);
+		}
+	}
+	std::vector<std::pair<int, int>> vectorMove;
+	// S'il y a au moin un déplacement améliorant la variance
+	if (minLongeurs < longueurActuelle) {
+		// On stocke ces déplacements
+		for (int i = 0; i < vectorLengthChangeMove.size(); i++) {
+			if (vectorMoveAutorised[i]) {
+				if ((vectorLengthChangeMove[i] < minLongeurs + 0.000001) && (vectorLengthChangeMove[i] > minLongeurs - 0.000001)) {
+					vectorMove.push_back(vectorMoveCoord[i]);
+				}
+			}
+		}
+	}
+	return vectorMove;
+}
+
+// Demarre l'algorithme de longueur minimale
+// On choisis uniquement les déplacements qui réduisent les longueurs autour d'un node, s'ils sont egaux on tire au hasard.
+// retourne le numero du nodebend choisi, uniquement utile pour l'affichage opengl
+// On itere sur les noeuds dans l'ordre
+int startShortestLength(GridLayout& GL, ConstCombinatorialEmbedding& ccem, int numCourant, int& numLastMoved, double& sommeLong, double& sommeLong2, double& variance, int gridHeight, int gridWidth) {
+	NodeBend nb = vectorNodeBends[numCourant];
+	std::vector<std::pair<int, int>> deplacements = shortestLengthNodeMove(nb, GL, ccem, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
+	std::vector<double> tmpProba;
+	double tmpSommeProba = 0;
+	int size = deplacements.size();
+	if (size > 0) {
+		numLastMoved = numCourant;
+		int randomChoice = generateRand(size) - 1;
 		changeVariance(nb, GL, deplacements[randomChoice].first, deplacements[randomChoice].second, sommeLong, sommeLong2, variance);
 		(*nb.a_x) = deplacements[randomChoice].first;
 		(*nb.a_y) = deplacements[randomChoice].second;

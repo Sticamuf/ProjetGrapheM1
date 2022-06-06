@@ -2,6 +2,7 @@
 #define CALCEDGELENGTH_HPP
 #include <ogdf/basic/GridLayout.h>
 #include "NodeBend.hpp"
+#include "EdgeMap.hpp"
 
 using namespace ogdf;
 
@@ -103,5 +104,35 @@ unsigned long long calcTmpEdgeLengthBends(const edge& e, NodeBend n, int bendX, 
     targetY = GL.y(target);
     length += sqrt(pow((targetX - sourceX), 2) + pow((targetY - sourceY), 2));
     return length;
+}
+
+// Recupere la somme des longueurs autour d'un noeud apres un déplacement
+unsigned long long totalLengthAroundNodeBend(NodeBend n, GridLayout& GL, int srcX, int srcY) {
+    unsigned long long totalLength = 0;
+    SListPure<adjEntry> adjEntries;
+    if (n.isNode) {
+        n.getNode()->allAdjEntries(adjEntries);
+    }
+    else {
+        adjEntries.pushBack(n.getAdjEntry());
+    }
+    // Si le deplacement est aucun déplacement on récupere juste les données dans la map
+    if ((srcX != n.getX()) || (srcY != n.getY())) {
+        for (auto it = adjEntries.begin(); it.valid(); it++) {
+            if (n.isNode) {
+                totalLength += calcTmpEdgeLength((*it), srcX, srcY, GL);
+            }
+            else {
+                totalLength += calcTmpEdgeLengthBends((*it)->theEdge(), n, srcX, srcY, GL);
+            }
+        }
+    }
+    else {
+        for (auto it = adjEntries.begin(); it.valid(); it++) {
+            auto it2 = mapEdgeLength.find((*it)->theEdge());
+            totalLength += it2->second;
+        }
+    }
+    return totalLength;
 }
 #endif

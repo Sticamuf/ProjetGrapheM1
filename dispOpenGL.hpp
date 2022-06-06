@@ -18,6 +18,8 @@
 
 using namespace ogdf;
 
+bool moveShortest = false;
+bool autoShortest = false;
 bool autoMixte = false;
 bool moveBestVariance = false;
 bool autoBestVariance = false;
@@ -162,11 +164,17 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		case GLFW_KEY_7:
 			moveBestVariance = true;
 			break;
+		case GLFW_KEY_8:
+			autoBestVariance = !autoBestVariance;
+			break;
 		case GLFW_KEY_9:
 			autoMixte = !autoMixte;
 			break;
-		case GLFW_KEY_8:
-			autoBestVariance = !autoBestVariance;
+		case GLFW_KEY_KP_1:
+			moveShortest = true;
+			break;
+		case GLFW_KEY_KP_2:
+			autoShortest = !autoShortest;
 			break;
 		}
 }
@@ -329,6 +337,20 @@ void dispOpenGL(Graph& G, GridLayout& GL, const int gridWidth, const int gridHei
 				}
 				startBestVariance(GL, CCE, numCourant, numLastMoved, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
 				numCourant = (numCourant + 1) % vectorNodeBends.size();
+			}
+			checkTime(start, lastWritten, 10, variance, false);
+			checkTour(totalTurn, lastWrittenTurn, 20000, variance, false);
+		}
+		else if (moveShortest) {
+			selectedNodeBendNum = startShortestLength(GL, CCE, numCourant, numLastMoved, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
+			moveShortest = false;
+		}
+		else if (autoShortest) {
+			selectedNodeBendNum = startShortestLength(GL, CCE, numCourant, numLastMoved, sommeLong, sommeLong2, variance, gridHeight, gridWidth);
+			numCourant = (numCourant + 1) % vectorNodeBends.size();
+			if (variance < bestVariance) {
+				bestVariance = variance;
+				writeToJson("bestResult.json", G, GL, gridWidth, gridHeight, maxBends);
 			}
 			checkTime(start, lastWritten, 10, variance, false);
 			checkTour(totalTurn, lastWrittenTurn, 20000, variance, false);
