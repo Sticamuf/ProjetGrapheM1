@@ -37,7 +37,7 @@ double calcEdgeLength(const edge& e, const GridLayout& GL) {
     return length;
 }
 
-unsigned long long calcTmpEdgeLength(const adjEntry& ad, int srcX, int srcY, const GridLayout& GL) {
+double calcTmpEdgeLength(const adjEntry& ad, int srcX, int srcY, const GridLayout& GL) {
     edge e = ad->theEdge();
     // Si la source de l'edge est la source de l'adjEntry
     int sourceX, sourceY;
@@ -50,7 +50,7 @@ unsigned long long calcTmpEdgeLength(const adjEntry& ad, int srcX, int srcY, con
         sourceX = GL.x(source);
         sourceY = GL.y(source);
     }
-    unsigned long long length = 0.0;
+    double length = 0.0;
     int targetX, targetY;
     IPolyline bends = GL.bends(e);
     if (bends.size() > 0) {
@@ -76,10 +76,10 @@ unsigned long long calcTmpEdgeLength(const adjEntry& ad, int srcX, int srcY, con
     return length;
 }
 
-unsigned long long calcTmpEdgeLengthBends(const edge& e, NodeBend n, int bendX, int bendY, const GridLayout& GL) {
+double calcTmpEdgeLengthBends(const edge& e, NodeBend n, int bendX, int bendY, const GridLayout& GL) {
     node source = e->source();
     node target = e->target();
-    unsigned long long length = 0.0;
+    double length = 0.0;
     int sourceX = GL.x(source);
     int sourceY = GL.y(source);
     int targetX, targetY;
@@ -107,8 +107,8 @@ unsigned long long calcTmpEdgeLengthBends(const edge& e, NodeBend n, int bendX, 
 }
 
 // Recupere la somme des longueurs autour d'un noeud apres un déplacement
-unsigned long long totalLengthAroundNodeBend(NodeBend n, GridLayout& GL, int srcX, int srcY) {
-    unsigned long long totalLength = 0;
+double totalLengthAroundNodeBend(NodeBend n, GridLayout& GL, int srcX, int srcY) {
+    double totalLength = 0;
     SListPure<adjEntry> adjEntries;
     if (n.isNode) {
         n.getNode()->allAdjEntries(adjEntries);

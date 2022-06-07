@@ -26,7 +26,8 @@ int main() {
     int gridWidth, gridHeight, maxBends;
 
     // ----- LECTURE D'UN FICHIER JSON DANS UN Graph -----
-    string file = "F:/The World/Cours/M1S2/Graphe/GitHub/ProjetGrapheM1-BinaryHeap/ProjetGrapheM1/exemples/exempleBonEmbedding.json";
+    string file = "F:/The World/Cours/M1S2/Graphe/GitHub/ProjetGrapheM1-BinaryHeap/ProjetGrapheM1/exemples/exemple11.json";
+    std::cout << "File: " << file << std::endl;
     readFromJson(file, G, GL, gridWidth, gridHeight, maxBends);
     writeToJson("output.json", G, GL, gridWidth, gridHeight, maxBends);
     
@@ -100,7 +101,7 @@ int main() {
         dispOpenGL(G, GL, gridWidth, gridHeight, maxX, maxY, maxBends);
     }
     else {
-        runAlgo(10, G, GL, gridWidth, gridHeight, maxX, maxY, maxBends);
+        runAlgo(2, G, GL, gridWidth, gridHeight, maxX, maxY, maxBends);
     }
     return 0;
 }

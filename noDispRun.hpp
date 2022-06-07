@@ -18,6 +18,20 @@
 // Fait tourner l'algo sélectionné tant qu'il n'a pas une variance de 1 sans affichage openGL
 // i==0 rouletteRusse i==1 recuit simulé
 void runAlgo(int i, Graph& G, GridLayout& GL, const int gridWidth, const int gridHeight, int maxX, int maxY, int maxBends) {
+
+	if (i == 0) {
+		std::cout << "Starting Roulette Russe..." << std::endl;
+	}
+	else if (i == 1) {
+		std::cout << "Starting Recuit Simule..." << std::endl;
+	}
+	else if (i == 2) {
+		std::cout << "Starting Best Variance..." << std::endl;
+	}
+	else if (i == 10) {
+		std::cout << "Starting Mixte(Recuit Simule + Best Variance)..." << std::endl;
+	}
+
 	//debut ogdf
 	node n = G.firstNode();
 	ConstCombinatorialEmbedding CCE = ConstCombinatorialEmbedding{ G };
@@ -59,7 +73,7 @@ void runAlgo(int i, Graph& G, GridLayout& GL, const int gridWidth, const int gri
 	writeCsvDouble("dataTime.csv", 0, variance);
 
 	int width, height;
-	while (variance > 1.00005) {
+	while (calcEdgeLengthRatio() > 1.00005) {
 		float ratio;
 		// Roulette russe
 		if (i == 0) {
@@ -97,7 +111,7 @@ void runAlgo(int i, Graph& G, GridLayout& GL, const int gridWidth, const int gri
 		if (variance < bestVariance) {
 			bestVariance = variance;
 			writeToJson("bestResult.json", G, GL, gridWidth, gridHeight, maxBends);
-			checkTime(start, lastWritten, 10, variance,true);
+			//checkTime(start, lastWritten, 10, variance,true);
 			checkTour(totalTurn, lastWrittenTurn, 10000, variance,true);
 		}
 		else {
